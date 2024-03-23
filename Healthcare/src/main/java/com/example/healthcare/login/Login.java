@@ -5,54 +5,67 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.List;
+
 @Entity
 @Builder
 @Table
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class Login {
+public class Login implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String email;
     private String password;
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
+    public Login(String email, String password, Role role) {
         this.email = email;
+        this.password = password;
+        this.role = role;
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role.name()));
+    }
+
+    @Override
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = encryptpassword(password);
+    @Override
+    public String getUsername() {
+        return email;
     }
 
-    private String encryptpassword(String password) {
-        return BCrypt.hashpw(password,BCrypt.gensalt());
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
     }
 
-    public String getRole() {
-        return role;
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
     }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
 }
