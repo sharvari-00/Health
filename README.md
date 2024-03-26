@@ -1,2 +1,2 @@
 # Heathcare App
-healthcare folder has the backend
+HealthCare folder has the backend
