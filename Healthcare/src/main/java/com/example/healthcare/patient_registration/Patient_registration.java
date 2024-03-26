@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table
 @NoArgsConstructor
-//@AllArgsConstructor
+@AllArgsConstructor
 @Data
 public class Patient_registration {
     @Id
@@ -28,15 +28,87 @@ public class Patient_registration {
 //    @JoinColumn(name = "doctor_details_id",nullable = false)
 //    private Doctor_details doctor_details;
 
-    public Patient_registration(Integer id, String fname, String lname, Integer age, String gender, String phone_number, String email_id, Boolean consent, String doc_id) {
-        this.id = id;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public String getFname() {
+        return fname;
+    }
+
+    public String getLname() {
+        return lname;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public String getPhone_number() {
+        return phone_number;
+    }
+
+    public String getEmail_id() {
+        return email_id;
+    }
+
+    public Boolean getConsent() {
+        return consent;
+    }
+
+    public String getDoc_id() {
+        return doc_id;
+    }
+
+    public void setFname(String fname) {
         this.fname = fname;
+    }
+
+    public void setLname(String lname) {
         this.lname = lname;
+    }
+
+    public void setAge(Integer age) {
         this.age = age;
+    }
+
+    public void setGender(String gender) {
         this.gender = gender;
+    }
+
+    public void setPhone_number(String phone_number) {
         this.phone_number = phone_number;
+    }
+
+    public void setEmail_id(String email_id) {
         this.email_id = email_id;
+    }
+
+    public void setConsent(Boolean consent) {
         this.consent = consent;
+    }
+
+    public void setDoc_id(String doc_id) {
         this.doc_id = doc_id;
+    }
+
+    @Override
+    public String toString() {
+        return "Patient_registration{" +
+                "id=" + id +
+                ", fname='" + fname + '\'' +
+                ", lname='" + lname + '\'' +
+                ", age=" + age +
+                ", gender='" + gender + '\'' +
+                ", phone_number='" + phone_number + '\'' +
+                ", email_id='" + email_id + '\'' +
+                ", consent=" + consent +
+                ", doc_id='" + doc_id + '\'' +
+                '}';
     }
 }
