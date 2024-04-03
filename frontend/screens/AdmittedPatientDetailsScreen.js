@@ -34,7 +34,7 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
   return (
     <View style={styles.container}>
       <ImageBackground
-        source={require('../assets/Loginim.jpg')}
+        source={require('../assets/wall.jpg')}
         style={styles.backgroundImage}
       >
         <View style={styles.layer}>
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
   layer: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    padding: 20,
+    //padding: 20,
   },
   upperContainer: {
     flex: 1,

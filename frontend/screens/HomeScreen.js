@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, ImageBackground } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, ImageBackground, Dimensions } from 'react-native';
 
 const HomeScreen = ({ navigation }) => {
   const handleLogin = (role) => {
@@ -11,7 +11,7 @@ const HomeScreen = ({ navigation }) => {
       {/* Background Image */}
       <ImageBackground
         style={styles.backgroundImage}
-        source={require('../assets/Loginim.jpg')} // Adjust the image path accordingly
+        source={require('../assets/wall.jpg')} // Adjust the image path accordingly
         resizeMode="cover"
       >
         {/* Layer */}
@@ -48,11 +48,11 @@ const HomeScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    height: Dimensions.get('window').width, // Set container height to full window height
   },
   backgroundImage: {
     flex: 1,
     resizeMode: 'cover',
-    justifyContent: 'center',
   },
   layer: {
     flex: 1,
@@ -102,3 +102,4 @@ const styles = StyleSheet.create({
 });
 
 export default HomeScreen;
+

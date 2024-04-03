@@ -24,7 +24,7 @@ const NurseScreen = ({ navigation }) => {
       {/* Background Image */}
       <ImageBackground
         style={styles.backgroundImage}
-        source={require('../assets/Loginim.jpg')}
+        source={require('../assets/wall.jpg')}
       >
         {/* Layer */}
         <View style={styles.layer}>

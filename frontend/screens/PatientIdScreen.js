@@ -25,7 +25,7 @@ const PatientIdScreen = ({ navigation }) => {
       {/* Background Image */}
       <ImageBackground
         style={styles.backgroundImage}
-        source={require('../assets/Loginim.jpg')} // Adjust the image path accordingly
+        source={require('../assets/wall.jpg')} // Adjust the image path accordingly
         resizeMode="cover"
       >
         {/* Layer */}

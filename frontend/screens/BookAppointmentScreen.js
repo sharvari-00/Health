@@ -19,7 +19,7 @@ const BookAppointmentScreen = ({ navigation }) => {
   };
 
   return (
-    <ImageBackground source={require('../assets/Loginim.jpg')} style={styles.backgroundImage}>
+    <ImageBackground source={require('../assets/wall.jpg')} style={styles.backgroundImage}>
       <View style={styles.overlay}>
         {/* Upper Container */}
         <View style={styles.upperContainer}>

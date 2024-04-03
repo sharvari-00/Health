@@ -34,7 +34,7 @@ const LoginScreen = ({ route, navigation }) => {
       <View style={styles.background}>
         <ImageBackground
           style={styles.backgroundImage}
-          source={require('../assets/Loginim.jpg')}
+          source={require('../assets/wall.jpg')}
           resizeMode="cover"
         >
           <View style={styles.layer}>

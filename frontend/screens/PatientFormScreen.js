@@ -21,7 +21,7 @@ const PatientFormScreen = ({ route }) => {
   return (
     <View style={styles.container}>
       <ImageBackground
-        source={require('../assets/Loginim.jpg')}
+        source={require('../assets/wall.jpg')}
         style={styles.backgroundImage}
       >
         <View style={styles.layer}>

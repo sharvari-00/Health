@@ -42,7 +42,7 @@ const PatientDetailsScreen = ({ route }) => {
     <View style={styles.container}>
       {/* Background Image */}
       <ImageBackground
-        source={require('../assets/Loginim.jpg')}
+        source={require('../assets/wall.jpg')}
         style={styles.backgroundImage}
       >
         {/* Layer */}
