@@ -1,21 +1,70 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AddPatientScreen = ({ navigation }) => {
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [age, setAge] = useState('');
   const [gender, setGender] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [address, setAddress] = useState('');
-  const [consent, setConsent] = useState(true); // Initially set to true (Yes)
+  const [email, setEmail] = useState('');
+  const [doctorId, setDoctorId] = useState('');
+  const [houseDetails, setHouseDetails] = useState('');
+  const [city, setCity] = useState('');
+  const [state, setState] = useState('');
+  const [consent, setConsent] = useState(true);
+  const [accessToken, setAccessToken] = useState('');
+
+  useEffect(() => {
+    // Retrieve the access token from AsyncStorage
+    AsyncStorage.getItem('accessToken')
+      .then(token => {
+        if (token) {
+          setAccessToken(token);
+        } else {
+          console.error('Access token not found');
+        }
+      })
+      .catch(error => {
+        console.error('Error retrieving access token:', error);
+      });
+  }, []);
 
   const handleSave = () => {
-    // Implement the logic to save patient information
-    console.log('Saving patient information...');
-    // Show a message or perform any additional actions after saving
+    const patientData = {
+      fname: firstName,
+      lname: lastName,
+      age,
+      gender,
+      phone_number: phoneNumber,
+      email_id: email,
+      doc_id: doctorId,
+      address_line: houseDetails,
+      city,
+      state,
+      consent
+    };
 
-    // Navigate to BookAppointmentScreen
-    navigation.navigate('BookAppointmentScreen');
+    fetch('http://localhost:9090/api/v1/patients/register_patient', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      },
+      body: JSON.stringify(patientData)
+    })
+    .then(response => {
+      if (response.ok) {
+        console.log('Patient data saved successfully');
+        navigation.navigate('BookAppointmentScreen');
+      } else {
+        console.error('Failed to save patient data');
+      }
+    })
+    .catch(error => {
+      console.error('Error saving patient data:', error);
+    });
   };
 
   return (
@@ -46,11 +95,20 @@ const AddPatientScreen = ({ navigation }) => {
           {/* Middle Right Container */}
           <View style={styles.middleRightContainer}>
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Name:</Text>
+              <Text style={styles.inputLabel}>First Name:</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Enter name"
-                onChangeText={(text) => setName(text)}
+                placeholder="Enter first name"
+                onChangeText={(text) => setFirstName(text)}
+              />
+              
+            </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>Last Name:</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter last name"
+                onChangeText={(text) => setLastName(text)}
               />
             </View>
             <View style={styles.inputContainer}>
@@ -78,28 +136,63 @@ const AddPatientScreen = ({ navigation }) => {
               />
             </View>
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Address:</Text>
+              <Text style={styles.inputLabel}>Email:</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Enter address"
-                onChangeText={(text) => setAddress(text)}
+                placeholder="Enter email"
+                onChangeText={(text) => setEmail(text)}
+                keyboardType="email-address"
               />
             </View>
-            <Text style={styles.consentText}>Consent for data sharing:</Text>
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>Doctor ID:</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter Doctor ID"
+                onChangeText={(text) => setDoctorId(text)}
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>House Details:</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter house details"
+                onChangeText={(text) => setHouseDetails(text)}
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>City:</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter city"
+                onChangeText={(text) => setCity(text)}
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>State:</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter state"
+                onChangeText={(text) => setState(text)}
+              />
+            </View>
+            {/* <Text style={styles.consentText}>Consent for data sharing:</Text>
             <View style={styles.radioContainer}>
               <TouchableOpacity
                 style={[styles.radioButton, consent ? styles.selected : styles.unselected]}
-                onPress={() => setConsent(true)} // Set to true for "Yes"
+                onPress={() => setConsent(true)}
               >
                 <Text style={consent ? styles.selectedText : styles.unselectedText}>Yes</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.radioButton, !consent ? styles.selected : styles.unselected]}
-                onPress={() => setConsent(false)} // Set to false for "No"
+                onPress={() => setConsent(false)}
               >
                 <Text style={!consent ? styles.selectedText : styles.unselectedText}>No</Text>
               </TouchableOpacity>
-            </View>
+            </View> */}
+
+            {/* More input fields here */}
             <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
               <Text style={styles.buttonText}>Save</Text>
             </TouchableOpacity>
@@ -187,12 +280,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   inputLabel: {
-    color: '#FFFFFF',
-    fontSize: 18,
+    color: '#000000',
+    fontSize: 20,
   },
   input: {
-    height: 40,
-    borderColor: '#61828a',
+    height: 50,
+    borderColor: '#FFFFFF',
     borderWidth: 1,
     marginVertical: 5,
     paddingHorizontal: 10,

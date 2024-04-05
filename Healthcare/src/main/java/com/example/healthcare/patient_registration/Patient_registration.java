@@ -1,10 +1,9 @@
 package com.example.healthcare.patient_registration;
-
-import com.example.healthcare.consulation_details.Consulation_details;
 import com.example.healthcare.doctor_details.Doctor_details;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -16,54 +15,32 @@ public class Patient_registration {
     @Id
     @GeneratedValue
     private Integer id;
+    @Getter
     private String fname;
+    @Getter
     private String lname;
+    @Getter
     private Integer age;
+    @Getter
     private String gender;
+    @Getter
     private String phone_number;
+    @Getter
     private String email_id;
+    @Getter
     private Boolean consent;
+    @Getter
     private String doc_id;
+    @Getter
+    private String address_line;
+    @Getter
+    private String city;
+    @Getter
+    private String state;
 //    @ManyToOne
 //    @JoinColumn(name = "doctor_details_id",nullable = false)
 //    private Doctor_details doctor_details;
 
-
-    public Integer getId() {
-        return id;
-    }
-
-    public String getFname() {
-        return fname;
-    }
-
-    public String getLname() {
-        return lname;
-    }
-
-    public Integer getAge() {
-        return age;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public String getPhone_number() {
-        return phone_number;
-    }
-
-    public String getEmail_id() {
-        return email_id;
-    }
-
-    public Boolean getConsent() {
-        return consent;
-    }
-
-    public String getDoc_id() {
-        return doc_id;
-    }
 
     public void setFname(String fname) {
         this.fname = fname;
@@ -97,6 +74,18 @@ public class Patient_registration {
         this.doc_id = doc_id;
     }
 
+    public void setAddress_line(String address_line) {
+        this.address_line = address_line;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
     @Override
     public String toString() {
         return "Patient_registration{" +
@@ -109,6 +98,9 @@ public class Patient_registration {
                 ", email_id='" + email_id + '\'' +
                 ", consent=" + consent +
                 ", doc_id='" + doc_id + '\'' +
+                ", address_line='" + address_line + '\'' +
+                ", city='" + city + '\'' +
+                ", state='" + state + '\'' +
                 '}';
     }
 }

@@ -1,9 +1,11 @@
 package com.example.healthcare.config;
 
 import jakarta.servlet.Filter;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,7 +24,9 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @EnableMethodSecurity
 public class SecurityConfiguration {
 
-    private static final String[] WHITE_LIST_URL = {"/api/v1/auth/**",
+    private static final String[] WHITE_LIST_URL = {
+            "/api/v1/auth/**",
+            "/api/v1/**",
             "/v2/api-docs",
             "/v3/api-docs",
             "/v3/api-docs/**",
@@ -57,5 +61,19 @@ public class SecurityConfiguration {
                 )
         ;
         return http.build();
+    }
+    @Bean
+    public SecurityFilterChain othersecurityFilterChain(HttpSecurity https) throws Exception{
+        https.authorizeHttpRequests(configurer->
+                configurer
+                        .requestMatchers(HttpMethod.POST,"/api/v1/patients/register_patient").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT,"/api/v1/patients/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET,"/api/v1/patients/patient_info").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST,"/api/v1/doctor/register_doctor").hasRole("ADMIN")
+        );
+//        https.httpBasic();
+        https.csrf(AbstractHttpConfigurer::disable);
+        return https.build();
+
     }
 }
