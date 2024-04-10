@@ -24,7 +24,7 @@ public class Doctor_details {
     private String lname;
     private Time shift_starts;
     private Time shift_ends;
-    private Integer Dept_no;
+    private String dept_name;
 
     @OneToOne(mappedBy = "doctor_details", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Login login;
@@ -80,12 +80,12 @@ public class Doctor_details {
         this.shift_ends = shift_ends;
     }
 
-    public Integer getDept_no() {
-        return Dept_no;
+    public String getDept_name() {
+        return dept_name;
     }
 
-    public void setDept_no(Integer dept_no) {
-        Dept_no = dept_no;
+    public void setDept_name(String dept_name) {
+        dept_name = dept_name;
     }
 
     public List<Appointment> getAppointments() {
