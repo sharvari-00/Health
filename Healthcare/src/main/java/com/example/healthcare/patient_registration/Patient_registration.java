@@ -41,7 +41,7 @@ public class Patient_registration {
     private Boolean consent;
 
     @Getter
-    private String doc_id;
+    private String docId;
 
     @Getter
     private String address_line;
@@ -69,7 +69,7 @@ public class Patient_registration {
         this.phone_number = phone_number;
         this.email_id = email_id;
         this.consent = consent;
-        this.doc_id = doc_id;
+        this.docId = docId;
         this.address_line = address_line;
         this.city = city;
         this.state = state;
@@ -103,7 +103,7 @@ public class Patient_registration {
                 ", phone_number='" + phone_number + '\'' +
                 ", email_id='" + email_id + '\'' +
                 ", consent=" + consent +
-                ", doc_id='" + doc_id + '\'' +
+                ", docId='" + docId + '\'' +
                 ", address_line='" + address_line + '\'' +
                 ", city='" + city + '\'' +
                 ", state='" + state + '\'' +
