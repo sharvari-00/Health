@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image, Picker } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const AddPatientScreen = ({ navigation }) => {
   const [firstName, setFirstName] = useState('');
@@ -14,6 +16,23 @@ const AddPatientScreen = ({ navigation }) => {
   const [state, setState] = useState('');
   const [consent, setConsent] = useState('Yes'); // Default value for consent
   const [accessToken, setAccessToken] = useState('');
+
+  useEffect(() => {
+    // Fetch the accessToken from AsyncStorage
+    const fetchAccessToken = async () => {
+      try {
+        const token = await AsyncStorage.getItem('accessToken');
+        if (token !== null) {
+          // Set the accessToken state
+          setAccessToken(token);
+        }
+      } catch (error) {
+        console.error('Error fetching accessToken:', error);
+      }
+    };
+
+    fetchAccessToken();
+  }, []); // Empty dependency array ensures this runs only once
 
   const handleSave = () => {
     // Pass the patient data to the BookAppointmentScreen

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, TextInput, FlatList, StyleSheet, ImageBackground, Image } from 'react-native';
 
 const BookAppointmentScreen = ({ route, navigation }) => {
@@ -10,9 +10,10 @@ const BookAppointmentScreen = ({ route, navigation }) => {
   ];
 
   // Extracting patient data from the route params
-  const { firstName, lastName, age, gender, phoneNumber, email, houseDetails, city, state, consent } = route.params;
+  const { firstName, lastName, age, gender, phoneNumber, email, houseDetails, city, state, consent, accessToken } = route.params;
   
   const [doctorId, setDoctorId] = useState('');
+
   const handleConfirmAppointment = () => {
     // Prepare the patient data to be sent to the backend
     const patientData = {
@@ -34,7 +35,7 @@ const BookAppointmentScreen = ({ route, navigation }) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${route.params.accessToken}`, // Include the accessToken
+        'Authorization': `Bearer ${accessToken}`, // Include the accessToken
       },
       body: JSON.stringify(patientData)
     })
@@ -62,7 +63,6 @@ const BookAppointmentScreen = ({ route, navigation }) => {
       console.error('Error registering patient:', error);
     });
   };
-
   return (
     <ImageBackground source={require('../assets/wall.jpg')} style={styles.backgroundImage}>
       <View style={styles.overlay}>
