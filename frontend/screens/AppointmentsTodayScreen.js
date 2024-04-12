@@ -1,7 +1,10 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet, ImageBackground, Image } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; // Import the hook
 
-const AppointmentsTodayScreen = ({ navigation }) => {
+const AppointmentsTodayScreen = () => {
+  const navigation = useNavigation(); // Use the useNavigation hook to get the navigation object
+
   // Dummy data for today's appointments (replace it with your actual data)
   const appointmentsData = [
     { id: '1', name: 'John Doe', age: 30, gender: 'Male' },
@@ -25,7 +28,7 @@ const AppointmentsTodayScreen = ({ navigation }) => {
             <Text style={styles.dateText}>Date: {new Date().toLocaleDateString()}</Text>
             <View style={styles.divider} />
             <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.backButton}>
+              <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('DoctorScreen')}>
                 <Text style={styles.buttonText}>Back</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.logoutButton}>

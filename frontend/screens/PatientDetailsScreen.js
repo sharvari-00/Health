@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Image, TextInput, Button } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; // Import the hook
 
 const PatientDetailsScreen = ({ route }) => {
+  const navigation = useNavigation(); // Use the useNavigation hook to get the navigation object
+
   const { patientId } = route.params; // Get the patient ID from the navigation params
 
   // Fetch patient details based on patientId (you might have an API call or local data)
@@ -15,9 +18,9 @@ const PatientDetailsScreen = ({ route }) => {
     treatment: 'Stay hydrated, Take prescribed medications',
   };
 
-  const [filePath, setFilePath] = useState('');
-  const [showInput, setShowInput] = useState(false);
-  const [uploadButtonText, setUploadButtonText] = useState('Upload');
+  const [filePath, setFilePath] = React.useState('');
+  const [showInput, setShowInput] = React.useState(false);
+  const [uploadButtonText, setUploadButtonText] = React.useState('Upload');
 
   const handleUpload = () => {
     if (!showInput) {
@@ -52,7 +55,7 @@ const PatientDetailsScreen = ({ route }) => {
             <Text style={styles.headerText}> Patient Diagnosis</Text>
             <View style={styles.divider} />
             <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.backButton}>
+              <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('NurseScreen')}>
                 <Text style={styles.buttonText}>Back</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.logoutButton}>

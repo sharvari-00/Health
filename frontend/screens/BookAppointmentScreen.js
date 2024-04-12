@@ -1,7 +1,7 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, ImageBackground, Image } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, TextInput, FlatList, StyleSheet, ImageBackground, Image } from 'react-native';
 
-const BookAppointmentScreen = ({ navigation }) => {
+const BookAppointmentScreen = ({ route, navigation }) => {
   // Dummy data for available doctors (replace it with your actual data)
   const availableDoctorsData = [
     { id: '101', name: 'Dr. Smith', duration: '9:00 - 13:00' },
@@ -9,13 +9,57 @@ const BookAppointmentScreen = ({ navigation }) => {
     // Add more doctor data as needed
   ];
 
-  const handleBookAppointment = (doctorId) => {
-    // Implement the logic for booking an appointment
-    console.log(`Booking appointment with doctor ID: ${doctorId}`);
-    // Show a message or perform any additional actions after booking
-
-    // Show confirmation message
-    alert('Appointment booked!');
+  // Extracting patient data from the route params
+  const { firstName, lastName, age, gender, phoneNumber, email, houseDetails, city, state, consent } = route.params;
+  
+  const [doctorId, setDoctorId] = useState('');
+  const handleConfirmAppointment = () => {
+    // Prepare the patient data to be sent to the backend
+    const patientData = {
+      firstName: firstName,
+      lastName: lastName,
+      age: age,
+      gender: gender,
+      phoneNumber: phoneNumber,
+      email: email,
+      houseDetails: houseDetails,
+      city: city,
+      state: state,
+      consent: consent === 'Yes' ? true : false,
+      doctorId: doctorId,
+    };
+  
+    // Make a POST request to register a patient
+    fetch('/api/v1/patients/register_patient', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(patientData)
+    })
+    .then(response => {
+      // Check if the request was successful
+      if (response.ok) {
+        // Extract patient ID from response headers
+        const patientId = response.headers.get('patientId');
+        // Display an alert message with the registered patient ID
+        alert(`Appointment scheduled with Doctor ID: ${doctorId}.\nRegistered patient ID is ${patientId}`);
+        // You can also access the patient details from the response body if needed
+        return response.json();
+      } else {
+        // Handle error responses
+        console.error('Failed to register patient');
+        // You may want to throw an error or handle it accordingly
+      }
+    })
+    .then(data => {
+      // Handle the response body data if needed
+      console.log('Registered patient details:', data);
+    })
+    .catch(error => {
+      // Handle any network errors or exceptions
+      console.error('Error registering patient:', error);
+    });
   };
 
   return (
@@ -39,11 +83,24 @@ const BookAppointmentScreen = ({ navigation }) => {
         <View style={styles.middleContainer}>
           {/* Left Middle Container */}
           <View style={styles.leftMiddleContainer}>
-            <Text style={styles.middleHeading}>Doctors</Text>
+            <Text style={styles.middleHeading}>Enter Doctor ID</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter doctor ID"
+              value={doctorId}
+              onChangeText={setDoctorId}
+            />
+            <TouchableOpacity
+              style={styles.confirmButton}
+              onPress={handleConfirmAppointment}
+            >
+              <Text style={styles.buttonText}>Confirm Appointment</Text>
+            </TouchableOpacity>
           </View>
 
           {/* Right Middle Container */}
           <View style={styles.rightMiddleContainer}>
+            <Text style={styles.middleHeading}>Doctors</Text>
             <FlatList
               data={availableDoctorsData}
               keyExtractor={(item) => item.id}
@@ -54,12 +111,6 @@ const BookAppointmentScreen = ({ navigation }) => {
                     <Text style={styles.doctorText}>Name: {item.name}</Text>
                     <Text style={styles.doctorText}>Duration: {item.duration}</Text>
                   </View>
-                  <TouchableOpacity
-                    style={styles.bookButton}
-                    onPress={() => handleBookAppointment(item.id)}
-                  >
-                    <Text style={styles.buttonText}>Book</Text>
-                  </TouchableOpacity>
                 </View>
               )}
             />
@@ -120,15 +171,32 @@ const styles = StyleSheet.create({
   },
   leftMiddleContainer: {
     flex: 3,
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: 'rgba(223, 233, 235, 0.2)',
     paddingHorizontal: 20,
+  },
+  input: {
+    width: '100%',
+    height: 50,
+    borderColor: '#FFFFFF',
+    borderWidth: 1,
+    marginVertical: 10,
+    paddingHorizontal: 10,
+    color: '#000000',
+    backgroundColor:'#FFFFFF'
+  },
+  confirmButton: {
+    backgroundColor: '#61828a',
+    padding: 10,
+    marginTop: 10,
+    borderRadius: 5,
   },
   middleHeading: {
     fontSize: 25,
     fontWeight: 'bold',
     color: '#FFFFFF',
+    marginBottom: 10,
   },
   rightMiddleContainer: {
     flex: 7,
@@ -142,7 +210,8 @@ const styles = StyleSheet.create({
     borderBottomColor: '#FFFFFF',
     padding: 15,
     alignItems: 'center',
-    borderRadius:8,  },
+    borderRadius: 8,
+  },
   doctorDetails: {
     flex: 1,
   },

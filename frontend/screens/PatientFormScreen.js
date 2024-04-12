@@ -1,21 +1,43 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image, Picker } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; // Import the hook
 
 const PatientFormScreen = ({ route }) => {
+  const navigation = useNavigation(); // Use the useNavigation hook to get the navigation object
   const { patientId } = route.params;
 
   const [symptoms, setSymptoms] = useState('');
   const [diagnosis, setDiagnosis] = useState('');
   const [prescription, setPrescription] = useState('');
+  const [admitPatient, setAdmitPatient] = useState('No');
+  const [symptomsAdded, setSymptomsAdded] = useState(false);
+  const [diagnosisAdded, setDiagnosisAdded] = useState(false);
+  const [prescriptionAdded, setPrescriptionAdded] = useState(false);
+  const [admissionUpdated, setAdmissionUpdated] = useState(false);
 
-  const handleSave = () => {
-    // Implement the logic to save patient information (symptoms, diagnosis, prescription)
-    console.log(`Save for patient: ${patientId}`);
+  const handleAddSymptoms = () => {
+    // Logic to add symptoms to the state or database
+    setSymptomsAdded(true);
   };
 
-  const handleAllocateNeed = () => {
-    // Implement the logic to allocate a need for the patient
-    console.log(`Allocation Need for patient: ${patientId}`);
+  const handleAddDiagnosis = () => {
+    // Logic to add diagnosis/treatment plan to the state or database
+    setDiagnosisAdded(true);
+  };
+
+  const handleAddPrescription = () => {
+    // Logic to add prescription to the state or database
+    setPrescriptionAdded(true);
+  };
+
+  const handleUpdateAdmission = () => {
+    // Logic to update admission status in the database
+    setAdmissionUpdated(true);
+  };
+
+  const handleConfirmConsultation = () => {
+    // Logic to confirm consultation and navigate back to AppointmentsTodayScreen
+    navigation.navigate('AppointmentsTodayScreen');
   };
 
   return (
@@ -28,14 +50,6 @@ const PatientFormScreen = ({ route }) => {
           <View style={styles.upperContainer}>
             <Text style={styles.headerText}>Consultation Form</Text>
             <View style={styles.divider} />
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.backButton}>
-                <Text style={styles.buttonText}>Back</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.logoutButton}>
-                <Text style={styles.buttonText}>Logout</Text>
-              </TouchableOpacity>
-            </View>
           </View>
           <View style={styles.middleContainer}>
             <View style={styles.middleLeftContainer}>
@@ -51,26 +65,46 @@ const PatientFormScreen = ({ route }) => {
               <TextInput
                 style={styles.input}
                 placeholder="Symptoms"
+                value={symptoms}
                 onChangeText={(text) => setSymptoms(text)}
               />
-              <Text style={styles.inputLabel}>Diagnosis</Text>
+              <TouchableOpacity style={[styles.addButton, { backgroundColor: symptomsAdded ? '#888888' : '#61828a' }]} onPress={handleAddSymptoms} disabled={symptomsAdded}>
+                <Text style={styles.buttonText}>{symptomsAdded ? 'Added' : 'Save'}</Text>
+              </TouchableOpacity>
+              <Text style={styles.inputLabel}>Treatment Plan</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Diagnosis"
+                placeholder="Treatment Plan"
+                value={diagnosis}
                 onChangeText={(text) => setDiagnosis(text)}
               />
+              <TouchableOpacity style={[styles.addButton, { backgroundColor: diagnosisAdded ? '#888888' : '#61828a' }]} onPress={handleAddDiagnosis} disabled={diagnosisAdded}>
+                <Text style={styles.buttonText}>{diagnosisAdded ? 'Added' : 'Save'}</Text>
+              </TouchableOpacity>
               <Text style={styles.inputLabel}>Prescription</Text>
               <TextInput
                 style={styles.input}
                 placeholder="Prescription"
+                value={prescription}
                 onChangeText={(text) => setPrescription(text)}
               />
-              <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-                <Text style={styles.buttonText}>Save Consultation</Text>
+              <TouchableOpacity style={[styles.addButton, { backgroundColor: prescriptionAdded ? '#888888' : '#61828a' }]} onPress={handleAddPrescription} disabled={prescriptionAdded}>
+                <Text style={styles.buttonText}>{prescriptionAdded ? 'Added' : 'Save'}</Text>
               </TouchableOpacity>
-              <View style={{ height: 10 }} />
-              <TouchableOpacity style={styles.allocateNeedButton} onPress={handleAllocateNeed}>
-                <Text style={styles.buttonText}>Admit Patient ?</Text>
+              <Text style={styles.inputLabel}>Admit Patient:</Text>
+              <Picker
+                selectedValue={admitPatient}
+                style={styles.dropdown}
+                onValueChange={(itemValue) => setAdmitPatient(itemValue)}
+              >
+                <Picker.Item label="No" value="0" />
+                <Picker.Item label="Yes" value="1" />
+              </Picker>
+              <TouchableOpacity style={[styles.updateButton, { backgroundColor: admissionUpdated ? '#888888' : '#61828a' }]} onPress={handleUpdateAdmission} disabled={admissionUpdated}>
+                <Text style={styles.buttonText}>{admissionUpdated ? 'Updated' : 'Save'}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmConsultation}>
+                <Text style={styles.buttonText}>Confirm Consultation</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -120,23 +154,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     marginBottom: 10,
   },
-  buttonContainer: {
-    flexDirection: 'row',
-    width: '100%',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-  },
-  backButton: {
-    backgroundColor: 'transparent',
-  },
-  logoutButton: {
-    backgroundColor: 'transparent',
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-  },
   middleLeftContainer: {
     flex: 1,
     backgroundColor: 'rgba(223, 233, 235, 0.2)',
@@ -166,12 +183,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   inputLabel: {
-    fontSize: 16,
+    fontSize: 18,
     color: '#000000',
     marginBottom: 5,
   },
   input: {
-    height: 40,
+    height: 80,
     borderColor: 'gray',
     borderWidth: 1,
     marginVertical: 5,
@@ -180,15 +197,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 5,
   },
-  saveButton: {
-    backgroundColor: '#61828a',
-    padding: 10,
-    marginVertical: 10,
+  dropdown: {
+    height: 40,
     width: '100%',
-    alignItems: 'center',
-    borderRadius: 5,
+    color: '#000000',
   },
-  allocateNeedButton: {
+  addButton: {
     backgroundColor: '#61828a',
     padding: 5,
     marginVertical: 5,
@@ -197,10 +211,33 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignSelf: 'flex-end',
   },
+  updateButton: {
+    backgroundColor: '#61828a',
+    padding: 10,
+    marginVertical: 10,
+    width: 150,
+    alignItems: 'center',
+    borderRadius: 5,
+    alignSelf: 'flex-end',
+  },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
   logo: {
     width: 200,
     height: 200,
     resizeMode: 'contain',
+  },
+  confirmButton: {
+    backgroundColor: '#61828a',
+    padding: 15,
+    marginVertical: 20,
+    width: 200,
+    alignItems: 'center',
+    alignSelf: 'center',
+    borderRadius: 5,
   },
 });
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image, Picker } from 'react-native';
 
 const ViewEditPatientDetailsScreen = ({ route }) => {
   const { patientId } = route.params;
@@ -7,26 +7,36 @@ const ViewEditPatientDetailsScreen = ({ route }) => {
   // Dummy patient details (replace it with your actual data)
   const patientDetails = {
     id: '1',
-    name: 'John Doe',
+    firstName: 'John',
+    lastName: 'Doe',
     age: 30,
     gender: 'Male',
-    phoneNumber: '1234567890',
-    address: '123 Main St',
+    registrationDate: '2024-04-11',
+    registrationTime: '10:00 AM',
     doctorAppointed: 'Dr. Smith',
+    bedAllocated: true, // Nullable bed allocation
+    bedNumber: '101',
+    phoneNumber: '1234567890',
+    email: 'john.doe@example.com',
+    addressLine1: '123 Main St',
+    city: 'Cityville',
+    state: 'Stateville',
     consent: true,
-    bedAllocated: null, // Nullable bed allocation
   };
 
   const [editedPhoneNumber, setEditedPhoneNumber] = useState(patientDetails.phoneNumber);
-  const [editedAddress, setEditedAddress] = useState(patientDetails.address);
-  const [consent, setConsent] = useState(true); // Initially set to true (Yes)
+  const [editedAddress, setEditedAddress] = useState(patientDetails.addressLine1);
+  const [editedEmail, setEditedEmail] = useState(patientDetails.email);
+  const [editedCity, setEditedCity] = useState(patientDetails.city);
+  const [editedState, setEditedState] = useState(patientDetails.state);
+  const [editedConsent, setEditedConsent] = useState(patientDetails.consent);
 
   const handleYesClick = () => {
-    setConsent(true);
+    setEditedConsent(true);
   };
 
   const handleNoClick = () => {
-    setConsent(false);
+    setEditedConsent(false);
   };
 
   const handleSaveChanges = () => {
@@ -61,13 +71,18 @@ const ViewEditPatientDetailsScreen = ({ route }) => {
           {/* Middle Right Container */}
           <View style={styles.middleRightContainer}>
             <View style={styles.formRow}>
-              <Text style={styles.formLabel}>ID:</Text>
+              <Text style={styles.formLabel}>Patient ID:</Text>
               <Text style={styles.formValue}>{patientDetails.id}</Text>
             </View>
 
             <View style={styles.formRow}>
-              <Text style={styles.formLabel}>Name:</Text>
-              <Text style={styles.formValue}>{patientDetails.name}</Text>
+              <Text style={styles.formLabel}>First Name:</Text>
+              <Text style={styles.formValue}>{patientDetails.firstName}</Text>
+            </View>
+
+            <View style={styles.formRow}>
+              <Text style={styles.formLabel}>Last Name:</Text>
+              <Text style={styles.formValue}>{patientDetails.lastName}</Text>
             </View>
 
             <View style={styles.formRow}>
@@ -81,13 +96,28 @@ const ViewEditPatientDetailsScreen = ({ route }) => {
             </View>
 
             <View style={styles.formRow}>
+              <Text style={styles.formLabel}>Registration Date:</Text>
+              <Text style={styles.formValue}>{patientDetails.registrationDate}</Text>
+            </View>
+
+            <View style={styles.formRow}>
+              <Text style={styles.formLabel}>Registration Time:</Text>
+              <Text style={styles.formValue}>{patientDetails.registrationTime}</Text>
+            </View>
+
+            <View style={styles.formRow}>
               <Text style={styles.formLabel}>Doctor Appointed:</Text>
               <Text style={styles.formValue}>{patientDetails.doctorAppointed}</Text>
             </View>
 
             <View style={styles.formRow}>
               <Text style={styles.formLabel}>Bed Allocated:</Text>
-              <Text style={styles.formValue}>{patientDetails.bedAllocated || 'Not allocated'}</Text>
+              <Text style={styles.formValue}>{patientDetails.bedAllocated ? 'Yes' : 'No'}</Text>
+            </View>
+
+            <View style={styles.formRow}>
+              <Text style={styles.formLabel}>Bed Number:</Text>
+              <Text style={styles.formValue}>{patientDetails.bedNumber}</Text>
             </View>
 
             <View style={styles.formRow}>
@@ -100,7 +130,16 @@ const ViewEditPatientDetailsScreen = ({ route }) => {
             </View>
 
             <View style={styles.formRow}>
-              <Text style={styles.formLabel}>Address:</Text>
+              <Text style={styles.formLabel}>Email:</Text>
+              <TextInput
+                style={styles.input}
+                value={editedEmail}
+                onChangeText={(text) => setEditedEmail(text)}
+              />
+            </View>
+
+            <View style={styles.formRow}>
+              <Text style={styles.formLabel}>Address Line 1:</Text>
               <TextInput
                 style={styles.input}
                 value={editedAddress}
@@ -109,19 +148,33 @@ const ViewEditPatientDetailsScreen = ({ route }) => {
             </View>
 
             <View style={styles.formRow}>
-              <Text style={styles.formLabel}>Consent for data sharing, if neccessary:</Text>
-              <TouchableOpacity
-                style={[styles.radioButton, consent ? styles.selected : styles.unselected]}
-                onPress={handleYesClick} // Set to true for "Yes"
+              <Text style={styles.formLabel}>City:</Text>
+              <TextInput
+                style={styles.input}
+                value={editedCity}
+                onChangeText={(text) => setEditedCity(text)}
+              />
+            </View>
+
+            <View style={styles.formRow}>
+              <Text style={styles.formLabel}>State:</Text>
+              <TextInput
+                style={styles.input}
+                value={editedState}
+                onChangeText={(text) => setEditedState(text)}
+              />
+            </View>
+
+            <View style={styles.formRow}>
+              <Text style={styles.formLabel}>Consent for data sharing:</Text>
+              <Picker
+                selectedValue={editedConsent}
+                style={{ height: 50, width: 150 }}
+                onValueChange={(itemValue) => setEditedConsent(itemValue)}
               >
-                <Text style={consent ? styles.selectedText : styles.unselectedText}>Yes</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.radioButton, !consent ? styles.selected : styles.unselected]}
-                onPress={handleNoClick} // Set to false for "No"
-              >
-                <Text style={!consent ? styles.selectedText : styles.unselectedText}>No</Text>
-              </TouchableOpacity>
+                <Picker.Item label="Yes" value={true} />
+                <Picker.Item label="No" value={false} />
+              </Picker>
             </View>
 
             <TouchableOpacity style={styles.saveButton} onPress={handleSaveChanges}>

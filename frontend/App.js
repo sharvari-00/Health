@@ -16,6 +16,7 @@ import AddPatientScreen from './screens/AddPatientScreen';
 import BookAppointmentScreen from './screens/BookAppointmentScreen';
 import ViewEditPatientsScreen from './screens/ViewEditPatientsScreen';
 import ViewEditPatientDetailsScreen from './screens/ViewEditPatientDetailsScreen';
+import PrescriptionScreen from './screens/PrescriptionScreen';
 const Stack = createStackNavigator();
 
 const App = () => {
@@ -37,6 +38,7 @@ const App = () => {
         <Stack.Screen name="BookAppointmentScreen" component={BookAppointmentScreen} />
         <Stack.Screen name="ViewEditPatientDetailsScreen" component={ViewEditPatientDetailsScreen} />
         <Stack.Screen name="ViewEditPatientScreen" component={ViewEditPatientsScreen} />
+        <Stack.Screen name="PrescriptionScreen" component={PrescriptionScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
