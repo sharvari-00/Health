@@ -1,9 +1,15 @@
 package com.example.healthcare.auth;
 
 import com.example.healthcare.config.JwtService;
+import com.example.healthcare.doctor_details.Doctor_details;
+import com.example.healthcare.doctor_details.Doctor_details_repo;
 import com.example.healthcare.login.Login;
 import com.example.healthcare.login.Login_repo;
 import com.example.healthcare.login.Role;
+import com.example.healthcare.nurse_details.Nurse_details;
+import com.example.healthcare.nurse_details.Nurse_details_repo;
+import com.example.healthcare.pharmacist_details.Pharmacist_details;
+import com.example.healthcare.pharmacist_details.Pharmacist_details_repo;
 import com.example.healthcare.token.Token;
 import com.example.healthcare.token.TokenType;
 import com.example.healthcare.token.Token_repo;
@@ -26,6 +32,9 @@ import java.io.IOException;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
+    private final Doctor_details_repo doctor_details_repo;
+    private final Nurse_details_repo nurse_details_repo;
+    private final Pharmacist_details_repo pharmacist_details_repo;
     private final Login_repo repository;
     private final Token_repo tokenRepository;
     private final PasswordEncoder passwordEncoder;
@@ -38,6 +47,29 @@ public class AuthenticationService {
                 .role(request.getRole())
                 .build();
         var savedUser = repository.save(user);
+
+        if (request.getRole() == Role.DOCTOR) {
+            var doctorDetails = Doctor_details.builder()
+                    .email(request.getEmail())
+                    // Add other details specific to the doctor
+                    .build();
+            doctor_details_repo.save(doctorDetails);
+        }
+        if (request.getRole() == Role.NURSE) {
+            var nurseDetails = Nurse_details.builder()
+                    .email(request.getEmail())
+                    // Add other details specific to the doctor
+                    .build();
+            nurse_details_repo.save(nurseDetails);
+        }
+        if (request.getRole() == Role.PHARMACIST) {
+            var pharmacistDetails = Pharmacist_details.builder()
+                    .email(request.getEmail())
+                    // Add other details specific to the doctor
+                    .build();
+            pharmacist_details_repo.save(pharmacistDetails);
+        }
+
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
         saveUserToken(savedUser, jwtToken);
