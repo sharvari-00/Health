@@ -1,5 +1,6 @@
-package com.example.healthcare.doctor_details;
+package com.example.healthcare.appointment;
 
+import com.example.healthcare.doctor_details.Doctor_details;
 import com.example.healthcare.patient_registration.Patient_registration;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
