@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class Patient_service {
@@ -32,11 +33,15 @@ public class Patient_service {
         existingPatient.setAddress_line(newPatientData.getAddress_line());
         existingPatient.setCity(newPatientData.getCity());
         existingPatient.setState(newPatientData.getState());
+        existingPatient.setConsent(newPatientData.getConsent());
 
         return patientRepo.save(existingPatient);
     }
     public List<Patient_registration> getAllPatients() {
         return patientRepo.findAll();
+    }
+    public Optional<Patient_registration> getPatientById(Long id) {
+        return patientRepo.findById(id);
     }
 
 //    public static Patient_registration getPatientDetailsByFname(String fname) {
