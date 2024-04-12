@@ -18,5 +18,4 @@ public class Doctor_Controller<TreatmentDto, SymptomsDto, PrescriptionDto> {
         Doctor_details registeredDoctor = doctor_service.registerDoctor(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(registeredDoctor);
     }
-
 }
