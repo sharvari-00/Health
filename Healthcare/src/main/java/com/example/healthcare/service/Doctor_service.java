@@ -1,9 +1,7 @@
 package com.example.healthcare.service;
 
-import com.example.healthcare.controller.RegistrationRequest;
 import com.example.healthcare.doctor_details.Doctor_details;
 import com.example.healthcare.doctor_details.Doctor_details_repo;
-import com.example.healthcare.login.Login;
 import com.example.healthcare.login.Login_repo;
 import com.example.healthcare.symptoms.Symptoms;
 import com.example.healthcare.prescription.Prescription;
@@ -22,23 +20,21 @@ public class Doctor_service<TreatmentDto> {
     @Autowired
     Login_repo login_repo;
 
-    public Doctor_details registerDoctor(RegistrationRequest request) {
-        Doctor_details doctorDetails = request.getDoctorDetails();
+    //Doctor details Update
+    public Doctor_details updateDoctorDetailsByAdmin(String doctorEmail, Doctor_details updatedDoctorDetails) {
+        // Find the doctor details by email
+        Doctor_details existingDoctorDetails = doctor_details_repo.findByEmail(doctorEmail)
+                .orElseThrow(() -> new RuntimeException("Doctor not found with email: " + doctorEmail));
 
-        // Check if the Doctor_details object is null
-        if (doctorDetails == null) {
-            throw new IllegalArgumentException("Doctor_details object is null");
-        }
-        Doctor_details savedDoctorDetails = doctor_details_repo.save(request.getDoctorDetails());
-        Login login = request.getLogin();
-        if (login == null) {
-            throw new IllegalArgumentException("Login object is null");
-        }
+        existingDoctorDetails.setFname(updatedDoctorDetails.getFname());
+        existingDoctorDetails.setLname(updatedDoctorDetails.getLname());
+        existingDoctorDetails.setShift_starts(updatedDoctorDetails.getShift_starts());
+        existingDoctorDetails.setShift_ends(updatedDoctorDetails.getShift_ends());
+        existingDoctorDetails.setDept_name(updatedDoctorDetails.getDept_name());
 
-        login.setDoctor_details(savedDoctorDetails);
-        login_repo.save(login);
-        return savedDoctorDetails;
+        return doctor_details_repo.save(existingDoctorDetails);
     }
+
 
 //    public void addSymptoms(AddSymptomsRequest request) {
 //        SimpleJpaRepository<Integer,> symptoms;
@@ -117,4 +113,8 @@ public class Doctor_service<TreatmentDto> {
 //            this.prescriptionDetails = prescriptionDetails;
 //        }
 //    }
+
+
+
+
 }

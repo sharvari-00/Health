@@ -1,9 +1,12 @@
 package com.example.healthcare.doctor_details;
 
+import com.example.healthcare.appointment.Appointment;
 import com.example.healthcare.login.Login;
 import com.example.healthcare.patient_registration.Patient_registration;
+import io.swagger.v3.oas.annotations.info.Contact;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -16,12 +19,14 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@Builder
 public class Doctor_details {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String fname;
     private String lname;
+    private String email;
     private Time shift_starts;
     private Time shift_ends;
     private String dept_name;
@@ -85,7 +90,8 @@ public class Doctor_details {
     }
 
     public void setDept_name(String dept_name) {
-        dept_name = dept_name;
+
+        this.dept_name = dept_name;
     }
 
     public List<Appointment> getAppointments() {

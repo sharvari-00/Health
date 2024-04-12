@@ -33,6 +33,8 @@ public class Patient_registration_Controller {
         Patient_registration updatedPatient = patientService.updatePatient(id, patient);
         return ResponseEntity.ok(updatedPatient);
     }
+
+    //Endpoint to get all patient's information.
     @GetMapping("/patient_info")
     public ResponseEntity<List<Patient_registration>> getAllPatients() {
         List<Patient_registration> patients = patientService.getAllPatients();
