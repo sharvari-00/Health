@@ -10,6 +10,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
+
 @RestController
 @RequestMapping("/api/v1/doctor")
 public class Doctor_Controller {
@@ -22,4 +25,9 @@ public class Doctor_Controller {
         return ResponseEntity.ok(updatedDoctorDetailsByAdmin);
     }
 
+    @GetMapping("/doctors")
+    public ResponseEntity<List<Doctor_details>> getAllDoctors() {
+        List<Doctor_details> doctors = doctor_service.getAllDoctors();
+        return new ResponseEntity<>(doctors, HttpStatus.OK);
+    }
 }

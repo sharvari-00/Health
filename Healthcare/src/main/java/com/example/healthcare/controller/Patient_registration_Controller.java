@@ -22,8 +22,12 @@ public class Patient_registration_Controller {
     @PostMapping("/register_patient")
     public ResponseEntity<Patient_registration> registerPatient(@RequestBody Patient_registration patient) {
         Patient_registration registeredPatient = patientService.registerPatient(patient);
-        return ResponseEntity.status(HttpStatus.CREATED).body(registeredPatient);
+        // Extract the ID of the registered patient
+        Integer patientId = registeredPatient.getId();
+        // Return the ID along with the registered patient object
+        return ResponseEntity.status(HttpStatus.CREATED).header("patientId", String.valueOf(patientId)).body(registeredPatient);
     }
+
 
     // Endpoint to update patient details
     @PutMapping("/{id}")

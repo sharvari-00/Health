@@ -6,6 +6,8 @@ import com.example.healthcare.login.Login_repo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class Doctor_service {
     @Autowired
@@ -28,6 +30,7 @@ public class Doctor_service {
         return doctor_details_repo.save(existingDoctorDetails);
     }
 
+
 //    public Doctor_details getDoctorDetailsByEmail(String doctorEmail) {
 //
 //        return null;
@@ -37,4 +40,8 @@ public class Doctor_service {
 //                .orElseThrow(() -> new RuntimeException("Doctor details not found for email: " + email));
 //    }
 
+
+    public List<Doctor_details> getAllDoctors() {
+        return doctor_details_repo.findAll();
+    }
 }
