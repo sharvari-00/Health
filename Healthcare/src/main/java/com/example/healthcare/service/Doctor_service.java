@@ -8,6 +8,8 @@ import com.example.healthcare.login.Login_repo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class Doctor_service {
     @Autowired
@@ -31,5 +33,8 @@ public class Doctor_service {
         login.setDoctor_details(savedDoctorDetails);
         login_repo.save(login);
         return savedDoctorDetails;
+    }
+    public List<Doctor_details> getAllDoctors() {
+        return doctor_details_repo.findAll();
     }
 }
