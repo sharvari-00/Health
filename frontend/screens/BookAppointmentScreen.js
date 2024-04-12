@@ -16,7 +16,7 @@ const BookAppointmentScreen = ({ route, navigation }) => {
 
   const handleConfirmAppointment = () => {
     // Prepare the patient data to be sent to the backend
-    const consent = (consent === "Yes");
+    //const consent = (consent === "Yes");
     const patientData = {
       fname: firstName,
       lname: lastName,
@@ -43,12 +43,16 @@ const BookAppointmentScreen = ({ route, navigation }) => {
     .then(response => {
       // Check if the request was successful
       if (response.ok) {
-        // Extract patient ID from response headers
-        const patientId = response.headers.get('patientId');
-        // Display an alert message with the registered patient ID
-        alert(`Appointment scheduled with Doctor ID: ${doctorId}.\nRegistered patient ID is ${patientId}`);
-        // You can also access the patient details from the response body if needed
-        return response.json();
+        // Parse the response body as JSON
+        return response.json()
+          .then(data => {
+            // Extract patient ID from the response data
+            const patientId = data.id; // Assuming the patient ID is available as 'id' in the response
+            // Display an alert message with the registered patient ID
+            alert(`Appointment scheduled with Doctor ID: ${doctorId}.\nRegistered patient ID is ${patientId}`);
+            // Return the response data
+            return data;
+          });
       } else {
         // Handle error responses
         console.error('Failed to register patient');
@@ -64,6 +68,7 @@ const BookAppointmentScreen = ({ route, navigation }) => {
       console.error('Error registering patient:', error);
     });
   };
+  
   
   return (
     <ImageBackground source={require('../assets/wall.jpg')} style={styles.backgroundImage}>
