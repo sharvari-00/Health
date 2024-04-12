@@ -33,7 +33,8 @@ const BookAppointmentScreen = ({ route, navigation }) => {
     fetch('/api/v1/patients/register_patient', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${route.params.accessToken}`, // Include the accessToken
       },
       body: JSON.stringify(patientData)
     })

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image, Picker } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AddPatientScreen = ({ navigation }) => {
   const [firstName, setFirstName] = useState('');
@@ -29,7 +28,8 @@ const AddPatientScreen = ({ navigation }) => {
       houseDetails,
       city,
       state,
-      consent
+      consent,
+      accessToken // Include accessToken here
     });
   };
 
