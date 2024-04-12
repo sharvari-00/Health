@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image, Picker } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const AddPatientScreen = ({ navigation }) => {
   const [firstName, setFirstName] = useState('');
@@ -13,57 +14,41 @@ const AddPatientScreen = ({ navigation }) => {
   const [houseDetails, setHouseDetails] = useState('');
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
-  const [consent, setConsent] = useState(true);
+  const [consent, setConsent] = useState('Yes'); // Default value for consent
   const [accessToken, setAccessToken] = useState('');
 
   useEffect(() => {
-    // Retrieve the access token from AsyncStorage
-    AsyncStorage.getItem('accessToken')
-      .then(token => {
-        if (token) {
+    // Fetch the accessToken from AsyncStorage
+    const fetchAccessToken = async () => {
+      try {
+        const token = await AsyncStorage.getItem('accessToken');
+        if (token !== null) {
+          // Set the accessToken state
           setAccessToken(token);
-        } else {
-          console.error('Access token not found');
         }
-      })
-      .catch(error => {
-        console.error('Error retrieving access token:', error);
-      });
-  }, []);
-
-  const handleSave = () => {
-    const patientData = {
-      fname: firstName,
-      lname: lastName,
-      age,
-      gender,
-      phone_number: phoneNumber,
-      email_id: email,
-      doc_id: doctorId,
-      address_line: houseDetails,
-      city,
-      state,
-      consent
+      } catch (error) {
+        console.error('Error fetching accessToken:', error);
+      }
     };
 
-    fetch('http://localhost:9090/api/v1/patients/register_patient', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${accessToken}`
-      },
-      body: JSON.stringify(patientData)
-    })
-    .then(response => {
-      if (response.ok) {
-        console.log('Patient data saved successfully');
-        navigation.navigate('BookAppointmentScreen');
-      } else {
-        console.error('Failed to save patient data');
-      }
-    })
-    .catch(error => {
-      console.error('Error saving patient data:', error);
+    fetchAccessToken();
+  }, []); // Empty dependency array ensures this runs only once
+
+  const handleSave = () => {
+    // Pass the patient data to the BookAppointmentScreen
+    navigation.navigate('BookAppointmentScreen', {
+      firstName,
+      lastName,
+      age,
+      gender,
+      phoneNumber,
+      email,
+      doctorId,
+      houseDetails,
+      city,
+      state,
+      consent,
+      accessToken // Include accessToken here
     });
   };
 
@@ -101,7 +86,6 @@ const AddPatientScreen = ({ navigation }) => {
                 placeholder="Enter first name"
                 onChangeText={(text) => setFirstName(text)}
               />
-              
             </View>
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>Last Name:</Text>
@@ -144,14 +128,7 @@ const AddPatientScreen = ({ navigation }) => {
                 keyboardType="email-address"
               />
             </View>
-            <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Doctor ID:</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Enter Doctor ID"
-                onChangeText={(text) => setDoctorId(text)}
-              />
-            </View>
+           
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>House Details:</Text>
               <TextInput
@@ -176,25 +153,24 @@ const AddPatientScreen = ({ navigation }) => {
                 onChangeText={(text) => setState(text)}
               />
             </View>
-            {/* <Text style={styles.consentText}>Consent for data sharing:</Text>
-            <View style={styles.radioContainer}>
-              <TouchableOpacity
-                style={[styles.radioButton, consent ? styles.selected : styles.unselected]}
-                onPress={() => setConsent(true)}
-              >
-                <Text style={consent ? styles.selectedText : styles.unselectedText}>Yes</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.radioButton, !consent ? styles.selected : styles.unselected]}
-                onPress={() => setConsent(false)}
-              >
-                <Text style={!consent ? styles.selectedText : styles.unselectedText}>No</Text>
-              </TouchableOpacity>
-            </View> */}
+            
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>Consent for data sharing:</Text>
+              <View style={styles.dropdownContainer}>
+                <Picker
+                  selectedValue={consent}
+                  style={styles.dropdown}
+                  onValueChange={(itemValue, itemIndex) => setConsent(itemValue)}
+                >
+                  <Picker.Item label="Yes" value="Yes" />
+                  <Picker.Item label="No" value="No" />
+                </Picker>
+              </View>
+            </View>
 
             {/* More input fields here */}
             <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-              <Text style={styles.buttonText}>Save</Text>
+              <Text style={styles.buttonText}>Next</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -223,6 +199,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: 10,
   },
   heading: {
     fontSize: 24,
@@ -291,33 +268,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     color: '#FFFFFF',
   },
-  consentText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    marginVertical: 10,
-  },
-  radioContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  radioButton: {
-    padding: 10,
-    alignItems: 'center',
+  dropdownContainer: {
+    borderWidth: 1,
+    borderColor: '#FFFFFF',
     borderRadius: 5,
-    marginRight: 10,
+    marginVertical: 5,
+    color: '#000000',
   },
-  selected: {
-    backgroundColor: '#32CD32', // Green for "Yes"
-  },
-  unselected: {
-    backgroundColor: '#DDDDDD', // Gray for "No"
-  },
-  selectedText: {
-    color: '#FFFFFF',
-  },
-  unselectedText: {
-    color: '#564335',
+  dropdown: {
+    height: 50,
+    color: '#000000',
   },
   saveButton: {
     backgroundColor: '#61828a',
