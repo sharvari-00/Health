@@ -1,37 +1,23 @@
 package com.example.healthcare.bed;
-import com.example.healthcare.nurse_details.Nurse_details;
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import java.sql.Blob;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Table
+@Getter
+@Setter
 @NoArgsConstructor
-//@AllArgsConstructor
-@Data
+@AllArgsConstructor
 public class Bed {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-    private Integer nurse_id;
-    private Integer doc_id;
-//    @OneToOne(mappedBy = "bed")
-//    private Nurse_details nurse_details;
-//
-//    @OneToOne(cascade = CascadeType.ALL)
-//    @JoinColumn(name = "consultation_details_id",referencedColumnName = "id")
-//    private Consulation_details consulation_details;
+    private Long BedId;
 
-
-    @Override
-    public String toString() {
-        return "Bed{" +
-                "id=" + id +
-                ", nurse_id=" + nurse_id +
-                ", doc_id=" + doc_id +
-                '}';
-    }
+    private Boolean occupied = false; // Default value is false
 }

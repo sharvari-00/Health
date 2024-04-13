@@ -1,8 +1,11 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ImageBackground, Image } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ImageBackground, Image, TextInput } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 
 const FrontDeskScreen = ({ navigation }) => {
+  const [showInput, setShowInput] = useState(false); // State to control the visibility of input and buttons
+  const [patientId, setPatientId] = useState(''); // State to store the entered patient ID
+
   const handleAddPatient = () => {
     // Implement logic for adding a patient
     navigation.navigate('AddPatientScreen');
@@ -10,9 +13,21 @@ const FrontDeskScreen = ({ navigation }) => {
   };
 
   const handleViewEditPatients = () => {
-    // Implement logic for viewing/editing patients
-    navigation.navigate('ViewEditPatientScreen');
-    console.log('View/Edit Patients');
+    setShowInput(true);
+  };
+
+  const handleNext = () => {
+    // Navigate to ViewEditPatientDetailsScreen with patientId
+    navigation.navigate('ViewEditPatientDetailsScreen', { patientId });
+    // Reset input field and hide input and buttons
+    setPatientId('');
+    setShowInput(false);
+  };
+
+  const handleCancel = () => {
+    // Reset input field and hide input and buttons
+    setPatientId('');
+    setShowInput(false);
   };
 
   return (
@@ -55,9 +70,28 @@ const FrontDeskScreen = ({ navigation }) => {
               <TouchableOpacity style={styles.button} onPress={handleAddPatient}>
                 <Text style={styles.buttonText}>Add Patient</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.button} onPress={handleViewEditPatients}>
-                <Text style={styles.buttonText}>View/Edit Patients</Text>
-              </TouchableOpacity>
+              {showInput ? (
+                <View>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Enter Patient ID"
+                    onChangeText={setPatientId}
+                    value={patientId}
+                  />
+                  <View style={styles.buttonRow}>
+                    <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+                      <Text style={styles.buttonText}>Next</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
+                      <Text style={styles.buttonText}>Cancel</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ) : (
+                <TouchableOpacity style={styles.button} onPress={handleViewEditPatients}>
+                  <Text style={styles.buttonText}>View/Edit Patients</Text>
+                </TouchableOpacity>
+              )}
             </View>
           </View>
           {/* Lower Container */}
@@ -148,6 +182,33 @@ const styles = StyleSheet.create({
     padding: 15,
     margin: 10,
     width: 200,
+    alignItems: 'center',
+    borderRadius: 10,
+  },
+  input: {
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderRadius: 10,
+    marginBottom: 10,
+    width: 250,
+  },
+  buttonRow: {
+    flexDirection: 'row',
+  },
+  nextButton: {
+    backgroundColor: '#61828a', // Button background color
+    padding: 15,
+    margin: 10,
+    width: 100,
+    alignItems: 'center',
+    borderRadius: 10,
+  },
+  cancelButton: {
+    backgroundColor: 'red', // Button background color
+    padding: 15,
+    margin: 10,
+    width: 100,
     alignItems: 'center',
     borderRadius: 10,
   },
