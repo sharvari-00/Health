@@ -1,4 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
+
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image, Picker } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -14,6 +16,7 @@ const AddPatientScreen = ({ navigation }) => {
   const [houseDetails, setHouseDetails] = useState('');
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
+
   const [consent, setConsent] = useState(true); // Default value for consent
   const [accessToken, setAccessToken] = useState('');
 
@@ -34,6 +37,7 @@ const AddPatientScreen = ({ navigation }) => {
     fetchAccessToken();
   }, []); // Empty dependency array ensures this runs only once
 
+
   const handleSave = () => {
     // Pass the patient data to the BookAppointmentScreen
     navigation.navigate('BookAppointmentScreen', {
@@ -47,8 +51,10 @@ const AddPatientScreen = ({ navigation }) => {
       houseDetails,
       city,
       state,
+
       consent,
       accessToken // Include accessToken here
+
     });
   };
 
@@ -162,8 +168,10 @@ const AddPatientScreen = ({ navigation }) => {
                   style={styles.dropdown}
                   onValueChange={(itemValue, itemIndex) => setConsent(itemValue)}
                 >
+
                   <Picker.Item label="Yes" value={true} />
                   <Picker.Item label="No" value={false} />
+
                 </Picker>
               </View>
             </View>

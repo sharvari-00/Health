@@ -1,6 +1,5 @@
-package com.example.healthcare.pharmacist_details;
+package com.example.healthcare.admin;
 
-import io.swagger.v3.oas.annotations.info.Contact;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,17 +7,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Table
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
+@Table
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
-public class Pharmacist_details {
+public class Admin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private String name;
     private String email;
+    private String fname;
 
     public Integer getId() {
         return id;
@@ -28,19 +27,19 @@ public class Pharmacist_details {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getFname() {
+        return fname;
+    }
+
+    public void setName(String fname) {
+        this.fname = fname;
     }
 }

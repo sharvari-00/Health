@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, TextInput, FlatList, StyleSheet, ImageBackground, Image } from 'react-native';
 
@@ -10,6 +11,7 @@ const BookAppointmentScreen = ({ route, navigation }) => {
   ];
 
   // Extracting patient data from the route params
+
   const { firstName, lastName, age, gender, phoneNumber, email, houseDetails, city, state, consent, accessToken } = route.params;
   
   const [doctorId, setDoctorId] = useState('');
@@ -37,12 +39,14 @@ const BookAppointmentScreen = ({ route, navigation }) => {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${accessToken}`, // Include the accessToken
+
       },
       body: JSON.stringify(patientData)
     })
     .then(response => {
       // Check if the request was successful
       if (response.ok) {
+
         // Parse the response body as JSON
         return response.json()
           .then(data => {
@@ -53,6 +57,7 @@ const BookAppointmentScreen = ({ route, navigation }) => {
             // Return the response data
             return data;
           });
+
       } else {
         // Handle error responses
         console.error('Failed to register patient');
