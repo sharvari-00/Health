@@ -16,6 +16,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.web.filter.CorsFilter;
+
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
@@ -26,7 +28,7 @@ public class SecurityConfiguration {
 
     private static final String[] WHITE_LIST_URL = {
             "/api/v1/auth/**",
-//            "/api/v1/**",
+            "/api/v1/patients",
             "/v2/api-docs",
             "/v3/api-docs",
             "/v3/api-docs/**",
@@ -36,15 +38,19 @@ public class SecurityConfiguration {
             "/configuration/security",
             "/swagger-ui/**",
             "/webjars/**",
-            "/swagger-ui.html"};
+            "/swagger-ui.html"
+    };
+
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
     private final LogoutHandler logoutHandler;
+    private final CorsFilter corsFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
+                .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(req ->
                         req.requestMatchers(WHITE_LIST_URL)
                                 .permitAll()
@@ -58,25 +64,8 @@ public class SecurityConfiguration {
                         logout.logoutUrl("/api/v1/auth/logout")
                                 .addLogoutHandler(logoutHandler)
                                 .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext())
-                )
-        ;
+                );
         return http.build();
     }
-    @Bean
-    public SecurityFilterChain othersecurityFilterChain(HttpSecurity https) throws Exception{
-        https.authorizeHttpRequests(configurer->
-                configurer
-                        .requestMatchers(HttpMethod.POST,"/api/v1/patients/register_patient").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT,"/api/v1/patients/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET,"/api/v1/patients/patient_info").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST,"/api/v1/doctor/{doctorEmail}").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST,"/api/v1/pharmacist/{pharmaEmail}").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST,"/api/v1/nurse/{nurseEmail}").hasRole("ADMIN")
-
-        );
-//        https.httpBasic();
-        https.csrf(AbstractHttpConfigurer::disable);
-        return https.build();
-
-    }
 }
+
