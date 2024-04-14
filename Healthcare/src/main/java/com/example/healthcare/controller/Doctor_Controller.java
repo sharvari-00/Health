@@ -5,11 +5,11 @@ import com.example.healthcare.patient_registration.Patient_registration;
 import com.example.healthcare.service.Doctor_service;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 
@@ -24,10 +24,10 @@ public class Doctor_Controller {
         Doctor_details updatedDoctorDetailsByAdmin = doctor_service.updateDoctorDetailsByAdmin(doctorEmail,updatedDoctorDetails);
         return ResponseEntity.ok(updatedDoctorDetailsByAdmin);
     }
-
     @GetMapping("/doctors")
     public ResponseEntity<List<Doctor_details>> getAllDoctors() {
         List<Doctor_details> doctors = doctor_service.getAllDoctors();
         return new ResponseEntity<>(doctors, HttpStatus.OK);
     }
+
 }

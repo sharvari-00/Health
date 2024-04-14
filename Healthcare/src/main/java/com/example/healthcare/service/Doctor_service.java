@@ -30,7 +30,6 @@ public class Doctor_service {
         return doctor_details_repo.save(existingDoctorDetails);
     }
 
-
 //    public Doctor_details getDoctorDetailsByEmail(String doctorEmail) {
 //
 //        return null;
@@ -44,4 +43,5 @@ public class Doctor_service {
     public List<Doctor_details> getAllDoctors() {
         return doctor_details_repo.findAll();
     }
+
 }
