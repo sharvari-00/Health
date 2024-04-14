@@ -1,24 +1,53 @@
 
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, TextInput, FlatList, StyleSheet, ImageBackground, Image } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, FlatList, StyleSheet, ImageBackground, Image, Alert } from 'react-native';
 
 const BookAppointmentScreen = ({ route, navigation }) => {
-  // Dummy data for available doctors (replace it with your actual data)
-  const availableDoctorsData = [
-    { id: '101', name: 'Dr. Smith', duration: '9:00 - 13:00' },
-    { id: '102', name: 'Dr. Johnson', duration: '16:00 - 20:00' },
-    // Add more doctor data as needed
-  ];
 
-  // Extracting patient data from the route params
+  const [availableDoctorsData, setAvailableDoctorsData] = useState([]);
 
-  const { firstName, lastName, age, gender, phoneNumber, email, houseDetails, city, state, consent, accessToken } = route.params;
-  
   const [doctorId, setDoctorId] = useState('');
+  const [registeredPatientId, setRegisteredPatientId] = useState(null);
+  const [confirmationText, setConfirmationText] = useState('');
+
+  const { accessToken } = route.params;
+
+  useEffect(() => {
+    fetchDoctorDetails();
+  }, []);
+
+  const fetchDoctorDetails = () => {
+    fetch('http://localhost:9090/api/v1/doctor/doctors', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+      },
+    })
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Failed to fetch doctor details');
+      }
+    })
+    .then(data => {
+      setAvailableDoctorsData(data);
+    })
+    .catch(error => {
+      console.error('Error fetching doctor details:', error);
+    });
+  };
 
   const handleConfirmAppointment = () => {
-    // Prepare the patient data to be sent to the backend
-    //const consent = (consent === "Yes");
+    const selectedDoctor = availableDoctorsData.find(doctor => doctor.id === parseInt(doctorId));
+    if (!selectedDoctor) {
+      Alert.alert('Error', 'Please select a valid doctor');
+      return;
+    }
+
+    const { firstName, lastName, age, gender, phoneNumber, email, houseDetails, city, state, consent } = route.params;
+
     const patientData = {
       fname: firstName,
       lname: lastName,
@@ -27,54 +56,42 @@ const BookAppointmentScreen = ({ route, navigation }) => {
       phone_number: phoneNumber,
       email_id: email,
       consent: consent,
-      docId: doctorId, // Corrected variable name
+      docId: selectedDoctor.id,
       address_line: houseDetails,
       city: city,
       state: state,
     };
-  
-    // Make a POST request to register a patient
+
     fetch('http://localhost:9090/api/v1/patients/register_patient', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${accessToken}`, // Include the accessToken
+
+        'Authorization': `Bearer ${accessToken}`,
 
       },
       body: JSON.stringify(patientData)
     })
     .then(response => {
-      // Check if the request was successful
       if (response.ok) {
 
-        // Parse the response body as JSON
-        return response.json()
-          .then(data => {
-            // Extract patient ID from the response data
-            const patientId = data.id; // Assuming the patient ID is available as 'id' in the response
-            // Display an alert message with the registered patient ID
-            alert(`Appointment scheduled with Doctor ID: ${doctorId}.\nRegistered patient ID is ${patientId}`);
-            // Return the response data
-            return data;
-          });
+        return response.json();
 
       } else {
-        // Handle error responses
-        console.error('Failed to register patient');
-        // You may want to throw an error or handle it accordingly
+        throw new Error('Failed to register patient');
       }
     })
     .then(data => {
-      // Handle the response body data if needed
-      console.log('Registered patient details:', data);
+      setRegisteredPatientId(data.id);
+      setConfirmationText(`Patient ID: ${data.id}\nRegistered Doctor ID: ${selectedDoctor.id}`);
+      Alert.alert('Success', `Appointment scheduled with Doctor ID: ${selectedDoctor.id}.\nRegistered patient ID is ${data.id}`);
     })
     .catch(error => {
-      // Handle any network errors or exceptions
       console.error('Error registering patient:', error);
+      Alert.alert('Error', 'Failed to register patient. Please try again.');
     });
   };
-  
-  
+
   return (
     <ImageBackground source={require('../assets/wall.jpg')} style={styles.backgroundImage}>
       <View style={styles.overlay}>
@@ -109,6 +126,7 @@ const BookAppointmentScreen = ({ route, navigation }) => {
             >
               <Text style={styles.buttonText}>Confirm Appointment</Text>
             </TouchableOpacity>
+            <Text style={styles.confirmationText}>{confirmationText}</Text>
           </View>
 
           {/* Right Middle Container */}
@@ -116,13 +134,15 @@ const BookAppointmentScreen = ({ route, navigation }) => {
             <Text style={styles.middleHeading}>Doctors</Text>
             <FlatList
               data={availableDoctorsData}
-              keyExtractor={(item) => item.id}
+              keyExtractor={(item) => item.id.toString()}
               renderItem={({ item, index }) => (
                 <View style={[styles.doctorItem, { backgroundColor: index % 2 === 0 ? 'rgba(169, 204, 207, 0.4)' : 'rgba(169, 204, 207, 0.4)' }]}>
                   <View style={styles.doctorDetails}>
                     <Text style={styles.doctorText}>Doctor ID: {item.id}</Text>
-                    <Text style={styles.doctorText}>Name: {item.name}</Text>
-                    <Text style={styles.doctorText}>Duration: {item.duration}</Text>
+                    <Text style={styles.doctorText}>Name: {item.fname} {item.lname}</Text>
+                    <Text style={styles.doctorText}>Department: {item.dept_name}</Text>
+                    <Text style={styles.doctorText}>Shift: {item.shift_starts} - {item.shift_ends}</Text>
+                    <Text style={styles.doctorText}>Email: {item.email}</Text>
                   </View>
                 </View>
               )}
@@ -138,7 +158,6 @@ const BookAppointmentScreen = ({ route, navigation }) => {
     </ImageBackground>
   );
 };
-
 const styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
@@ -254,6 +273,12 @@ const styles = StyleSheet.create({
     width: 200,
     height: 200,
     resizeMode: 'contain',
+  },
+  confirmationText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    marginTop: 10,
+    textAlign: 'center',
   },
 });
 
