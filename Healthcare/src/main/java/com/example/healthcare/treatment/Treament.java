@@ -1,11 +1,11 @@
 package com.example.healthcare.treatment;
 
+import com.example.healthcare.patient_registration.Patient_registration;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+@Setter
+@Getter
 @Entity
 @Builder
 @Table
@@ -16,30 +16,13 @@ public class Treament {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private Integer patient_id;
+    private Integer patientId;
+    @ManyToOne
+    @JoinColumn(name = "Patient_registration_id",referencedColumnName = "id", nullable = false) // Assuming foreign key column is named patient_registration_id
+    private Patient_registration patientRegistration;
     private String tre_text;
 
-    public Integer getId() {
-        return id;
-    }
+    public void setPatientId(int patientId) {
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getPatient_id() {
-        return patient_id;
-    }
-
-    public void setPatient_id(Integer patient_id) {
-        this.patient_id = patient_id;
-    }
-
-    public String getTre_text() {
-        return tre_text;
-    }
-
-    public void setTre_text(String tre_text) {
-        this.tre_text = tre_text;
     }
 }

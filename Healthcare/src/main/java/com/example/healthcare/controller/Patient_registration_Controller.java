@@ -1,7 +1,10 @@
 package com.example.healthcare.controller;
 
 import com.example.healthcare.patient_registration.Patient_registration;
+import com.example.healthcare.prescription.Prescription;
 import com.example.healthcare.service.Patient_service;
+import com.example.healthcare.symptoms.Symptoms;
+import com.example.healthcare.treatment.Treament;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +35,7 @@ public class Patient_registration_Controller {
 
     // Endpoint to update patient details
     @PutMapping("/{id}")
-    public ResponseEntity<Patient_registration> updatePatient(@PathVariable Long id, @RequestBody Patient_registration patient) {
+    public ResponseEntity<Patient_registration> updatePatient(@PathVariable Long id, @RequestBody Patient_registration patient) throws Throwable {
         Patient_registration updatedPatient = patientService.updatePatient(id, patient);
         return ResponseEntity.ok(updatedPatient);
     }
@@ -42,6 +45,31 @@ public class Patient_registration_Controller {
     public ResponseEntity<List<Patient_registration>> getAllPatients() {
         List<Patient_registration> patients = patientService.getAllPatients();
         return new ResponseEntity<>(patients, HttpStatus.OK);
+    }
+//    public List<Patient_registration> getPatientsForLoggedInDoctor(@PathVariable String id) {
+//        return patientService.findByDoctorId(id);
+//    }
+    @GetMapping("/appointments_for_today/{docId}")
+    public ResponseEntity<Patient_registration> getPatientById(@PathVariable String docId) {
+        List<Patient_registration> patientRegistrations = patientService.findByDocId(docId);
+        return ResponseEntity.ok((Patient_registration) patientRegistrations);
+    }
+    @PostMapping("/symptoms/{patient_id}")
+    public ResponseEntity<Symptoms> updateSymptoms(@PathVariable int patient_id, @RequestBody Symptoms symptoms) {
+        Symptoms updatedSymptoms = patientService.updateSymptoms(patient_id, symptoms);
+        return ResponseEntity.ok(updatedSymptoms);
+    }
+
+//    @PostMapping("/treatment/{patient_id}")
+//    public ResponseEntity<Treament> updateTreatment(@PathVariable int patient_id, @RequestBody Treament treatment) {
+//        Treament updatedTreatment = patientService.updateTreatment(patient_id, treatment);
+//        return ResponseEntity.ok(updatedTreatment);
+//    }
+
+    @PostMapping("/prescription/{patient_id}")
+    public ResponseEntity<Prescription> updatePrescription(@PathVariable int patient_id, @RequestBody Prescription prescription) {
+        Prescription updatedPrescription = patientService.updatePrescription(patient_id, prescription);
+        return ResponseEntity.ok(updatedPrescription);
     }
 
     @GetMapping("/{id}")

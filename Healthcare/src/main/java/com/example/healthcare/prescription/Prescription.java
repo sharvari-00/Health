@@ -16,14 +16,14 @@ public class Prescription {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private Integer patient_id;
+    private Integer patientId;
     private String pre_text;
 
     public Integer getId() {
         return id;
     }
     public Integer getPatient_id() {
-        return patient_id;
+        return patientId;
     }
 
     public String getPre_text() {

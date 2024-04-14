@@ -19,5 +19,24 @@ public class Bed {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long BedId;
 
-    private Boolean occupied = false; // Default value is false
+
+    private Boolean occupied = false;
+
+//    @OneToOne(mappedBy = "bed")
+//    private Nurse_details nurse_details;
+//
+//    @OneToOne(cascade = CascadeType.ALL)
+//    @JoinColumn(name = "consultation_details_id",referencedColumnName = "id")
+//    private Consulation_details consulation_details;
+
+
+//    @Override
+//    public String toString() {
+//        return "Bed{" +
+//                "id=" + id +
+//                ", nurse_id=" + nurse_id +
+//                ", doc_id=" + doc_id +
+//                '}';
+//    }
+
 }
