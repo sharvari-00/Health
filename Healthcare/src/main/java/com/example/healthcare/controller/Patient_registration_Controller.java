@@ -40,14 +40,13 @@ public class Patient_registration_Controller {
         List<Patient_registration> patients = patientService.getAllPatients();
         return new ResponseEntity<>(patients, HttpStatus.OK);
     }
-    @GetMapping("/{id}")
-    public ResponseEntity<Patient_registration> getPatientById(@PathVariable Long id) {
-        Patient_registration patient = patientService.getPatientById(id);
-        if (patient != null) {
-            return ResponseEntity.ok(patient);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+//    public List<Patient_registration> getPatientsForLoggedInDoctor(@PathVariable String id) {
+//        return patientService.findByDoctorId(id);
+//    }
+    @GetMapping("/appointments_for_today/{docId}")
+    public ResponseEntity<Patient_registration> getPatientById(@PathVariable String docId) {
+        List<Patient_registration> patientRegistrations = patientService.findByDocId(docId);
+        return ResponseEntity.ok((Patient_registration) patientRegistrations);
     }
     @PostMapping("/symptoms/{patient_id}")
     public ResponseEntity<Symptoms> updateSymptoms(@PathVariable int patient_id, @RequestBody Symptoms symptoms) {

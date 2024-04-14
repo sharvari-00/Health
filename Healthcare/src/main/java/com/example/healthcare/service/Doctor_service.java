@@ -3,15 +3,10 @@ package com.example.healthcare.service;
 import com.example.healthcare.doctor_details.Doctor_details;
 import com.example.healthcare.doctor_details.Doctor_details_repo;
 import com.example.healthcare.login.Login_repo;
-import com.example.healthcare.symptoms.Symptoms;
-import com.example.healthcare.prescription.Prescription;
-import com.example.healthcare.treatment.Treament;
-import com.example.healthcare.patient_registration.Patient_registration;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class Doctor_service<TreatmentDto> {
@@ -35,6 +30,10 @@ public class Doctor_service<TreatmentDto> {
         return doctor_details_repo.save(existingDoctorDetails);
     }
 
+//    public Optional<Doctor_details> getDoctorDetailsByEmail(String email) {
+//    return doctor_details_repo.findByEmail(email);
+//    }
+//
 
 //    public void addSymptoms(AddSymptomsRequest request) {
 //        SimpleJpaRepository<Integer,> symptoms;

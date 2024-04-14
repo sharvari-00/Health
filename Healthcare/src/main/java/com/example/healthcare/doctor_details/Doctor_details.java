@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.sql.Time;
 import java.util.List;
@@ -100,6 +101,9 @@ public class Doctor_details {
 
     public void setAppointments(List<Appointment> appointments) {
         this.appointments = appointments;
+    }
+
+    public interface DoctorDetailsRepository extends JpaRepository<Doctor_details, Long> {
     }
 
     //    @OneToOne

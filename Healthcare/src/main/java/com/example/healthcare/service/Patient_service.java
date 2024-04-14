@@ -5,7 +5,6 @@ import com.example.healthcare.patient_registration.Patient_registration_repo;
 import com.example.healthcare.prescription.Prescription;
 import com.example.healthcare.prescription.PrescriptionRepository;
 import com.example.healthcare.symptoms.Symptoms;
-import com.example.healthcare.treatment.Treament;
 import com.example.healthcare.symptoms.SymptomsRepository;
 //import com.example.healthcare.treatment.TreatmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,6 +77,11 @@ public class Patient_service {
             prescription.setId(existingPrescription.getId()); // Update existing record if found
         }
         return prescriptionRepository.save(prescription);
+    }
+
+
+    public List findByDocId(String docId) {
+        return patientRepo.findByDocId(docId);
     }
 
 //    public static Patient_registration getPatientDetailsByFname(String fname) {

@@ -15,9 +15,10 @@ import java.sql.Blob;
 public class Bed {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-    private Integer nurse_id;
-    private Integer doc_id;
+    private Long BedId;
+
+    private Boolean occupied = false;
+
 //    @OneToOne(mappedBy = "bed")
 //    private Nurse_details nurse_details;
 //
@@ -26,12 +27,12 @@ public class Bed {
 //    private Consulation_details consulation_details;
 
 
-    @Override
-    public String toString() {
-        return "Bed{" +
-                "id=" + id +
-                ", nurse_id=" + nurse_id +
-                ", doc_id=" + doc_id +
-                '}';
-    }
+//    @Override
+//    public String toString() {
+//        return "Bed{" +
+//                "id=" + id +
+//                ", nurse_id=" + nurse_id +
+//                ", doc_id=" + doc_id +
+//                '}';
+//    }
 }
