@@ -32,6 +32,7 @@ public class PatientAdmissionService {
         }
     }
 
+
     public void dischargePatient(Integer patientId) {
         Optional<Patient_registration> optionalPatient = patientRegistrationRepo.findById(patientId.longValue());
         if (optionalPatient.isPresent()) {

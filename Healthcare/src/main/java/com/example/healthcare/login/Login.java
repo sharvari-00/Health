@@ -135,6 +135,10 @@ public class Login implements UserDetails {
         return pharmacist_details;
     }
 
+    public Integer getDoctorId() {
+        return id;
+    }
+
 //    public void setDocId(Integer id) {
 //        this.doctor_details = id;
 //    }

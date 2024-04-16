@@ -31,34 +31,19 @@ public class Patient_registration_Controller {
         // Return the ID along with the registered patient object
         return ResponseEntity.status(HttpStatus.CREATED).header("patientId", String.valueOf(patientId)).body(registeredPatient);
     }
-
-
     // Endpoint to update patient details
     @PutMapping("/{id}")
     public ResponseEntity<Patient_registration> updatePatient(@PathVariable Long id, @RequestBody Patient_registration patient) throws Throwable {
         Patient_registration updatedPatient = patientService.updatePatient(id, patient);
         return ResponseEntity.ok(updatedPatient);
     }
-
     //Endpoint to get all patient's information.
     @GetMapping("/patient_info")
     public ResponseEntity<List<Patient_registration>> getAllPatients() {
         List<Patient_registration> patients = patientService.getAllPatients();
         return new ResponseEntity<>(patients, HttpStatus.OK);
     }
-//    public List<Patient_registration> getPatientsForLoggedInDoctor(@PathVariable String id) {
-//        return patientService.findByDoctorId(id);
-//    }
-    @GetMapping("/appointments_for_today/{docId}")
-    public ResponseEntity<Patient_registration> getPatientById(@PathVariable String docId) {
-        List<Patient_registration> patientRegistrations = patientService.findByDocId(docId);
-        return ResponseEntity.ok((Patient_registration) patientRegistrations);
-    }
-    @PostMapping("/symptoms/{patient_id}")
-    public ResponseEntity<Symptoms> updateSymptoms(@PathVariable int patient_id, @RequestBody Symptoms symptoms) {
-        Symptoms updatedSymptoms = patientService.updateSymptoms(patient_id, symptoms);
-        return ResponseEntity.ok(updatedSymptoms);
-    }
+
 
 //    @PostMapping("/treatment/{patient_id}")
 //    public ResponseEntity<Treament> updateTreatment(@PathVariable int patient_id, @RequestBody Treament treatment) {
@@ -66,11 +51,7 @@ public class Patient_registration_Controller {
 //        return ResponseEntity.ok(updatedTreatment);
 //    }
 
-    @PostMapping("/prescription/{patient_id}")
-    public ResponseEntity<Prescription> updatePrescription(@PathVariable int patient_id, @RequestBody Prescription prescription) {
-        Prescription updatedPrescription = patientService.updatePrescription(patient_id, prescription);
-        return ResponseEntity.ok(updatedPrescription);
-    }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<Patient_registration> getPatientDetails(@PathVariable Long id) {
@@ -78,6 +59,13 @@ public class Patient_registration_Controller {
         return patientOptional.map(patient -> ResponseEntity.ok().body(patient))
                 .orElse(ResponseEntity.notFound().build());
     }
+    //get the admitted patient details for the nurse.
+
+    @GetMapping("/admitted")
+    public List<Patient_registration> getAdmittedPatients() {
+        return patientService.getAdmittedPatients();
+    }
+
 
 //    @GetMapping("/patients/{fname}")
 //    public ResponseEntity<Patient_registration> getPatientDetails(@PathVariable String fname) {

@@ -22,7 +22,7 @@ public class Prescription {
     public Integer getId() {
         return id;
     }
-    public Integer getPatient_id() {
+    public Integer getPatientId() {
         return patientId;
     }
 

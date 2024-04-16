@@ -2,10 +2,7 @@ package com.example.healthcare.patient_registration;
 
 import com.example.healthcare.doctor_details.Doctor_details;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -52,21 +49,24 @@ public class Patient_registration {
     @Getter
     private String state;
 
+    // Update setters for new fields
+    @Setter
     @Getter
     private LocalDate registrationDate=LocalDate.now();
+    @Setter
     @Getter
     private LocalTime registrationTime=LocalTime.now();
 
+    @Setter
     @Getter
-    private Boolean admitted = false;
+    private Boolean admitted;
+    public Boolean isAdmitted() {
+        return admitted;
+    }
+
     @Getter
     private Long bedId; // Integer to store the bed id
 
-
-    @Getter
-    private LocalDate registrationDate=LocalDate.now();
-    @Getter
-    private LocalTime registrationTime=LocalTime.now();
 
     // Constructor including new fields
     public Patient_registration(Integer id, String fname, String lname, Integer age, String gender, String phone_number,
@@ -85,23 +85,11 @@ public class Patient_registration {
         this.city = city;
         this.state = state;
 
-        this.admitted = admitted;
-        this.bedId = bedId;
-
         // Set registrationDate to current date only if not provided
         this.registrationDate = registrationDate != null ? registrationDate : LocalDate.now();
 
         // Set registrationTime to current time only if not provided
         this.registrationTime = registrationTime != null ? registrationTime : LocalTime.now();
-    }
-
-    // Update setters for new fields
-    public void setRegistrationDate(LocalDate registrationDate) {
-        this.registrationDate = registrationDate;
-    }
-
-    public void setRegistrationTime(LocalTime registrationTime) {
-        this.registrationTime = registrationTime;
     }
 
     // Other existing setters...
@@ -125,4 +113,6 @@ public class Patient_registration {
                 ", registrationTime=" + registrationTime +
                 '}';
     }
+
+
 }
