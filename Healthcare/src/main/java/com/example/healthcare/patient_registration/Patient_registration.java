@@ -61,8 +61,6 @@ public class Patient_registration {
     private Boolean admitted = false;
     @Getter
     private Long bedId; // Integer to store the bed id
-
-
     // Constructor including new fields
     public Patient_registration(Integer id, String fname, String lname, Integer age, String gender, String phone_number,
                                 String email_id, Boolean consent, String doc_id, String address_line, String city,
@@ -79,8 +77,10 @@ public class Patient_registration {
         this.address_line = address_line;
         this.city = city;
         this.state = state;
+
         this.admitted = admitted;
         this.bedId = bedId;
+
 
         // Set registrationDate to current date only if not provided
         this.registrationDate = registrationDate != null ? registrationDate : LocalDate.now();

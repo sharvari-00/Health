@@ -1,15 +1,13 @@
-
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, TextInput, FlatList, StyleSheet, ImageBackground, Image, Alert } from 'react-native';
 
 const BookAppointmentScreen = ({ route, navigation }) => {
-
   const [availableDoctorsData, setAvailableDoctorsData] = useState([]);
-
   const [doctorId, setDoctorId] = useState('');
   const [registeredPatientId, setRegisteredPatientId] = useState(null);
   const [confirmationText, setConfirmationText] = useState('');
-
+  const [errorText, setErrorText] = useState('');
+  const [isConfirmed, setIsConfirmed] = useState(false);
   const { accessToken } = route.params;
 
   useEffect(() => {
@@ -42,8 +40,11 @@ const BookAppointmentScreen = ({ route, navigation }) => {
   const handleConfirmAppointment = () => {
     const selectedDoctor = availableDoctorsData.find(doctor => doctor.id === parseInt(doctorId));
     if (!selectedDoctor) {
-      Alert.alert('Error', 'Please select a valid doctor');
+      setErrorText('Please select a valid doctor');
       return;
+    } else {
+      setErrorText('');
+      setIsConfirmed(true); // Mark appointment as confirmed
     }
 
     const { firstName, lastName, age, gender, phoneNumber, email, houseDetails, city, state, consent } = route.params;
@@ -66,17 +67,13 @@ const BookAppointmentScreen = ({ route, navigation }) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-
         'Authorization': `Bearer ${accessToken}`,
-
       },
       body: JSON.stringify(patientData)
     })
     .then(response => {
       if (response.ok) {
-
         return response.json();
-
       } else {
         throw new Error('Failed to register patient');
       }
@@ -121,11 +118,13 @@ const BookAppointmentScreen = ({ route, navigation }) => {
               onChangeText={setDoctorId}
             />
             <TouchableOpacity
-              style={styles.confirmButton}
+              style={[styles.confirmButton, isConfirmed && styles.confirmedButton]} // Change button style when confirmed
               onPress={handleConfirmAppointment}
+              disabled={isConfirmed} // Disable button when confirmed
             >
-              <Text style={styles.buttonText}>Confirm Appointment</Text>
+              <Text style={styles.buttonText}>{isConfirmed ? 'Confirmed' : 'Confirm Appointment'}</Text>
             </TouchableOpacity>
+            <Text style={styles.errorText}>{errorText}</Text>
             <Text style={styles.confirmationText}>{confirmationText}</Text>
           </View>
 
@@ -158,6 +157,7 @@ const BookAppointmentScreen = ({ route, navigation }) => {
     </ImageBackground>
   );
 };
+
 const styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
@@ -224,6 +224,9 @@ const styles = StyleSheet.create({
     marginTop: 10,
     borderRadius: 5,
   },
+  confirmedButton: {
+    backgroundColor: '#4CAF50', // Change color when confirmed
+  },
   middleHeading: {
     fontSize: 25,
     fontWeight: 'bold',
@@ -276,6 +279,12 @@ const styles = StyleSheet.create({
   },
   confirmationText: {
     color: '#FFFFFF',
+    fontSize: 16,
+    marginTop: 10,
+    textAlign: 'center',
+  },
+  errorText: {
+    color: 'red',
     fontSize: 16,
     marginTop: 10,
     textAlign: 'center',

@@ -1,38 +1,110 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image, Picker } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ViewEditPatientDetailsScreen = ({ route }) => {
   const { patientId } = route.params;
+  //const [changesSaved, setChangesSaved] = useState(false);
+  
+  const [accessToken, setAccessToken] = useState('');
+  const [patientDetails, setPatientDetails] = useState(null);
 
-  // Dummy patient details (replace it with your actual data)
-  const patientDetails = {
-    id: '1',
-    name: 'John Doe',
-    age: 30,
-    gender: 'Male',
-    phoneNumber: '1234567890',
-    address: '123 Main St',
-    doctorAppointed: 'Dr. Smith',
-    consent: true,
-    bedAllocated: null, // Nullable bed allocation
-  };
+  const [editedPhoneNumber, setEditedPhoneNumber] = useState('');
+  const [editedAddress, setEditedAddress] = useState('');
+  const [editedEmail, setEditedEmail] = useState('');
+  const [editedCity, setEditedCity] = useState('');
+  const [editedState, setEditedState] = useState('');
+  const [editedConsent, setEditedConsent] = useState(true);
 
-  const [editedPhoneNumber, setEditedPhoneNumber] = useState(patientDetails.phoneNumber);
-  const [editedAddress, setEditedAddress] = useState(patientDetails.address);
-  const [consent, setConsent] = useState(true); // Initially set to true (Yes)
+  useEffect(() => {
+    // Fetch patient details using API
+    const fetchPatientDetails = async () => {
+      try {
+        // Get access token from async storage
+        const token = await AsyncStorage.getItem('accessToken');
+        setAccessToken(token);
+
+        // Fetch patient details using the token and patientId
+        const response = await fetch(`http://localhost:9090/api/v1/patients/${patientId}`, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setPatientDetails(data);
+          // Set initial values for editable fields
+          setEditedPhoneNumber(data.phone_number);
+          setEditedAddress(data.address_line);
+          setEditedEmail(data.email_id);
+          setEditedCity(data.city);
+          setEditedState(data.state);
+          setEditedConsent(data.consent);
+        } else {
+          console.error('Failed to fetch patient details');
+        }
+      } catch (error) {
+        console.error('Error fetching patient details:', error);
+      }
+    };
+
+    fetchPatientDetails();
+  }, []);
 
   const handleYesClick = () => {
-    setConsent(true);
+    setEditedConsent(true);
   };
 
   const handleNoClick = () => {
-    setConsent(false);
+    setEditedConsent(false);
   };
 
-  const handleSaveChanges = () => {
-    // Implement the logic to save edited patient details
-    console.log('Saving changes to patient details...');
+  const handleSaveChanges = async () => {
+    try {
+      //setIsSaving(true);
+      const response = await fetch(`http://localhost:9090/api/v1/patients/${patientId}`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fname: patientDetails.fname,
+          lname: patientDetails.lname,
+          phone_number: editedPhoneNumber,
+          email_id: editedEmail,
+          address_line: editedAddress,
+          city: editedCity,
+          state: editedState,
+          consent: editedConsent,
+        }),
+      });
+
+      if (response.ok) {
+        console.log('Changes saved successfully');
+        //setChangesSaved(true); 
+        // Optionally, update the local state or any UI feedback here
+      } else {
+        console.error('Failed to save changes');
+      }
+    } catch (error) {
+      console.error('Error saving changes:', error);
+    }
+    // finally {
+    //   setIsSaving(false); // Reset saving state
+    // }
   };
+
+  if (!patientDetails) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <ImageBackground source={require('../assets/wall.jpg')} style={styles.backgroundImage}>
@@ -61,13 +133,18 @@ const ViewEditPatientDetailsScreen = ({ route }) => {
           {/* Middle Right Container */}
           <View style={styles.middleRightContainer}>
             <View style={styles.formRow}>
-              <Text style={styles.formLabel}>ID:</Text>
+              <Text style={styles.formLabel}>Patient ID:</Text>
               <Text style={styles.formValue}>{patientDetails.id}</Text>
             </View>
 
             <View style={styles.formRow}>
-              <Text style={styles.formLabel}>Name:</Text>
-              <Text style={styles.formValue}>{patientDetails.name}</Text>
+              <Text style={styles.formLabel}>First Name:</Text>
+              <Text style={styles.formValue}>{patientDetails.fname}</Text>
+            </View>
+
+            <View style={styles.formRow}>
+              <Text style={styles.formLabel}>Last Name:</Text>
+              <Text style={styles.formValue}>{patientDetails.lname}</Text>
             </View>
 
             <View style={styles.formRow}>
@@ -81,16 +158,6 @@ const ViewEditPatientDetailsScreen = ({ route }) => {
             </View>
 
             <View style={styles.formRow}>
-              <Text style={styles.formLabel}>Doctor Appointed:</Text>
-              <Text style={styles.formValue}>{patientDetails.doctorAppointed}</Text>
-            </View>
-
-            <View style={styles.formRow}>
-              <Text style={styles.formLabel}>Bed Allocated:</Text>
-              <Text style={styles.formValue}>{patientDetails.bedAllocated || 'Not allocated'}</Text>
-            </View>
-
-            <View style={styles.formRow}>
               <Text style={styles.formLabel}>Phone Number:</Text>
               <TextInput
                 style={styles.input}
@@ -100,7 +167,16 @@ const ViewEditPatientDetailsScreen = ({ route }) => {
             </View>
 
             <View style={styles.formRow}>
-              <Text style={styles.formLabel}>Address:</Text>
+              <Text style={styles.formLabel}>Email:</Text>
+              <TextInput
+                style={styles.input}
+                value={editedEmail}
+                onChangeText={(text) => setEditedEmail(text)}
+              />
+            </View>
+
+            <View style={styles.formRow}>
+              <Text style={styles.formLabel}>Address Line 1:</Text>
               <TextInput
                 style={styles.input}
                 value={editedAddress}
@@ -109,23 +185,38 @@ const ViewEditPatientDetailsScreen = ({ route }) => {
             </View>
 
             <View style={styles.formRow}>
-              <Text style={styles.formLabel}>Consent for data sharing, if neccessary:</Text>
-              <TouchableOpacity
-                style={[styles.radioButton, consent ? styles.selected : styles.unselected]}
-                onPress={handleYesClick} // Set to true for "Yes"
+              <Text style={styles.formLabel}>City:</Text>
+              <TextInput
+                style={styles.input}
+                value={editedCity}
+                onChangeText={(text) => setEditedCity(text)}
+              />
+            </View>
+
+            <View style={styles.formRow}>
+              <Text style={styles.formLabel}>State:</Text>
+              <TextInput
+                style={styles.input}
+                value={editedState}
+                onChangeText={(text) => setEditedState(text)}
+              />
+            </View>
+
+            <View style={styles.formRow}>
+              <Text style={styles.formLabel}>Consent for data sharing:</Text>
+              <Picker
+                selectedValue={editedConsent}
+                style={{ height: 50, width: 150 }}
+                onValueChange={(itemValue) => setEditedConsent(itemValue)}
               >
-                <Text style={consent ? styles.selectedText : styles.unselectedText}>Yes</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.radioButton, !consent ? styles.selected : styles.unselected]}
-                onPress={handleNoClick} // Set to false for "No"
-              >
-                <Text style={!consent ? styles.selectedText : styles.unselectedText}>No</Text>
-              </TouchableOpacity>
+                <Picker.Item label="Yes" value={true} />
+                <Picker.Item label="No" value={false} />
+              </Picker>
             </View>
 
             <TouchableOpacity style={styles.saveButton} onPress={handleSaveChanges}>
-              <Text style={styles.buttonText}>Save Changes</Text>
+            <Text style={styles.buttonText}>Save Changes</Text>
+
             </TouchableOpacity>
           </View>
         </View>
@@ -225,24 +316,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     flex: 1,
   },
-  radioButton: {
-    padding: 10,
-    alignItems: 'center',
-    borderRadius: 5,
-    marginRight: 10,
-  },
-  selected: {
-    backgroundColor: '#32CD32', // Green for "Yes"
-  },
-  unselected: {
-    //backgroundColor: '#FF0000', // Red for "No"
-  },
-  selectedText: {
-    color: '#FFFFFF',
-  },
-  unselectedText: {
-    color: '#000000',
-  },
   saveButton: {
     backgroundColor: '#61828a',
     padding: 15,
@@ -258,6 +331,7 @@ const styles = StyleSheet.create({
   logo: {
     width: 200,
     height: 200,
+    resizeMode: 'contain',
   },
 });
 

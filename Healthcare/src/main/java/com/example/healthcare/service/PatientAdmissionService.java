@@ -38,8 +38,6 @@ public class PatientAdmissionService {
             Patient_registration patient = optionalPatient.get();
             if (patient.getAdmitted()) {
                 patient.setAdmitted(false); // Mark the patient as discharged
-                patient.setBedId(null); // Release the bed
-                patientRegistrationRepo.save(patient);
 
                 // Find the bed assigned to the discharged patient and mark it as unoccupied
                 Long bedId = patient.getBedId();
@@ -47,10 +45,18 @@ public class PatientAdmissionService {
                     Optional<Bed> optionalBed = bedRepository.findById(bedId);
                     if (optionalBed.isPresent()) {
                         Bed bed = optionalBed.get();
-                        bed.setOccupied(false);
-                        bedRepository.save(bed);
+                        bed.setOccupied(false); // Mark the bed as unoccupied first
+                        bedRepository.save(bed); // Save the bed status
+                    } else {
+                        throw new RuntimeException("Bed not found with ID: " + bedId);
                     }
+                } else {
+                    throw new IllegalStateException("Patient is not assigned a bed");
                 }
+
+                // Clear the bed assignment from the patient
+                patient.setBedId(null);
+                patientRegistrationRepo.save(patient); // Save the patient record
             } else {
                 throw new IllegalStateException("Patient is not admitted");
             }
@@ -58,6 +64,7 @@ public class PatientAdmissionService {
             throw new IllegalArgumentException("Patient not found with ID: " + patientId);
         }
     }
+
 
     private void allocateBed(Patient_registration patient) {
         Optional<Bed> availableBedOptional = bedRepository.findFirstByOccupiedFalse();
