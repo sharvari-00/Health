@@ -1,35 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image, Picker } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ViewEditPatientDetailsScreen = ({ route }) => {
   const { patientId } = route.params;
 
-  // Dummy patient details (replace it with your actual data)
-  const patientDetails = {
-    id: '1',
-    firstName: 'John',
-    lastName: 'Doe',
-    age: 30,
-    gender: 'Male',
-    registrationDate: '2024-04-11',
-    registrationTime: '10:00 AM',
-    doctorAppointed: 'Dr. Smith',
-    bedAllocated: true, // Nullable bed allocation
-    bedNumber: '101',
-    phoneNumber: '1234567890',
-    email: 'john.doe@example.com',
-    addressLine1: '123 Main St',
-    city: 'Cityville',
-    state: 'Stateville',
-    consent: true,
-  };
+  const [accessToken, setAccessToken] = useState('');
+  const [patientDetails, setPatientDetails] = useState(null);
 
-  const [editedPhoneNumber, setEditedPhoneNumber] = useState(patientDetails.phoneNumber);
-  const [editedAddress, setEditedAddress] = useState(patientDetails.addressLine1);
-  const [editedEmail, setEditedEmail] = useState(patientDetails.email);
-  const [editedCity, setEditedCity] = useState(patientDetails.city);
-  const [editedState, setEditedState] = useState(patientDetails.state);
-  const [editedConsent, setEditedConsent] = useState(patientDetails.consent);
+  const [editedPhoneNumber, setEditedPhoneNumber] = useState('');
+  const [editedAddress, setEditedAddress] = useState('');
+  const [editedEmail, setEditedEmail] = useState('');
+  const [editedCity, setEditedCity] = useState('');
+  const [editedState, setEditedState] = useState('');
+  const [editedConsent, setEditedConsent] = useState(true);
+
+  useEffect(() => {
+    // Fetch patient details using API
+    const fetchPatientDetails = async () => {
+      try {
+        // Get access token from async storage
+        const token = await AsyncStorage.getItem('accessToken');
+        setAccessToken(token);
+
+        // Fetch patient details using the token and patientId
+        const response = await fetch(`YOUR_BACKEND_API_ENDPOINT/patients/${patientId}`, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setPatientDetails(data);
+          // Set initial values for editable fields
+          setEditedPhoneNumber(data.phone_number);
+          setEditedAddress(data.address_line);
+          setEditedEmail(data.email_id);
+          setEditedCity(data.city);
+          setEditedState(data.state);
+          setEditedConsent(data.consent);
+        } else {
+          console.error('Failed to fetch patient details');
+        }
+      } catch (error) {
+        console.error('Error fetching patient details:', error);
+      }
+    };
+
+    fetchPatientDetails();
+  }, []);
 
   const handleYesClick = () => {
     setEditedConsent(true);
@@ -39,10 +61,42 @@ const ViewEditPatientDetailsScreen = ({ route }) => {
     setEditedConsent(false);
   };
 
-  const handleSaveChanges = () => {
-    // Implement the logic to save edited patient details
-    console.log('Saving changes to patient details...');
+  const handleSaveChanges = async () => {
+    try {
+      const response = await fetch(`YOUR_BACKEND_API_ENDPOINT/patients/${patientId}`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          phone_number: editedPhoneNumber,
+          email_id: editedEmail,
+          address_line: editedAddress,
+          city: editedCity,
+          state: editedState,
+          consent: editedConsent,
+        }),
+      });
+
+      if (response.ok) {
+        console.log('Changes saved successfully');
+        // Optionally, update the local state or any UI feedback here
+      } else {
+        console.error('Failed to save changes');
+      }
+    } catch (error) {
+      console.error('Error saving changes:', error);
+    }
   };
+
+  if (!patientDetails) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <ImageBackground source={require('../assets/wall.jpg')} style={styles.backgroundImage}>
@@ -77,12 +131,12 @@ const ViewEditPatientDetailsScreen = ({ route }) => {
 
             <View style={styles.formRow}>
               <Text style={styles.formLabel}>First Name:</Text>
-              <Text style={styles.formValue}>{patientDetails.firstName}</Text>
+              <Text style={styles.formValue}>{patientDetails.fname}</Text>
             </View>
 
             <View style={styles.formRow}>
               <Text style={styles.formLabel}>Last Name:</Text>
-              <Text style={styles.formValue}>{patientDetails.lastName}</Text>
+              <Text style={styles.formValue}>{patientDetails.lname}</Text>
             </View>
 
             <View style={styles.formRow}>
@@ -93,31 +147,6 @@ const ViewEditPatientDetailsScreen = ({ route }) => {
             <View style={styles.formRow}>
               <Text style={styles.formLabel}>Gender:</Text>
               <Text style={styles.formValue}>{patientDetails.gender}</Text>
-            </View>
-
-            <View style={styles.formRow}>
-              <Text style={styles.formLabel}>Registration Date:</Text>
-              <Text style={styles.formValue}>{patientDetails.registrationDate}</Text>
-            </View>
-
-            <View style={styles.formRow}>
-              <Text style={styles.formLabel}>Registration Time:</Text>
-              <Text style={styles.formValue}>{patientDetails.registrationTime}</Text>
-            </View>
-
-            <View style={styles.formRow}>
-              <Text style={styles.formLabel}>Doctor Appointed:</Text>
-              <Text style={styles.formValue}>{patientDetails.doctorAppointed}</Text>
-            </View>
-
-            <View style={styles.formRow}>
-              <Text style={styles.formLabel}>Bed Allocated:</Text>
-              <Text style={styles.formValue}>{patientDetails.bedAllocated ? 'Yes' : 'No'}</Text>
-            </View>
-
-            <View style={styles.formRow}>
-              <Text style={styles.formLabel}>Bed Number:</Text>
-              <Text style={styles.formValue}>{patientDetails.bedNumber}</Text>
             </View>
 
             <View style={styles.formRow}>
@@ -278,24 +307,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     flex: 1,
   },
-  radioButton: {
-    padding: 10,
-    alignItems: 'center',
-    borderRadius: 5,
-    marginRight: 10,
-  },
-  selected: {
-    backgroundColor: '#32CD32', // Green for "Yes"
-  },
-  unselected: {
-    //backgroundColor: '#FF0000', // Red for "No"
-  },
-  selectedText: {
-    color: '#FFFFFF',
-  },
-  unselectedText: {
-    color: '#000000',
-  },
   saveButton: {
     backgroundColor: '#61828a',
     padding: 15,
@@ -311,6 +322,7 @@ const styles = StyleSheet.create({
   logo: {
     width: 200,
     height: 200,
+    resizeMode: 'contain',
   },
 });
 

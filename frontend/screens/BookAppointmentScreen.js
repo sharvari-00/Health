@@ -2,67 +2,88 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, TextInput, FlatList, StyleSheet, ImageBackground, Image } from 'react-native';
 
 const BookAppointmentScreen = ({ route, navigation }) => {
-  // Dummy data for available doctors (replace it with your actual data)
-  const availableDoctorsData = [
-    { id: '101', name: 'Dr. Smith', duration: '9:00 - 13:00' },
-    { id: '102', name: 'Dr. Johnson', duration: '16:00 - 20:00' },
-    // Add more doctor data as needed
-  ];
+  // State to hold the fetched doctor data
+  const [availableDoctorsData, setAvailableDoctorsData] = useState([]);
 
   // Extracting patient data from the route params
   const { firstName, lastName, age, gender, phoneNumber, email, houseDetails, city, state, consent, accessToken } = route.params;
-  
-  const [doctorId, setDoctorId] = useState('');
 
-  const handleConfirmAppointment = () => {
-    // Prepare the patient data to be sent to the backend
-    const patientData = {
-      firstName: firstName,
-      lastName: lastName,
-      age: age,
-      gender: gender,
-      phoneNumber: phoneNumber,
-      email: email,
-      houseDetails: houseDetails,
-      city: city,
-      state: state,
-      consent: consent === 'Yes' ? true : false,
-      doctorId: doctorId,
-    };
-  
-    // Make a POST request to register a patient
-    fetch('/api/v1/patients/register_patient', {
-      method: 'POST',
+  // Function to fetch doctor details from the backend
+  const fetchDoctorDetails = () => {
+    fetch('YOUR_BACKEND_ENDPOINT', { // Replace YOUR_BACKEND_ENDPOINT with the actual endpoint
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${accessToken}`, // Include the accessToken
       },
-      body: JSON.stringify(patientData)
     })
     .then(response => {
-      // Check if the request was successful
       if (response.ok) {
-        // Extract patient ID from response headers
-        const patientId = response.headers.get('patientId');
-        // Display an alert message with the registered patient ID
-        alert(`Appointment scheduled with Doctor ID: ${doctorId}.\nRegistered patient ID is ${patientId}`);
-        // You can also access the patient details from the response body if needed
         return response.json();
       } else {
-        // Handle error responses
-        console.error('Failed to register patient');
-        // You may want to throw an error or handle it accordingly
+        throw new Error('Failed to fetch doctor details');
       }
     })
     .then(data => {
-      // Handle the response body data if needed
+      setAvailableDoctorsData(data); // Update state with fetched doctor data
+    })
+    .catch(error => {
+      console.error('Error fetching doctor details:', error);
+    });
+  };
+
+  // Fetch doctor details when the component mounts
+  useEffect(() => {
+    fetchDoctorDetails();
+  }, []); // Empty dependency array ensures the effect runs only once when the component mounts
+
+  // State to hold the selected doctor ID
+  const [doctorId, setDoctorId] = useState('');
+
+  // Function to handle confirming the appointment
+  const handleConfirmAppointment = () => {
+    const patientData = {
+      fname: firstName,
+      lname: lastName,
+      age: age,
+      gender: gender,
+      phone_number: phoneNumber,
+      email_id: email,
+      consent: consent,
+      docId: doctorId,
+      address_line: houseDetails,
+      city: city,
+      state: state,
+    };
+  
+    fetch('http://localhost:9090/api/v1/patients/register_patient', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(patientData)
+    })
+    .then(response => {
+      if (response.ok) {
+        return response.json()
+          .then(data => {
+            const patientId = data.id;
+            alert(`Appointment scheduled with Doctor ID: ${doctorId}.\nRegistered patient ID is ${patientId}`);
+            return data;
+          });
+      } else {
+        console.error('Failed to register patient');
+      }
+    })
+    .then(data => {
       console.log('Registered patient details:', data);
     })
     .catch(error => {
-      // Handle any network errors or exceptions
       console.error('Error registering patient:', error);
     });
   };
+  
   return (
     <ImageBackground source={require('../assets/wall.jpg')} style={styles.backgroundImage}>
       <View style={styles.overlay}>
@@ -104,7 +125,7 @@ const BookAppointmentScreen = ({ route, navigation }) => {
             <Text style={styles.middleHeading}>Doctors</Text>
             <FlatList
               data={availableDoctorsData}
-              keyExtractor={(item) => item.id}
+              keyExtractor={(item) => item.id.toString()}
               renderItem={({ item, index }) => (
                 <View style={[styles.doctorItem, { backgroundColor: index % 2 === 0 ? 'rgba(169, 204, 207, 0.4)' : 'rgba(169, 204, 207, 0.4)' }]}>
                   <View style={styles.doctorDetails}>

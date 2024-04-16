@@ -14,7 +14,7 @@ const AddPatientScreen = ({ navigation }) => {
   const [houseDetails, setHouseDetails] = useState('');
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
-  const [consent, setConsent] = useState('Yes'); // Default value for consent
+  const [consent, setConsent] = useState(true); // Default value for consent
   const [accessToken, setAccessToken] = useState('');
 
   useEffect(() => {
@@ -162,8 +162,8 @@ const AddPatientScreen = ({ navigation }) => {
                   style={styles.dropdown}
                   onValueChange={(itemValue, itemIndex) => setConsent(itemValue)}
                 >
-                  <Picker.Item label="Yes" value="Yes" />
-                  <Picker.Item label="No" value="No" />
+                  <Picker.Item label="Yes" value={true} />
+                  <Picker.Item label="No" value={false} />
                 </Picker>
               </View>
             </View>
