@@ -63,8 +63,23 @@ public class Doctor_Controller {
     }
     @PostMapping("/prescription/{patient_id}") //this api creates the prescription for a particular patient
     public ResponseEntity<Prescription> updatePrescription(@PathVariable int patient_id, @RequestBody Prescription prescription) {
-        Prescription updatedPrescription = doctor_service.updatePrescription(patient_id, prescription);
-        return ResponseEntity.ok(updatedPrescription);
+//        Prescription updatedPrescription = doctor_service.updatePrescription(patient_id, prescription);
+//        return ResponseEntity.ok(updatedPrescription);
+        try {
+            // Get the authentication object from the security context
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            if (authentication != null && authentication.getAuthorities().stream()
+                    .anyMatch(r -> r.getAuthority().equals("DOCTOR"))) {
+                Prescription updatedPrescription = doctor_service.updatePrescription(patient_id, prescription);
+                return ResponseEntity.ok(updatedPrescription);
+            }else {
+
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
 }
