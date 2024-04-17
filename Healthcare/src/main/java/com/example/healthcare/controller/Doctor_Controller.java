@@ -43,7 +43,7 @@ public class Doctor_Controller {
         List patients = doctor_service.getPatientsByLoggedInDoctor(loggedInDoctorEmail);
         return new ResponseEntity<>(patients, HttpStatus.OK);
     }
-    @PostMapping("/symptoms") //this api creates the symptoms for a particular patient
+    @PostMapping("/symptoms/{patient_id}") //this api creates the symptoms for a particular patient
     public ResponseEntity<Symptoms> updateSymptoms(@PathVariable int patient_id, @RequestBody Symptoms symptoms) {
         try {
             // Get the authentication object from the security context

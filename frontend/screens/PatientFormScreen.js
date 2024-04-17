@@ -5,7 +5,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const PatientFormScreen = ({ route }) => {
   const navigation = useNavigation();
-  const { patientId } = route.params;
+  const { patientId,name,age,gender } = route.params;
+
   const [accessToken, setAccessToken] = useState('');
   const [patientDetails, setPatientDetails] = useState({
     name: '',
@@ -54,7 +55,7 @@ const PatientFormScreen = ({ route }) => {
 
   const handleAddSymptoms = async () => {
     try {
-      const response = await fetch('http://localhost:9090/api/v1/doctor/symptoms', {
+      const response = await fetch(`http://localhost:9090/api/v1/doctor/symptoms/${patientId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -77,7 +78,7 @@ const PatientFormScreen = ({ route }) => {
 
   const handleAddDiagnosis = async () => {
     try {
-      const response = await fetch('http://localhost:9090/api/v1/doctor/diagnosis', {
+      const response = await fetch(`http://localhost:9090/api/v1/doctor/diagnosis/${patientId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -100,7 +101,7 @@ const PatientFormScreen = ({ route }) => {
 
   const handleAddPrescription = async () => {
     try {
-      const response = await fetch('http://localhost:9090/api/v1/doctor/prescription', {
+      const response = await fetch(`http://localhost:9090/api/v1/doctor/prescription/${patientId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -163,9 +164,9 @@ const PatientFormScreen = ({ route }) => {
             <View style={styles.middleLeftContainer}>
               <Text style={styles.consultationFormHeading}>Patient Details</Text>
               <Text style={styles.patientDetails}>ID: {patientId}</Text>
-              <Text style={styles.patientDetails}>Name: {data.name}</Text>
-              <Text style={styles.patientDetails}>Age: {data.age}</Text>
-              <Text style={styles.patientDetails}>Gender: {data.gender}</Text>
+              <Text style={styles.patientDetails}>Name: {name}</Text>
+              <Text style={styles.patientDetails}>Age: {age}</Text>
+              <Text style={styles.patientDetails}>Gender: {gender}</Text>
             </View>
             <View style={styles.middleRightContainer}>
               <Text style={styles.prescriptionFormHeading}>Consultation Form</Text>
@@ -221,7 +222,7 @@ const PatientFormScreen = ({ route }) => {
                 onPress={handleUpdateAdmission}
                 disabled={admissionUpdated}
               >
-                <Text style={styles.buttonText}>{admissionUpdated ? 'Updated' : 'Save Admission'}</Text>
+                <Text style={styles.buttonText}>{admissionUpdated ? 'Admission Updated' : 'Save Admission'}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmConsultation}>
                 <Text style={styles.buttonText}>Confirm Consultation</Text>
