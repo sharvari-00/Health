@@ -90,13 +90,14 @@ const ViewEditPatientDetailsScreen = ({ route }) => {
     }
   };
 
-  if (!patientDetails) {
-    return (
-      <View style={styles.loadingContainer}>
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
+  // if (!patientDetails) {
+  //   return (
+  //     <View style={styles.loadingContainer}>
+  //       <Text>Loading...</Text>
+  //     </View>
+  //   );
+  // }
+
 
   return (
     <ImageBackground source={require('../assets/wall.jpg')} style={styles.backgroundImage}>

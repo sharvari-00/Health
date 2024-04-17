@@ -222,16 +222,17 @@ const styles = StyleSheet.create({
     flex: 2,
     alignItems: 'center',
     backgroundColor: 'rgba(223, 233, 235, 0.2)',
-    justifyContent: 'center',
+    justifyContent: 'left',
   },
   middleRightContainer: {
     flex: 8,
     alignItems: 'stretch',
-    justifyContent: 'center',
+    justifyContent: 'left',
     paddingHorizontal: 20,
   },
   subHeading: {
     fontSize: 20,
+    marginTop:20,
     fontWeight: 'bold',
     marginBottom: 10,
     color: '#FFFFFF',
@@ -243,6 +244,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#FFFFFF',
     marginBottom: 5,
+    marginLeft:20,
   },
   input: {
     height: 40,
@@ -251,6 +253,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     backgroundColor: '#FFFFFF',
     borderRadius: 10,
+    height:150,
+    width:'85%',
+    marginBottom: 10,
+    marginLeft:20,
   },
   curvedInput: {
     borderRadius: 10,
@@ -262,6 +268,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 10,
     marginTop: 10,
+    width:'5%',
+    marginLeft:20,
   },
   lowerContainer: {
     flex: 2,

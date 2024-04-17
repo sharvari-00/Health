@@ -1,20 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const PrescriptionScreen = ({ route }) => {
   const { patientId } = route.params; // Get the patient ID from the navigation params
   const [patientDetails, setPatientDetails] = useState(null); // State to store patient details
   const [prescriptions, setPrescriptions] = useState([]); // State to store prescriptions
   const navigation = useNavigation();
-
+  const [accessToken, setAccessToken] = useState('');
 
   // Function to fetch patient details and prescriptions based on patient ID
   const fetchPatientDetails = async () => {
     try {
+      // Get access token from AsyncStorage
+      const token = await AsyncStorage.getItem('accessToken');
+      setAccessToken(token);
+
       // Here, you would make an API call to fetch patient details and prescriptions from the database
       // Replace this with your actual API call
-      const response = await fetch(`your_api_endpoint/patients/${patientId}`);
+      const response = await fetch(`your_api_endpoint/patients/${patientId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await response.json();
       // Update state with fetched data
       setPatientDetails(data.patientDetails);
@@ -40,9 +49,9 @@ const PrescriptionScreen = ({ route }) => {
             <Text style={styles.headerText}> Prescription</Text>
             <View style={styles.divider} />
             <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('PatientIdScreen')}>
-  <Text style={styles.buttonText}>Back</Text>
-</TouchableOpacity>
+              <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('PatientIdScreen')}>
+                <Text style={styles.buttonText}>Back</Text>
+              </TouchableOpacity>
               <TouchableOpacity style={styles.logoutButton}>
                 <Text style={styles.buttonText}>Logout</Text>
               </TouchableOpacity>
@@ -81,7 +90,6 @@ const PrescriptionScreen = ({ route }) => {
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -1,58 +1,116 @@
-import React from 'react';
-import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Image, TextInput, Button } from 'react-native';
-import { useNavigation } from '@react-navigation/native'; // Import the hook
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Image, TextInput, FlatList } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const PatientDetailsScreen = ({ route }) => {
-  const navigation = useNavigation(); // Use the useNavigation hook to get the navigation object
+  const navigation = useNavigation();
+  const { patientId } = route.params;
 
-  const { patientId } = route.params; // Get the patient ID from the navigation params
+  // State variables to store patient details, symptoms, treatment plan, and prescription
+  const [patientDetails, setPatientDetails] = useState({});
+  const [symptoms, setSymptoms] = useState([]);
+  const [treatmentPlan, setTreatmentPlan] = useState([]);
+  const [prescription, setPrescription] = useState([]);
 
-  // Fetch patient details based on patientId (you might have an API call or local data)
-  const patientDetails = {
-    name: 'John Doe',
-    age: 25,
-    gender: 'Male',
-    symptoms: 'Fever, Cough',
-    diagnosis: 'Common Cold',
-    prescription: 'Paracetamol, Rest',
-    treatment: 'Stay hydrated, Take prescribed medications',
-  };
+  // Fetch access token and patient data on component mount
+  useEffect(() => {
+    const fetchPatientData = async () => {
+      try {
+        const accessToken = await AsyncStorage.getItem('accessToken');
+        if (accessToken) {
+          fetchPatientDetails(accessToken);
+          fetchSymptoms(accessToken);
+          fetchTreatmentPlan(accessToken);
+          fetchPrescription(accessToken);
+        } else {
+          console.error('Access token not found.');
+        }
+      } catch (error) {
+        console.error('Error fetching access token:', error);
+      }
+    };
 
-  const [filePath, setFilePath] = React.useState('');
-  const [showInput, setShowInput] = React.useState(false);
-  const [uploadButtonText, setUploadButtonText] = React.useState('Upload');
+    fetchPatientData();
+  }, []);
 
-  const handleUpload = () => {
-    if (!showInput) {
-      setShowInput(true);
-      setUploadButtonText('Cancel');
-    } else {
-      setShowInput(false);
-      setUploadButtonText('Upload');
-      setFilePath('');
+  // Function to fetch patient details
+  const fetchPatientDetails = async (accessToken) => {
+    try {
+      const response = await fetch(`your_patient_details_api_endpoint/${patientId}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      const data = await response.json();
+      setPatientDetails(data);
+    } catch (error) {
+      console.error('Error fetching patient details:', error);
     }
   };
 
-  const handleSaveImage = () => {
-    // Logic to save the image path to the patient database
-    console.log('Image path saved:', filePath);
-    setShowInput(false); // Hide input after saving
-    setUploadButtonText('Upload');
-    setFilePath('');
+  // Function to fetch symptoms
+  const fetchSymptoms = async (accessToken) => {
+    try {
+      const response = await fetch(`your_symptoms_api_endpoint/${patientId}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      const data = await response.json();
+      setSymptoms(data);
+    } catch (error) {
+      console.error('Error fetching symptoms:', error);
+    }
+  };
+
+  // Function to fetch treatment plan
+  const fetchTreatmentPlan = async (accessToken) => {
+    try {
+      const response = await fetch(`your_treatment_plan_api_endpoint/${patientId}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      const data = await response.json();
+      setTreatmentPlan(data);
+    } catch (error) {
+      console.error('Error fetching treatment plan:', error);
+    }
+  };
+
+  // Function to fetch prescription
+  const fetchPrescription = async (accessToken) => {
+    try {
+      const response = await fetch(`your_prescription_api_endpoint/${patientId}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      const data = await response.json();
+      setPrescription(data);
+    } catch (error) {
+      console.error('Error fetching prescription:', error);
+    }
   };
 
   return (
     <View style={styles.container}>
-      {/* Background Image */}
       <ImageBackground
         source={require('../assets/wall.jpg')}
         style={styles.backgroundImage}
       >
-        {/* Layer */}
         <View style={styles.layer}>
-          {/* Upper Container */}
           <View style={styles.upperContainer}>
-            <Text style={styles.headerText}> Patient Diagnosis</Text>
+            <Text style={styles.headerText}>Patient Diagnosis</Text>
             <View style={styles.divider} />
             <View style={styles.buttonContainer}>
               <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('NurseScreen')}>
@@ -63,40 +121,45 @@ const PatientDetailsScreen = ({ route }) => {
               </TouchableOpacity>
             </View>
           </View>
-          {/* Middle Container */}
           <View style={styles.middleContainer}>
-            {/* Left Middle Container */}
-            <View style={styles.leftMiddleContainer}>
-              <Text style={[styles.patientDetailText, { fontSize: 24, textAlign: 'center' }]}>Patient Details</Text>
-              <Text></Text>
-              <Text style={styles.patientDetailText}>Name: {patientDetails.name}</Text>
-              <Text style={styles.patientDetailText}>Age: {patientDetails.age}</Text>
-              <Text style={styles.patientDetailText}>Gender: {patientDetails.gender}</Text>
-              <Text style={styles.patientDetailText}>Symptoms: {patientDetails.symptoms}</Text>
-              <Text style={styles.patientDetailText}>Diagnosis: {patientDetails.diagnosis}</Text>
-              <Text style={styles.patientDetailText}>Prescription: {patientDetails.prescription}</Text>
-              <Text style={styles.patientDetailText}>Treatment: {patientDetails.treatment}</Text>
-            </View>
             {/* Right Middle Container */}
             <View style={styles.rightMiddleContainer}>
               <Text style={styles.imageUploadText}>Test Report</Text>
-              <TouchableOpacity style={[styles.uploadButton, showInput ? styles.cancelButton : null]} onPress={handleUpload}>
-                <Text style={[styles.buttonText, showInput ? styles.cancelButtonText : null]}>{uploadButtonText}</Text>
-              </TouchableOpacity>
-              {showInput && (
-                <View>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Enter file path"
-                    onChangeText={(text) => setFilePath(text)}
-                    value={filePath}
-                  />
-                  <Button title="Save" onPress={handleSaveImage} color="#61828a" />
-                </View>
-              )}
+              {/* Add your image upload logic here */}
+            </View>
+            {/* Left Middle Container */}
+            <View style={styles.leftMiddleContainer}>
+              <Text style={[styles.patientDetailText, { fontSize: 24, textAlign: 'center' }]}>Patient History</Text>
+              <Text style={styles.patientDetailText}>Patient Id: {patientDetails.id}</Text>
+              <Text style={styles.patientDetailText}>Name: {patientDetails.name}</Text>
+              <Text style={styles.patientDetailText}>Age: {patientDetails.age}</Text>
+              <Text style={styles.patientDetailText}>Gender: {patientDetails.gender}</Text>
+              <Text style={styles.patientDetailText}>Symptoms:</Text>
+              <FlatList
+                data={symptoms}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item, index }) => (
+                  <Text style={styles.detailText}>{index + 1}. {item.symptom}</Text>
+                )}
+              />
+              <Text style={styles.patientDetailText}>Treatment Plan:</Text>
+              <FlatList
+                data={treatmentPlan}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item, index }) => (
+                  <Text style={styles.detailText}>{index + 1}. {item.treatment}</Text>
+                )}
+              />
+              <Text style={styles.patientDetailText}>Prescription:</Text>
+              <FlatList
+                data={prescription}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item, index }) => (
+                  <Text style={styles.detailText}>{index + 1}. {item.medication}</Text>
+                )}
+              />
             </View>
           </View>
-          {/* Bottom Container */}
           <View style={styles.bottomContainer}>
             <View style={styles.logoContainer}>
               <Image style={styles.logo} source={require('../assets/logo2.png')} />
@@ -107,6 +170,7 @@ const PatientDetailsScreen = ({ route }) => {
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -121,26 +185,26 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent layer
   },
   upperContainer: {
-    flex: 3,
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
   middleContainer: {
-    flex: 4,
+    flex: 3,
     flexDirection: 'row',
   },
   leftMiddleContainer: {
-    flex: 1,
-    backgroundColor: 'rgba(223, 233, 235, 0.2)', // Background color with opacity
+    flex: 8,
     padding: 20,
   },
   rightMiddleContainer: {
-    flex: 1,
+    flex: 2,
     justifyContent: 'center',
+    backgroundColor: 'rgba(223, 233, 235, 0.2)',
     alignItems: 'center',
   },
   bottomContainer: {
-    flex: 3,
+    flex: 1,
     justifyContent: 'flex-end',
     alignItems: 'flex-start',
   },
@@ -212,6 +276,10 @@ const styles = StyleSheet.create({
     width: 200,
     height: 200,
     resizeMode: 'contain',
+  },
+  detailText: {
+    fontSize: 16,
+    color: '#FFFFFF',
   },
 });
 
