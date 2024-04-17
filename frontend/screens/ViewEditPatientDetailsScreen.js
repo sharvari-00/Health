@@ -25,7 +25,7 @@ const ViewEditPatientDetailsScreen = ({ route }) => {
         setAccessToken(token);
 
         // Fetch patient details using the token and patientId
-        const response = await fetch(`http://localhost:9090/api/v1/patients/${patientId}`, {
+        const response = await fetch(`http://localhost:9090/api/v1/patients/exists/${patientId}`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,

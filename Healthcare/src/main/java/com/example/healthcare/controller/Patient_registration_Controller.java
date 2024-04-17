@@ -4,7 +4,6 @@ import com.example.healthcare.patient_registration.Patient_registration;
 import com.example.healthcare.prescription.Prescription;
 import com.example.healthcare.service.Patient_service;
 import com.example.healthcare.symptoms.Symptoms;
-import com.example.healthcare.treatment.Treament;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -46,9 +45,9 @@ public class Patient_registration_Controller {
         List<Patient_registration> patients = patientService.getAllPatients();
         return new ResponseEntity<>(patients, HttpStatus.OK);
     }
-    @GetMapping("/{id}")
-    public ResponseEntity<Patient_registration> getPatientById(@PathVariable Long id) {
-        Patient_registration patient = patientService.getPatientById(id);
+    @GetMapping("exists/{id}")
+    public ResponseEntity<Optional<Patient_registration>> getPatientById(@PathVariable Long id) {
+        Optional<Patient_registration> patient = patientService.getPatientById(id);
         if (patient != null) {
             return ResponseEntity.ok(patient);
         } else {
@@ -73,7 +72,7 @@ public class Patient_registration_Controller {
         return ResponseEntity.ok(updatedPrescription);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/details/{id}")
     public ResponseEntity<Patient_registration> getPatientDetails(@PathVariable Long id) {
         Optional<Patient_registration> patientOptional = patientService.getPatientById(id);
         return patientOptional.map(patient -> ResponseEntity.ok().body(patient))
