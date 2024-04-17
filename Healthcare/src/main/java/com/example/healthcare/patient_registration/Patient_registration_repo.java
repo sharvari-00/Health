@@ -11,4 +11,6 @@ public interface Patient_registration_repo<patient_registration> extends JpaRepo
     Optional<Patient_registration> findById(Long id);
 
     List<Patient_registration> findByDocId(String s);
+
+    List<Patient_registration> findByBedIdNotNull();
 }

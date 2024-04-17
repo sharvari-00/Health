@@ -1,5 +1,6 @@
 package com.example.healthcare.service;
 
+import com.example.healthcare.DTO.patientInfoDTO;
 import com.example.healthcare.patient_registration.Patient_registration;
 import com.example.healthcare.patient_registration.Patient_registration_repo;
 import com.example.healthcare.prescription.Prescription;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class Patient_service {
@@ -84,6 +86,13 @@ public class Patient_service {
             prescription.setId(existingPrescription.getId()); // Update existing record if found
         }
         return prescriptionRepository.save(prescription);
+    }
+
+    public List<patientInfoDTO> getPatientsWithBedId() {
+        List<Patient_registration> patients = patientRepo.findByBedIdNotNull();
+        return patients.stream()
+                .map(patient -> new patientInfoDTO(patient.getId(), patient.getFname(), patient.getBedId()))
+                .collect(Collectors.toList());
     }
 
 //    public static Patient_registration getPatientDetailsByFname(String fname) {

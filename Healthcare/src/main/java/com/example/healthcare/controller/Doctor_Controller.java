@@ -1,17 +1,17 @@
 package com.example.healthcare.controller;
 
+import com.example.healthcare.DTO.patientInfoDTO;
 import com.example.healthcare.diagnosis.Diagnosis;
 import com.example.healthcare.doctor_details.Doctor_details;
-import com.example.healthcare.patient_registration.Patient_registration;
 import com.example.healthcare.prescription.Prescription;
 import com.example.healthcare.service.Doctor_service;
+import com.example.healthcare.service.Patient_service;
 import com.example.healthcare.symptoms.Symptoms;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -20,8 +20,11 @@ import java.util.List;
 @RequestMapping("/api/v1/doctor")
 public class Doctor_Controller {
     private final Doctor_service doctor_service;
+    private final Patient_service patientRegistrationService;
 
-    public Doctor_Controller(Doctor_service doctorService) { this.doctor_service = doctorService;}
+    public Doctor_Controller(Doctor_service doctorService, Patient_service patientRegistrationService) { this.doctor_service = doctorService;
+        this.patientRegistrationService = patientRegistrationService;
+    }
     @PutMapping("/{doctorEmail}")
     public ResponseEntity<Doctor_details> updateDoctorDetailsByAdmin(@PathVariable String doctorEmail, @RequestBody Doctor_details updatedDoctorDetails) {
         Doctor_details updatedDoctorDetailsByAdmin = doctor_service.updateDoctorDetailsByAdmin(doctorEmail,updatedDoctorDetails);
@@ -102,6 +105,23 @@ public class Doctor_Controller {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+    @GetMapping("/onRoundPatients")
+    public List<patientInfoDTO> getPatientsWithBedId() {
+        try {
+            // Get the authentication object from the security context
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.getAuthorities().stream()
+                    .anyMatch(r -> r.getAuthority().equals("DOCTOR"))) {
+                return patientRegistrationService.getPatientsWithBedId();
+
+            }else {
+                return (List<patientInfoDTO>) ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+        } catch (Exception e) {
+            return (List<patientInfoDTO>) ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
     }
 
 }

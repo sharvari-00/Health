@@ -222,7 +222,7 @@ const PatientFormScreen = ({ route }) => {
                 onPress={handleUpdateAdmission}
                 disabled={admissionUpdated}
               >
-                <Text style={styles.buttonText}>{admissionUpdated ? 'Admission Updated' : 'Save Admission'}</Text>
+                <Text style={styles.buttonText}>{admissionUpdated ? 'Admission Updated' : 'Admit Patient?'}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmConsultation}>
                 <Text style={styles.buttonText}>Confirm Consultation</Text>
@@ -311,20 +311,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     backgroundColor: '#FFFFFF',
     borderRadius: 5,
+    height:80,
   },
   addButton: {
     backgroundColor: '#61828a',
     padding: 10,
     marginVertical: 10,
-    width: '50%',
+    width: '5%',
     alignItems: 'center',
     borderRadius: 5,
+    marginBottom:20,
   },
   updateButton: {
     backgroundColor: '#61828a',
     padding: 10,
     marginVertical: 10,
-    width: '50%',
+    width: '10%',
     alignItems: 'center',
     borderRadius: 5,
   },
@@ -337,7 +339,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#61828a',
     padding: 15,
     marginVertical: 20,
-    width: '100%',
+    width: '40%',
     alignItems: 'center',
     alignSelf: 'center',
     borderRadius: 5,

@@ -1,33 +1,40 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, ImageBackground, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ImageBackground, Image } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native'; 
 
 const RoundsScreen = ({ navigation }) => {
-  // Dummy data for admitted patients (replace it with your actual data)
-  const admittedPatientsData = [
-    {
-      id: '1',
-      name: 'John Doe',
-      age: 30,
-      gender: 'Male',
-      symptoms: 'Fever, Headache',
-      diagnosis: 'Common Cold',
-      prescription: 'Rest and fluids',
-      bedNo: '101',
-      treatment: 'Ongoing',
-    },
-    {
-      id: '2',
-      name: 'Jane Smith',
-      age: 25,
-      gender: 'Female',
-      symptoms: 'Cough, Fatigue',
-      diagnosis: 'Flu',
-      prescription: 'Antiviral medication',
-      bedNo: '102',
-      treatment: 'Ongoing',
-    },
-    // Add more admitted patients as needed
-  ];
+  const [admittedPatientsData, setAdmittedPatientsData] = useState([]);
+  const [accessToken, setAccessToken] = useState('');
+
+  useEffect(() => {
+    const fetchAdmittedPatients = async () => {
+      try {
+        // Fetch the access token from AsyncStorage
+        const token = await AsyncStorage.getItem('accessToken');
+
+        // Fetch admitted patients data using the token
+        const response = await fetch('http://localhost:9090/api/v1/doctor/onRoundPatients', {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setAdmittedPatientsData(data);
+        } else {
+          console.error('Failed to fetch admitted patients data');
+        }
+      } catch (error) {
+        console.error('Error fetching admitted patients data:', error);
+      }
+    };
+
+    fetchAdmittedPatients();
+  }, []);
 
   const handlePatientClick = (patientId) => {
     navigation.navigate('AdmittedPatientDetailsScreen', { patientId });
@@ -55,19 +62,15 @@ const RoundsScreen = ({ navigation }) => {
           <View style={styles.middleContainer}>
             <View style={styles.middleLeftContainer}>
               <Text style={styles.middleLeftHeader}>Admitted Patients</Text>
-              {admittedPatientsData.map((patient, index) => (
+              {admittedPatientsData.map((patient) => (
                 <TouchableOpacity
                   key={patient.id}
                   style={styles.patientItem}
                   onPress={() => handlePatientClick(patient.id)}
                 >
-                 <Text style={[styles.patientInfo, { fontWeight: 'bold', fontSize: 18 }]}>Patient {index + 1}</Text>
-
-                  <Text style={styles.patientInfo}>ID: {patient.id}</Text>
-                  <Text style={styles.patientInfo}>Name: {patient.name}</Text>
-                  <Text style={styles.patientInfo}>Age: {patient.age}</Text>
-                  <Text style={styles.patientInfo}>Gender: {patient.gender}</Text>
-                  <Text style={styles.patientInfo}>Bed No: {patient.bedNo}</Text>
+                  <Text style={[styles.patientInfo, { fontWeight: 'bold', fontSize: 18 }]}>Patient {patient.id}</Text>
+                  <Text style={styles.patientInfo}>Name: {patient.fname}</Text>
+                  <Text style={styles.patientInfo}>Bed No: {patient.bedId}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -83,8 +86,6 @@ const RoundsScreen = ({ navigation }) => {
     </View>
   );
 };
-
-const lightBorderColor = '#00637C'; // Light brown color for borders
 
 const styles = StyleSheet.create({
   container: {
@@ -169,7 +170,7 @@ const styles = StyleSheet.create({
   },
   patientItem: {
     borderBottomWidth: 2,
-    borderColor: lightBorderColor,
+    borderColor: '#00637C', // Light brown color for borders
     padding: 15,
     marginBottom: 10,
     width: '100%',
