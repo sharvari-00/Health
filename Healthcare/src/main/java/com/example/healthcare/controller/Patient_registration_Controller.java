@@ -6,6 +6,8 @@ import com.example.healthcare.service.Patient_service;
 import com.example.healthcare.symptoms.Symptoms;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -74,6 +76,7 @@ public class Patient_registration_Controller {
 
     @GetMapping("/details/{id}")
     public ResponseEntity<Patient_registration> getPatientDetails(@PathVariable Long id) {
+
         Optional<Patient_registration> patientOptional = patientService.getPatientById(id);
         return patientOptional.map(patient -> ResponseEntity.ok().body(patient))
                 .orElse(ResponseEntity.notFound().build());

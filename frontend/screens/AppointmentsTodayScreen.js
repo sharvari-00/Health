@@ -1,13 +1,44 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet, ImageBackground, Image } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const AppointmentsTodayScreen = ({ navigation }) => {
-  // Dummy data for today's appointments (replace it with your actual data)
-  const appointmentsData = [
-    { id: '1', name: 'John Doe', age: 30, gender: 'Male' },
-    { id: '2', name: 'Jane Smith', age: 25, gender: 'Female' },
-    // Add more appointment data as needed
-  ];
+const AppointmentsTodayScreen = () => {
+  const navigation = useNavigation(); 
+
+  const [appointmentsData, setAppointmentsData] = useState([]);
+  const [accessToken, setAccessToken] = useState('');
+
+  useEffect(() => {
+    const fetchAccessToken = async () => {
+      try {
+        const token = await AsyncStorage.getItem('accessToken');
+        setAccessToken(token);
+      } catch (error) {
+        console.error('Error fetching access token:', error);
+      }
+    };
+
+    fetchAccessToken();
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('http://localhost:9090/api/v1/doctor/patients', {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        });
+        const data = await response.json();
+        setAppointmentsData(data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, [accessToken]);
 
   const handlePatientClick = (patientId) => {
     navigation.navigate('PatientFormScreen', { patientId });
@@ -25,7 +56,7 @@ const AppointmentsTodayScreen = ({ navigation }) => {
             <Text style={styles.dateText}>Date: {new Date().toLocaleDateString()}</Text>
             <View style={styles.divider} />
             <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.backButton}>
+              <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('DoctorScreen')}>
                 <Text style={styles.buttonText}>Back</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.logoutButton}>
@@ -47,6 +78,10 @@ const AppointmentsTodayScreen = ({ navigation }) => {
                     onPress={() => handlePatientClick(item.id)}
                   >
                     <Text style={styles.serialNumber}>{index + 1}</Text>
+                    <View style={styles.patientDetails}>
+                      <Text style={styles.detailLabel}>Id:</Text>
+                      <Text style={styles.detailText}>{item.id}</Text>
+                    </View>
                     <View style={styles.patientDetails}>
                       <Text style={styles.detailLabel}>Name:</Text>
                       <Text style={styles.detailText}>{item.name}</Text>
@@ -179,7 +214,7 @@ const styles = StyleSheet.create({
     width: 200,
     height: 200,
     resizeMode: 'contain',
-    marginBottom: 20,
+    //marginBottom: 20,
   },
 });
 

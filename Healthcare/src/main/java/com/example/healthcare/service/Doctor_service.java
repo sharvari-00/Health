@@ -1,11 +1,18 @@
 package com.example.healthcare.service;
 
+import com.example.healthcare.DTO.PatientsDTO;
+import com.example.healthcare.diagnosis.Diagnosis;
+import com.example.healthcare.diagnosis.DiagnosisRepository;
 import com.example.healthcare.doctor_details.Doctor_details;
 import com.example.healthcare.doctor_details.Doctor_details_repo;
+import com.example.healthcare.login.Login;
 import com.example.healthcare.login.Login_repo;
+import com.example.healthcare.patient_registration.Patient_registration_repo;
+import com.example.healthcare.prescription.PrescriptionRepository;
 import com.example.healthcare.symptoms.Symptoms;
 import com.example.healthcare.prescription.Prescription;
-import com.example.healthcare.treatment.Treament;
+import com.example.healthcare.symptoms.SymptomsRepository;
+
 import com.example.healthcare.patient_registration.Patient_registration;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,15 +20,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class Doctor_service<TreatmentDto> {
     @Autowired
+    Patient_registration_repo patient_repo;
+    @Autowired
     Doctor_details_repo doctor_details_repo;
     @Autowired
     Login_repo login_repo;
-
+    @Autowired
+    PrescriptionRepository prescriptionRepository;
+    @Autowired
+    SymptomsRepository symptomsRepository;
+    @Autowired
+    DiagnosisRepository diagnosisRepository;
     //Doctor details Update
     public Doctor_details updateDoctorDetailsByAdmin(String doctorEmail, Doctor_details updatedDoctorDetails) {
         // Find the doctor details by email
@@ -38,90 +54,56 @@ public class Doctor_service<TreatmentDto> {
     }
 
 
-//    public void addSymptoms(AddSymptomsRequest request) {
-//        SimpleJpaRepository<Integer,> symptoms;
-//        Optional<patient_id> optionalPatient = symptoms.findById(request.getPatientId());
-//
-//        // Check if the patient exists
-//        if (optionalPatient.isPresent()) {
-//            Patient patient = optionalPatient.get();
-//
-//            // Update the patient's symptoms
-//            patient.setSymptoms(request.getSymptoms());
-//
-//            // Save the updated patient to the database
-//            symptoms.save(patient);
-//        } else {
-//            // Handle case when patient does not exist
-//            throw new RuntimeException("Patient not found with ID: " + request.getPatientId());
-//        }
-//    }
-
-//    public void addTreatment(AddTreatmentRequest request) {
-//
-//    }
-//
-//    public void addPrescription(AddPrescriptionRequest request) {
-//
-//    }
-//
-//
-//    @Setter
-//    @Getter
-//    public static class AddSymptomsRequest {
-//        private Long patientId;
-//        private String symptoms;
-//
-//    }
-//
-//
-//    public class AddTreatmentRequest {
-//        private Long patientId;
-//        private String treatmentDetails;
-//
-//        public Long getPatientId() {
-//            return patientId;
-//        }
-//
-//        public void setPatientId(Long patientId) {
-//            this.patientId = patientId;
-//        }
-//
-//        public String getTreatmentDetails() {
-//            return treatmentDetails;
-//        }
-//
-//        public void setTreatmentDetails(String treatmentDetails) {
-//            this.treatmentDetails = treatmentDetails;
-//        }
-//    }
-//    public class AddPrescriptionRequest {
-//        private Long patientId;
-//        private String prescriptionDetails;
-//
-//        public Long getPatientId() {
-//            return patientId;
-//        }
-//
-//        public void setPatientId(Long patientId) {
-//            this.patientId = patientId;
-//        }
-//
-//        public String getPrescriptionDetails() {
-//            return prescriptionDetails;
-//        }
-//
-//        public void setPrescriptionDetails(String prescriptionDetails) {
-//            this.prescriptionDetails = prescriptionDetails;
-//        }
-//    }
-
-
-
 
 
     public List<Doctor_details> getAllDoctors() {
         return doctor_details_repo.findAll();
     }
 
+    public List getPatientsByLoggedInDoctor(String loggedInDoctorEmail) {
+        Optional<
+                Login> loggedInDoctor = login_repo.findByEmail(loggedInDoctorEmail);
+        if (loggedInDoctor.isPresent()) {
+            String docId = String.valueOf(loggedInDoctor.get().getDoctorId()) ;
+            List<PatientsDTO> patientsDTOList = new ArrayList<>();
+            List<Patient_registration> patients = patient_repo.findByDocId(String.valueOf(docId));
+            for (Patient_registration patient : patients) {
+                PatientsDTO patientsDTO = new PatientsDTO();
+                patientsDTO.setPatientId(Long.valueOf(patient.getId()));
+                patientsDTO.setName(patient.getFname() + " " + patient.getLname());
+                patientsDTO.setAge(patient.getAge());
+                patientsDTO.setGender(patient.getGender());
+                patientsDTOList.add(patientsDTO);
+            }
+            return patientsDTOList;
+        } else {
+            throw new RuntimeException("Doctor not found with email: " + loggedInDoctorEmail);
+        }
+    }
+    public Symptoms updateSymptoms(int patient_id, Symptoms symptoms) {
+        symptoms.setPatient_id(patient_id); // Set patient ID in case it's not provided in the request body
+//        Symptoms existingSymptoms = symptomsRepository.findByPatientId(patient_id);
+//        if (existingSymptoms != null) {
+//            symptoms.setId(existingSymptoms.getId()); // Update existing record if found
+//        }
+        return symptomsRepository.save(symptoms);
+    }
+    public Prescription updatePrescription(int patient_id, Prescription prescription) {
+
+        prescription.setPatientId(patient_id); // Set patient ID in case it's not provided in the request body
+//        Prescription existingPrescription = prescriptionRepository.findByPatientId(patient_id);
+//        if (existingPrescription != null) {
+//            prescription.setId(existingPrescription.getId()); // Update existing record if found
+//        }
+        return prescriptionRepository.save(prescription);
+    }
+    public Diagnosis updateDiagnosis(int patient_id, Diagnosis diagnosis) {
+
+        diagnosis.setPatientId(patient_id); // Set patient ID in case it's not provided in the request body
+//        Diagnosis existingDiagnosis = diagnosisRepository.findByPatientId(patient_id);
+//        if (existingDiagnosis != null) {
+//            diagnosis.setId(existingDiagnosis.getId()); // Update existing record if found
+//        }
+        return diagnosisRepository.save(diagnosis);
+    }
 }
