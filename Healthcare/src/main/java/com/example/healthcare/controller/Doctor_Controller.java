@@ -41,11 +41,26 @@ public class Doctor_Controller {
     // doctor authenticates-> take the token,pass it into this API.
     //this api will also be used when the doctor clicks on the patient
     public ResponseEntity getPatientsByLoggedInDoctor() {
+        try {
+            // Get the authentication object from the security context
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String loggedInDoctorEmail = authentication.getName();
-        List patients = doctor_service.getPatientsByLoggedInDoctor(loggedInDoctorEmail);
-        return new ResponseEntity<>(patients, HttpStatus.OK);
+            // Check if the authentication object contains the doctor role
+            if (authentication != null && authentication.getAuthorities().stream()
+                    .anyMatch(r -> r.getAuthority().equals("DOCTOR"))) {
+                // If the user is authenticated as a doctor, admit the patient
+                String loggedInDoctorEmail = authentication.getName();
+                List patients = doctor_service.getPatientsByLoggedInDoctor(loggedInDoctorEmail);
+                return new ResponseEntity<>(patients, HttpStatus.OK);
+            }else {
+                // If the user is not authenticated as a doctor, return unauthorized status
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+
     }
     @PostMapping("/symptoms/{patient_id}") //this api creates the symptoms for a particular patient
     public ResponseEntity<Symptoms> updateSymptoms(@PathVariable int patient_id, @RequestBody Symptoms symptoms) {

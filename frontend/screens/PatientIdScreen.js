@@ -6,7 +6,7 @@ const PatientIdScreen = ({ navigation }) => {
 
   const handleNext = () => {
     // Navigate to PatientDetailsScreen with patientId as a parameter
-    navigation.navigate('PatientDetailsScreen', { patientId });
+    navigation.navigate('PrescriptionScreen', { patientId });
   };
 
   // Sample data
