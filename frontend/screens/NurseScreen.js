@@ -1,34 +1,80 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet, ImageBackground, Image } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
-const NurseScreen = ({ navigation }) => {
-  // Dummy data for patients (replace it with your actual data)
-  const patientData = [
-    { id: '1', bedNo: '101' },
-    { id: '2', bedNo: '102' },
-    // Add more patient data as needed
-  ];
+const NurseScreen = () => {
+  const navigation = useNavigation(); // Use useNavigation hook here
+  const [accessToken, setAccessToken] = useState('');
+  const [patientData, setPatientData] = useState([]);
+  const [userName, setUserName] = useState('');
+
+  useEffect(() => {
+    const fetchAccessToken = async () => {
+      try {
+        // Retrieve the access token from AsyncStorage
+        const token = await AsyncStorage.getItem('accessToken');
+        setAccessToken(token);
+      } catch (error) {
+        console.error('Error fetching access token:', error);
+      }
+    };
+
+    const fetchUserName = async () => {
+      try {
+        // Retrieve the user name from AsyncStorage or an API endpoint
+        const name = await AsyncStorage.getItem('userName');
+        setUserName(name);
+      } catch (error) {
+        console.error('Error fetching user name:', error);
+      }
+    };
+
+    fetchAccessToken();
+    fetchUserName();
+  }, []);
+
+  useEffect(() => {
+    const fetchPatientData = async () => {
+      try {
+        // Make a GET request to the API endpoint to fetch patient data using the access token
+        const response = await fetch('YOUR_BACKEND_API_ENDPOINT/patients', {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setPatientData(data);
+        } else {
+          console.error('Failed to fetch patient data');
+        }
+      } catch (error) {
+        console.error('Error fetching patient data:', error);
+      }
+    };
+
+    if (accessToken) {
+      fetchPatientData();
+    }
+  }, [accessToken]);
 
   const handleViewDetails = (patientId) => {
-    // Navigate to PatientDetailsScreen with patientId as a parameter
     navigation.navigate('PatientDetailsScreen', { patientId });
   };
-
-  // Dummy user name fetched from database (replace it with actual data)
-  const userName = 'XYZ';
 
   const currentDate = new Date().toDateString();
 
   return (
     <View style={styles.container}>
-      {/* Background Image */}
       <ImageBackground
         style={styles.backgroundImage}
         source={require('../assets/wall.jpg')}
       >
-        {/* Layer */}
         <View style={styles.layer}>
-          {/* Upper Container */}
           <View style={styles.upperContainer}>
             <Text style={styles.headerText}>Nurse's Dashboard</Text>
             <View style={styles.divider} />
@@ -41,16 +87,14 @@ const NurseScreen = ({ navigation }) => {
               </TouchableOpacity>
             </View>
           </View>
-          {/* Middle Container */}
           <View style={styles.middleContainer}>
-            {/* Left Middle Container */}
             <View style={styles.leftMiddleContainer}>
               <Text style={styles.dateText}>{currentDate}</Text>
               <Text style={styles.greetingText}>Hello, {userName}</Text>
               <Text style={styles.departmentText}>Nurse</Text>
               <Text style={styles.infoText}>Hope you have a great day today!</Text>
+              {/* Additional nurse details can be added here */}
             </View>
-            {/* Right Middle Container */}
             <View style={styles.rightMiddleContainer}>
               <Text style={styles.listHeaderText}>List of Patients</Text>
               <FlatList
@@ -68,7 +112,6 @@ const NurseScreen = ({ navigation }) => {
               />
             </View>
           </View>
-          {/* Bottom Container */}
           <View style={styles.bottomContainer}>
             <View style={styles.logoContainer}>
               <Image style={styles.logo} source={require('../assets/logo2.png')} />
