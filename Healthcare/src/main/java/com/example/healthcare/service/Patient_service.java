@@ -63,12 +63,13 @@ public class Patient_service {
 //    }
     public Symptoms updateSymptoms(int patient_id, Symptoms symptoms) {
         symptoms.setPatient_id(patient_id); // Set patient ID in case it's not provided in the request body
-        Symptoms existingSymptoms = symptomsRepository.findByPatientId(patient_id);
+        Symptoms existingSymptoms = (Symptoms) symptomsRepository.findByPatientId(patient_id);
         if (existingSymptoms != null) {
             symptoms.setId(existingSymptoms.getId()); // Update existing record if found
         }
         return symptomsRepository.save(symptoms);
     }
+
 
 //    public Treament updateTreatment(int patient_id, Treament treatment) {
 //        treatment.setPatientId(patient_id); // Set patient ID in case it's not provided in the request body
@@ -81,7 +82,7 @@ public class Patient_service {
 
     public Prescription updatePrescription(int patient_id, Prescription prescription) {
         prescription.setPatientId(patient_id); // Set patient ID in case it's not provided in the request body
-        Prescription existingPrescription = prescriptionRepository.findByPatientId(patient_id);
+        Prescription existingPrescription = (Prescription) prescriptionRepository.findByPatientId(patient_id);
         if (existingPrescription != null) {
             prescription.setId(existingPrescription.getId()); // Update existing record if found
         }

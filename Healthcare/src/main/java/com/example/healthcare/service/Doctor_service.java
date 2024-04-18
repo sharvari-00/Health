@@ -111,15 +111,15 @@ public class Doctor_service<TreatmentDto> {
     public Optional<Object> getPatientById(Long patientId) {
         return patient_repo.findById(patientId);
     }
-    public List<Symptoms> getSymptomsByPatientId(Long patientId) {
-        return Collections.singletonList(symptomsRepository.findByPatientId(Math.toIntExact(patientId)));
+    public List<Symptoms> getSymptomsByPatientId(Integer patientId) {
+        return symptomsRepository.findByPatientId(patientId);
     }
 
-    public List<Prescription> getPrescriptionsByPatientId(Long patientId) {
-        return Collections.singletonList(prescriptionRepository.findByPatientId(Math.toIntExact(patientId)));
+    public List<Prescription> getPrescriptionsByPatientId(Integer patientId) {
+        return (List<Prescription>) prescriptionRepository.findByPatientId(patientId);
     }
 
-    public List<Diagnosis> getDiagnosesByPatientId(Long patientId) {
-        return Collections.singletonList(diagnosisRepository.findByPatientId(Math.toIntExact(patientId)));
+    public List<Diagnosis> getDiagnosesByPatientId(Integer patientId) {
+        return (List<Diagnosis>) diagnosisRepository.findByPatientId(patientId);
     }
 }

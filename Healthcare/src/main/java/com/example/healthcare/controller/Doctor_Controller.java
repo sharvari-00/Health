@@ -146,7 +146,7 @@ public class Doctor_Controller {
         }
     }
     @GetMapping("/symptoms_patient/{patientId}")
-    public ResponseEntity<List<Symptoms>> getSymptomsByPatientId(@PathVariable Long patientId) {
+    public ResponseEntity<List<Symptoms>> getSymptomsByPatientId(@PathVariable Integer patientId) {
         try {
             // Get the authentication object from the security context
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -166,7 +166,7 @@ public class Doctor_Controller {
         }
     }
     @GetMapping("/prescriptions_patient/{patientId}")
-    public ResponseEntity<List<Prescription>> getPrescriptionsByPatientId(@PathVariable Long patientId) {
+    public ResponseEntity<List<Prescription>> getPrescriptionsByPatientId(@PathVariable Integer patientId) {
         try {
             // Get the authentication object from the security context
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -186,7 +186,7 @@ public class Doctor_Controller {
         }
     }
     @GetMapping("/diagnosis_patient/{patientId}")
-    public ResponseEntity<List<Diagnosis>> getDiagnosesByPatientId(@PathVariable Long patientId) {
+    public ResponseEntity<List<Diagnosis>> getDiagnosesByPatientId(@PathVariable Integer patientId) {
         try {
             // Get the authentication object from the security context
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

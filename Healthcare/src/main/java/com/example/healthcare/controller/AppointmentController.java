@@ -14,11 +14,11 @@ public class AppointmentController<patient_registration> {
     @Autowired
     private AppointmentService appointmentService;
 
-    @GetMapping("/appointments-for-today/{docId}{today}")
-    public List<Patient_registration> getAppointmentsForToday(@RequestParam("docId") String docId) {
-        LocalDate today = LocalDate.now();
-        return appointmentService.getPatientsByDoctorIdAndDate(docId,today);
-    }
+//    @GetMapping("/appointments-for-today/{docId}{today}")
+//    public List<Patient_registration> getAppointmentsForToday(@RequestParam("docId") String docId) {
+//        LocalDate today = LocalDate.now();
+//        return appointmentService.getPatientsByDoctorIdAndDate(docId,today);
+//    }
 }
 
 

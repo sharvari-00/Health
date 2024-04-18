@@ -11,9 +11,9 @@ import java.util.List;
 public class AppointmentService {
         @Autowired
         private Patient_registration_repo patientRegistrationRepository;
-
-        public List getPatientsByDoctorIdAndDate(String docId, LocalDate date) {
-            return patientRegistrationRepository.findByDocIdAndRegistrationDate(docId, date);
-        }
+//
+//        public List getPatientsByDoctorIdAndDate(String docId, LocalDate date) {
+//            return patientRegistrationRepository.findByDocIdAndRegistrationDate(docId, date);
+//        }
     }
 
