@@ -5,37 +5,62 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const PrescriptionScreen = ({ route }) => {
   const { patientId } = route.params; // Get the patient ID from the navigation params
-  const [patientDetails, setPatientDetails] = useState(null); // State to store patient details
   const [prescriptions, setPrescriptions] = useState([]); // State to store prescriptions
+  const [patientName, setPatientName] = useState(''); // State to store patient name
+  const [loading, setLoading] = useState(true); // State to track loading status
   const navigation = useNavigation();
   const [accessToken, setAccessToken] = useState('');
 
-  // Function to fetch patient details and prescriptions based on patient ID
-  const fetchPatientDetails = async () => {
+  // Function to fetch prescriptions based on patient ID
+  const fetchPrescriptions = async () => {
     try {
       // Get access token from AsyncStorage
       const token = await AsyncStorage.getItem('accessToken');
       setAccessToken(token);
-
-      // Here, you would make an API call to fetch patient details and prescriptions from the database
-      // Replace this with your actual API call
-      const response = await fetch(`your_api_endpoint/patients/${patientId}`, {
+  
+      // Fetch prescriptions from the API
+      const response = await fetch(`http://localhost:9090/api/v1/pharmacist/prescriptions/${patientId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       const data = await response.json();
-      // Update state with fetched data
-      setPatientDetails(data.patientDetails);
-      setPrescriptions(data.prescriptions);
+      
+      // Update state with prescriptions data
+      setPrescriptions(data);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Error fetching prescriptions:', error);
+    } finally {
+      setLoading(false); // Set loading status to false after fetching data
+    }
+  };
+
+  // Function to fetch patient name based on patient ID
+  const fetchPatientName = async () => {
+    try {
+      // Get access token from AsyncStorage
+      const token = await AsyncStorage.getItem('accessToken');
+      setAccessToken(token);
+  
+      // Fetch patient details from the API
+      const response = await fetch(`http://localhost:9090/api/v1/patients/${patientId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      
+      // Update state with patient name
+      setPatientName(data.name);
+    } catch (error) {
+      console.error('Error fetching patient name:', error);
     }
   };
 
   useEffect(() => {
-    // Fetch patient details and prescriptions when the component mounts
-    fetchPatientDetails();
+    // Fetch prescriptions and patient name when the component mounts
+    fetchPrescriptions();
+    fetchPatientName();
   }, []);
 
   return (
@@ -46,7 +71,7 @@ const PrescriptionScreen = ({ route }) => {
       >
         <View style={styles.layer}>
           <View style={styles.upperContainer}>
-            <Text style={styles.headerText}> Prescription</Text>
+            <Text style={styles.headerText}>Prescription</Text>
             <View style={styles.divider} />
             <View style={styles.buttonContainer}>
               <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('PatientIdScreen')}>
@@ -60,20 +85,22 @@ const PrescriptionScreen = ({ route }) => {
           <View style={styles.middleContainer}>
             <View style={styles.leftMiddleContainer}>
               <Text style={[styles.patientDetailText, { fontSize: 24, textAlign: 'center' }]}>Prescription List</Text>
-              {patientDetails ? (
-                <View>
-                  <Text style={styles.text}>Patient ID: {patientDetails.patient_id}</Text>
-                  <Text style={styles.text}>Prescriptions:</Text>
+              {loading ? (
+                <Text style={styles.text}>Loading...</Text>
+              ) : patientName ? (
+                <>
+                  <Text style={styles.text}>Patient ID: {patientId}</Text>
+                  <Text style={styles.text}>Patient Name: {patientName}</Text>
                   {prescriptions.length > 0 ? (
                     prescriptions.map((prescription, index) => (
-                      <Text key={index} style={styles.text}>{`${index + 1}. ${prescription}`}</Text>
+                      <Text key={index} style={styles.text}>{index + 1}. {prescription.pre_text}</Text>
                     ))
                   ) : (
                     <Text style={styles.text}>No prescriptions found for this patient.</Text>
                   )}
-                </View>
+                </>
               ) : (
-                <Text style={styles.error}>Patient details not found.</Text>
+                <Text style={styles.text}>Patient details not found.</Text>
               )}
             </View>
             <View style={styles.rightMiddleContainer}>
@@ -90,6 +117,7 @@ const PrescriptionScreen = ({ route }) => {
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
