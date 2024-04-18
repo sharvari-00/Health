@@ -21,6 +21,7 @@ import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -105,5 +106,20 @@ public class Doctor_service<TreatmentDto> {
 //            diagnosis.setId(existingDiagnosis.getId()); // Update existing record if found
 //        }
         return diagnosisRepository.save(diagnosis);
+    }
+
+    public Optional<Object> getPatientById(Long patientId) {
+        return patient_repo.findById(patientId);
+    }
+    public List<Symptoms> getSymptomsByPatientId(Long patientId) {
+        return Collections.singletonList(symptomsRepository.findByPatientId(Math.toIntExact(patientId)));
+    }
+
+    public List<Prescription> getPrescriptionsByPatientId(Long patientId) {
+        return Collections.singletonList(prescriptionRepository.findByPatientId(Math.toIntExact(patientId)));
+    }
+
+    public List<Diagnosis> getDiagnosesByPatientId(Long patientId) {
+        return Collections.singletonList(diagnosisRepository.findByPatientId(Math.toIntExact(patientId)));
     }
 }
