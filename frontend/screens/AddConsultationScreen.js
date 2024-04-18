@@ -1,11 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, ImageBackground } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const AddConsultationScreen = ({ route }) => {
-  const { patientId } = route.params;
+const PatientFormScreen = ({ route }) => {
+  const navigation = useNavigation();
+  const { patientId, firstName, lastName, age, gender, bedNo } = route.params;
   const [accessToken, setAccessToken] = useState('');
+  const [patientDetails, setPatientDetails] = useState({
+    id: '',
+    fname: '',
+    lname: '',
+    gender: '',
+    age: '',
+    bed_id: ''
+  });
   const [symptomsInput, setSymptomsInput] = useState('');
   const [treatmentPlanInput, setTreatmentPlanInput] = useState('');
   const [prescriptionInput, setPrescriptionInput] = useState('');
@@ -25,6 +34,26 @@ const AddConsultationScreen = ({ route }) => {
 
     fetchAccessToken();
   }, []);
+
+  useEffect(() => {
+    const fetchPatientDetails = async () => {
+      try {
+        const response = await fetch(`YOUR_BACKEND_API_ENDPOINT/patient/${patientId}`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        });
+        const data = await response.json();
+        setPatientDetails(data);
+      } catch (error) {
+        console.error('Error fetching patient details:', error);
+      }
+    };
+
+    if (accessToken) {
+      fetchPatientDetails();
+    }
+  }, [accessToken, patientId]);
 
   const handleSaveSymptoms = async () => {
     try {
@@ -108,8 +137,12 @@ const AddConsultationScreen = ({ route }) => {
           <View style={styles.middleContainer}>
             <View style={styles.middleLeftContainer}>
               {/* Details fetched from API */}
-              <Text style={styles.subHeading}>Patient Details</Text>
-              {/* Add patient details here */}
+              <Text style={styles.patientDetail}>Patient ID: {patientId}</Text>
+              <Text style={styles.patientDetail}>First Name: {firstName}</Text>
+              <Text style={styles.patientDetail}>Last Name: {lastName}</Text>
+              <Text style={styles.patientDetail}>Gender: {gender}</Text>
+              <Text style={styles.patientDetail}>Age: {age}</Text>
+              <Text style={styles.patientDetail}>Bed No.: {bedNo}</Text>
             </View>
             <View style={styles.middleRightContainer}>
               <View style={styles.formField}>
@@ -220,9 +253,16 @@ const styles = StyleSheet.create({
   },
   middleLeftContainer: {
     flex: 2,
-    alignItems: 'center',
+    alignItems: 'left',
     backgroundColor: 'rgba(223, 233, 235, 0.2)',
     justifyContent: 'left',
+  
+  },
+  patientDetail: {
+    fontSize: 16,
+    color: '#FFFFFF',
+    marginBottom: 5,
+    marginLeft:20,
   },
   middleRightContainer: {
     flex: 8,
@@ -284,4 +324,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddConsultationScreen;
+export default PatientFormScreen;

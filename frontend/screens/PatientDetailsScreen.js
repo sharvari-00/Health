@@ -12,6 +12,9 @@ const PatientDetailsScreen = ({ route }) => {
   const [symptoms, setSymptoms] = useState([]);
   const [treatmentPlan, setTreatmentPlan] = useState([]);
   const [prescription, setPrescription] = useState([]);
+  const [showInput, setShowInput] = useState(false);
+  const [filePath, setFilePath] = useState('');
+  const [uploadButtonText, setUploadButtonText] = useState('Upload');
 
   // Fetch access token and patient data on component mount
   useEffect(() => {
@@ -102,6 +105,23 @@ const PatientDetailsScreen = ({ route }) => {
     }
   };
 
+  // Function to handle the upload button press
+  const handleUpload = () => {
+    setShowInput(!showInput);
+    setUploadButtonText(showInput ? 'Upload' : 'Cancel');
+    if (!showInput) {
+      setFilePath('');
+    }
+  };
+
+  const handleSaveImage = () => {
+    // Logic to save the image path to the patient database
+    console.log('Image path saved:', filePath);
+    setShowInput(false); // Hide input after saving
+    setUploadButtonText('Upload');
+    setFilePath('');
+  };
+
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -125,7 +145,24 @@ const PatientDetailsScreen = ({ route }) => {
             {/* Right Middle Container */}
             <View style={styles.rightMiddleContainer}>
               <Text style={styles.imageUploadText}>Test Report</Text>
-              {/* Add your image upload logic here */}
+              <TouchableOpacity style={[styles.uploadButton, showInput ? styles.cancelButton : null]} onPress={handleUpload}>
+                <Text style={[styles.buttonText, showInput ? styles.cancelButtonText : null]}>
+                  {showInput ? 'Cancel' : 'Upload'}
+                </Text>
+              </TouchableOpacity>
+              {showInput && (
+                <View>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Enter file path"
+                    onChangeText={(text) => setFilePath(text)}
+                    value={filePath}
+                  />
+                  <TouchableOpacity style={styles.saveButton} onPress={handleSaveImage}>
+                    <Text style={styles.buttonText}>Save</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
             {/* Left Middle Container */}
             <View style={styles.leftMiddleContainer}>
@@ -170,7 +207,6 @@ const PatientDetailsScreen = ({ route }) => {
     </View>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {
@@ -253,19 +289,32 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
-    marginBottom:40,
+    marginBottom: 20,
   },
   cancelButton: {
     backgroundColor: 'red',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    marginBottom: 20,
   },
   cancelButtonText: {
     color: '#FFFFFF',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
   input: {
     backgroundColor: '#FFFFFF',
     paddingHorizontal: 10,
     marginBottom: 20,
-    width:170,
+    width: 170,
+  },
+  saveButton: {
+    backgroundColor: '#61828a',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    marginBottom: 20,
   },
   logoContainer: {
     position: 'absolute',
@@ -282,5 +331,6 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
 });
+
 
 export default PatientDetailsScreen;

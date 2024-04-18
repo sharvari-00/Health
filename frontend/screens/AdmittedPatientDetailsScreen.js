@@ -109,19 +109,42 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
   }, []);
 
   const handleAddConsultation = () => {
-    navigation.navigate('AddConsultationScreen', { patientId });
+    navigation.navigate('AddConsultationScreen', { 
+      patientId,
+      firstName: patientDetails?.fname,
+      lastName: patientDetails?.lname,
+      age: patientDetails?.age,
+      gender: patientDetails?.gender,
+      bedNo: patientDetails?.bed_id,
+    });
   };
 
   const handleDischarge = async () => {
     try {
       // Call backend API to discharge patient using token and patientId
+      //const token = await AsyncStorage.getItem('accessToken');
       setDischargeProcessing(true);
-      // After successful discharge
-      setDischargeProcessing(false);
+      const response = await fetch(`YOUR_BACKEND_DISCHARGE_API_ENDPOINT/${patientId}`, {
+        method: 'POST', // Adjust the method according to your API endpoint
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (response.ok) {
+        // After successful discharge
+        setDischargeProcessing(false);
+        // Perform any necessary actions after successful discharge
+      } else {
+        // Handle non-OK response from the server
+        console.error('Failed to discharge patient:', response.status);
+      }
     } catch (error) {
       console.error('Error discharging patient:', error);
     }
   };
+  
 
   return (
     <View style={styles.container}>
@@ -167,24 +190,32 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
               <Text style={styles.patientDetail}>Last Name: {patientDetails?.lname}</Text>
               <Text style={styles.patientDetail}>Gender: {patientDetails?.gender}</Text>
               <Text style={styles.patientDetail}>Age: {patientDetails?.age}</Text>
+              <Text style={styles.patientDetail}>Bed No.: {patientDetails?.bed_id}</Text>
+              
               <Text style={styles.sectionHeading}>Symptoms</Text>
-              <FlatList
-                data={symptoms}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item }) => <Text style={styles.item}>{item}</Text>}
-              />
-              <Text style={styles.sectionHeading}>Treatment Plan</Text>
-              <FlatList
-                data={treatmentPlan}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item }) => <Text style={styles.item}>{item}</Text>}
-              />
-              <Text style={styles.sectionHeading}>Prescription</Text>
-              <FlatList
-                data={prescription}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item }) => <Text style={styles.item}>{item}</Text>}
-              />
+  <FlatList
+    data={symptoms}
+    keyExtractor={(item, index) => index.toString()}
+    renderItem={({ item, index }) => (
+      <Text style={styles.item}>{`${index + 1}. ${item}`}</Text>
+    )}
+  />
+  <Text style={styles.sectionHeading}>Treatment Plan</Text>
+  <FlatList
+    data={treatmentPlan}
+    keyExtractor={(item, index) => index.toString()}
+    renderItem={({ item, index }) => (
+      <Text style={styles.item}>{`${index + 1}. ${item}`}</Text>
+    )}
+  />
+  <Text style={styles.sectionHeading}>Prescription</Text>
+  <FlatList
+    data={prescription}
+    keyExtractor={(item, index) => index.toString()}
+    renderItem={({ item, index }) => (
+      <Text style={styles.item}>{`${index + 1}. ${item}`}</Text>
+    )}
+  />
             </View>
           </View>
           <View style={styles.lowerContainer}>
@@ -281,6 +312,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#FFFFFF',
     marginBottom: 5,
+
   },
   item: {
     fontSize: 16,
