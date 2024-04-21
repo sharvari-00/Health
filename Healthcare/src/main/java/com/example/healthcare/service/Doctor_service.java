@@ -67,7 +67,7 @@ public class Doctor_service<TreatmentDto> {
         if (loggedInDoctor.isPresent()) {
             String docId = String.valueOf(loggedInDoctor.get().getDoctorId()) ;
             List<PatientsDTO> patientsDTOList = new ArrayList<>();
-            List<Patient_registration> patients = patient_repo.findByDocId(String.valueOf(docId));
+            List<Patient_registration> patients = patient_repo.findByDocId(docId);
             for (Patient_registration patient : patients) {
                 PatientsDTO patientsDTO = new PatientsDTO();
                 patientsDTO.setPatientId(Long.valueOf(patient.getId()));
