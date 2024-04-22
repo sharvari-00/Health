@@ -73,7 +73,7 @@ public ResponseEntity<List<PatientsDTO>> getPatientsByLoggedInDoctor() {
                 .anyMatch(r -> r.getAuthority().equals("DOCTOR"))) {
             // If the user is authenticated as a doctor, retrieve patients
             String loggedInDoctorEmail = authentication.getName();
-            List patients = doctor_service.getPatientsByLoggedInDoctor(loggedInDoctorEmail);
+            List<PatientsDTO> patients = doctor_service.getPatientsByLoggedInDoctor(loggedInDoctorEmail);
 
             // Check if the list of patients is empty
             if (patients.isEmpty()) {

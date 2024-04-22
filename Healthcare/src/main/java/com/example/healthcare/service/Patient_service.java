@@ -47,7 +47,6 @@ public class Patient_service {
         existingPatient.setCity(newPatientData.getCity());
         existingPatient.setState(newPatientData.getState());
         existingPatient.setConsent(newPatientData.getConsent());
-
         return (Patient_registration) patientRepo.save(existingPatient);
     }
     public List<Patient_registration> getAllPatients() {
