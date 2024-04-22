@@ -61,7 +61,7 @@ public class Doctor_service<TreatmentDto> {
         return doctor_details_repo.findAll();
     }
 
-    public List getPatientsByLoggedInDoctor(String loggedInDoctorEmail) {
+    public List<PatientsDTO> getPatientsByLoggedInDoctor(String loggedInDoctorEmail) {
         Optional<
                 Login> loggedInDoctor = login_repo.findByEmail(loggedInDoctorEmail);
         if (loggedInDoctor.isPresent()) {

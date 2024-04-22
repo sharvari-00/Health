@@ -28,7 +28,6 @@ public class SecurityConfiguration {
 
     private static final String[] WHITE_LIST_URL = {
             "/api/v1/auth/**",
-            "/api/v1/patients/**",
             "/v2/api-docs",
             "/v3/api-docs",
             "/v3/api-docs/**",
@@ -67,6 +66,24 @@ public class SecurityConfiguration {
                                 .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext())
                 );
         return http.build();
+    }
+
+    @Bean
+    public SecurityFilterChain othersecurityFilterChain(HttpSecurity https) throws Exception{
+        https.authorizeHttpRequests(configurer->
+                configurer
+                        .requestMatchers(HttpMethod.POST,"/api/v1/patients/register_patient").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT,"/api/v1/patients/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET,"/api/v1/patients/patient_info").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST,"/api/v1/doctor/{doctorEmail}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST,"/api/v1/pharmacist/{pharmaEmail}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST,"/api/v1/nurse/{nurseEmail}").hasRole("ADMIN")
+
+        );
+//        https.httpBasic();
+        https.csrf(AbstractHttpConfigurer::disable);
+        return https.build();
+
     }
 }
 
