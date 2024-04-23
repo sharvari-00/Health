@@ -8,6 +8,7 @@ const AppointmentsTodayScreen = () => {
 
   const [appointmentsData, setAppointmentsData] = useState([]);
   const [accessToken, setAccessToken] = useState('');
+  const [doctorId, setDoctorId] = useState('');
 
   useEffect(() => {
     const fetchAccessToken = async () => {
@@ -22,10 +23,10 @@ const AppointmentsTodayScreen = () => {
     fetchAccessToken();
   }, []);
 
-  useEffect(() => {
+   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:9090/api/v1/doctor/patients', {
+        const response = await fetch(`http://localhost:9090/api/v1/doctor/doctors/${doctorId}/patients`, {
           headers: {
             Authorization: `Bearer ${accessToken}`
           }
@@ -37,8 +38,10 @@ const AppointmentsTodayScreen = () => {
       }
     };
 
-    fetchData();
-  }, [accessToken]);
+    if (doctorId) {
+      fetchData();
+    }
+  }, [doctorId, accessToken]);
 
   const handlePatientClick = (patientId, name, age, gender) => {
     navigation.navigate('PatientFormScreen', { patientId,name,age,gender});
@@ -84,7 +87,7 @@ const AppointmentsTodayScreen = () => {
                     </View>
                     <View style={styles.patientDetails}>
                       <Text style={styles.detailLabel}>Name:</Text>
-                      <Text style={styles.detailText}>{item.name}</Text>
+                      <Text style={styles.detailText}>{item.fname} {item.lname}</Text>
                     </View>
                     <View style={styles.patientDetails}>
                       <Text style={styles.detailLabel}>Age:</Text>
