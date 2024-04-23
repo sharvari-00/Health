@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ImageBackground, Image } from 'react-native';
-
-const DoctorScreen = ({ navigation }) => {
+const DoctorScreen = ({ navigation, route }) => {
   const { email } = route.params;
   const { accessToken } = route.params;
   const [doctorDetails, setDoctorDetails] = useState(null);
@@ -40,7 +39,7 @@ const DoctorScreen = ({ navigation }) => {
   const handleAppointmentsToday = () => {
     navigation.navigate('AppointmentsTodayScreen', { doctor: doctorDetails });
   };
-
+  
   const handleRoundsForAdmittedPatients = () => {
     // Implement the logic for Rounds for Admitted Patients
     navigation.navigate('RoundsScreen');
@@ -54,7 +53,6 @@ const DoctorScreen = ({ navigation }) => {
     day: 'numeric',
   });
 
-  
   return (
     <View style={styles.container}>
       {/* Background Image */}
@@ -95,7 +93,7 @@ const DoctorScreen = ({ navigation }) => {
                 <Text style={styles.buttonText}>Appointments for Today</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.button} onPress={handleRoundsForAdmittedPatients}>
-                <Text style={styles.buttonText}>On Round Consultion</Text>
+                <Text style={styles.buttonText}>On Round Consultation</Text>
               </TouchableOpacity>
             </View>
           </View>

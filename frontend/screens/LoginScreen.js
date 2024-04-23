@@ -221,6 +221,7 @@ const LoginScreen = ({ route, navigation }) => {
               email: email // Pass email as a parameter
             });
             break;
+
         case 'frontdesk':
           navigation.navigate('FrontDeskScreen', { });
           break;

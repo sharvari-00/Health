@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   buttonText: {
-    fontSize: 22,
+    fontSize: 29,
     fontFamily: 'Cursive',
     fontWeight: 'bold',
     color: '#FFFFFF',
@@ -95,9 +95,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#61828a',
     padding: 20,
     marginVertical: 10,
-    width: 200,
+    width: 400,
     alignItems: 'center',
     borderRadius: 10,
+    height: 80,
   },
 });
 

@@ -67,8 +67,10 @@ public class Doctor_service<TreatmentDto> {
 
 
     public List<Patient_registration> getPatientsByDoctorIdAndTodayDate(Integer doctorId) {
+
         LocalDate today = LocalDate.now();
         return patient_repo.findByDocIdAndRegistrationDate(String.valueOf(doctorId), today);
+
     }
 
     public Symptoms updateSymptoms(int patient_id, Symptoms symptoms) {
