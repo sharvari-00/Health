@@ -2,8 +2,43 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ImageBackground, Image } from 'react-native';
 
 const DoctorScreen = ({ navigation }) => {
+  const { email } = route.params;
+  const { accessToken } = route.params;
+  const [doctorDetails, setDoctorDetails] = useState(null);
+
+  useEffect(() => {
+    const fetchDoctorDetails = async () => {
+      try {
+        const response = await fetch('http://localhost:9090/api/v1/user/details', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch doctor details');
+        }
+
+        const data = await response.json();
+        setDoctorDetails(data);
+      } catch (error) {
+        console.error('Error fetching doctor details:', error);
+        // Handle error
+      }
+    };
+
+    fetchDoctorDetails();
+  }, [accessToken]);
+
+  // Doctor's data
+  const doctorId = doctorDetails ? doctorDetails.id : 'Loading...';
+  const doctorName = doctorDetails ? `Dr. ${doctorDetails.fname} ${doctorDetails.lname}` : 'Loading...';
+  const doctorDepartment = doctorDetails ? doctorDetails.dept_name : 'Loading...';
+  const greetingMessage = "Hope you have a great day today!";
+
   const handleAppointmentsToday = () => {
-    navigation.navigate('AppointmentsTodayScreen');
+    navigation.navigate('AppointmentsTodayScreen', { doctor: doctorDetails });
   };
 
   const handleRoundsForAdmittedPatients = () => {
@@ -19,11 +54,7 @@ const DoctorScreen = ({ navigation }) => {
     day: 'numeric',
   });
 
-  // Sample doctor's data
-  const doctorName = "Dr. Satish"; // Fetched from the database
-  const doctorDepartment = "Cardiologist"; // Fetched from the database
-  const greetingMessage = "Hope you have a great day today!";
-
+  
   return (
     <View style={styles.container}>
       {/* Background Image */}
@@ -55,6 +86,7 @@ const DoctorScreen = ({ navigation }) => {
               
               <Text style={styles.greetingText}>Hello, {doctorName}</Text>
               <Text style={styles.departmentText}>{doctorDepartment}</Text>
+              <Text style={styles.infoText}>ID: {doctorId}</Text>
               <Text style={styles.infoText}>{greetingMessage}</Text>
             </View>
             {/* Right Container */}
