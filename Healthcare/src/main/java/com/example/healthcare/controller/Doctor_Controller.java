@@ -1,6 +1,5 @@
 package com.example.healthcare.controller;
 
-import com.example.healthcare.DTO.PatientsDTO;
 import com.example.healthcare.DTO.patientInfoDTO;
 import com.example.healthcare.diagnosis.Diagnosis;
 import com.example.healthcare.doctor_details.Doctor_details;
@@ -38,58 +37,33 @@ public class Doctor_Controller {
         return new ResponseEntity<>(doctors, HttpStatus.OK);
     }
 
-//    @GetMapping("/patients")    //this api is used when the patient logs in and see the patient details in short hand when appointments for today is clicked.
-//    // doctor authenticates-> take the token,pass it into this API.
-//    //this api will also be used when the doctor clicks on the patient
-//    public ResponseEntity<List<PatientsDTO>> getPatientsByLoggedInDoctor() {
-//        try {
-//            // Get the authentication object from the security context
-//            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//
-//            // Check if the authentication object contains the doctor role
-//            if (authentication != null && authentication.getAuthorities().stream()
-//                    .anyMatch(r -> r.getAuthority().equals("DOCTOR"))) {
-//                // If the user is authenticated as a doctor, retrieve patients
-//                String loggedInDoctorEmail = authentication.getName();
-//                List<PatientsDTO> patients = doctor_service.getPatientsByLoggedInDoctor(loggedInDoctorEmail);
-//                return new ResponseEntity<>(patients, HttpStatus.OK);
-//            } else {
-//                // If the user is not authenticated as a doctor, return unauthorized status
-//                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-//            }
-//        } catch (Exception e) {
-//            // If an error occurs, return internal server error status
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//        }
-//    }
-@GetMapping("/patients")
-public ResponseEntity<List<PatientsDTO>> getPatientsByLoggedInDoctor() {
-    try {
-        // Get the authentication object from the security context
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    @GetMapping("/doctors/{doctorId}/patients")
+    public ResponseEntity getPatientsByDoctorIdAndTodayDate(@PathVariable Integer doctorId) {
+        try {
+            // Get the authentication object from the security context
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        // Check if the authentication object contains the doctor role
-        if (authentication != null && authentication.getAuthorities().stream()
-                .anyMatch(r -> r.getAuthority().equals("DOCTOR"))) {
-            // If the user is authenticated as a doctor, retrieve patients
-            String loggedInDoctorEmail = authentication.getName();
-            List<PatientsDTO> patients = doctor_service.getPatientsByLoggedInDoctor(loggedInDoctorEmail);
+            // Check if the authentication object contains the doctor role
+            if (authentication != null && authentication.getAuthorities().stream()
+                    .anyMatch(r -> r.getAuthority().equals("DOCTOR"))) {
+                // If the user is authenticated as a doctor, retrieve patients
+                List patients = doctor_service.getPatientsByDoctorIdAndTodayDate(doctorId);
 
-            // Check if the list of patients is empty
-            if (patients.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+                // Check if the list of patients is empty
+                if (patients.isEmpty()) {
+                    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+                }
+
+                return new ResponseEntity<>(patients, HttpStatus.OK);
+            } else {
+                // If the user is not authenticated as a doctor, return unauthorized status
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
-
-            return new ResponseEntity<>(patients, HttpStatus.OK);
-        } else {
-            // If the user is not authenticated as a doctor, return unauthorized status
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (Exception e) {
+            // If an error occurs, return internal server error status
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-    } catch (Exception e) {
-        // If an error occurs, return internal server error status
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
-}
     @PostMapping("/symptoms/{patient_id}") //this api creates the symptoms for a particular patient
     public ResponseEntity<Symptoms> updateSymptoms(@PathVariable int patient_id, @RequestBody Symptoms symptoms) {
         try {
