@@ -68,11 +68,9 @@ const AppointmentsTodayScreen = () => {
     }
   }, [doctorId, accessToken]);
 
-  const handlePatientClick = (patientId, fname, lname, age, gender) => {
-    const fullName = `${fname} ${lname}`;
-    navigation.navigate('PatientFormScreen', { patientId, fullName, age, gender, doctorId });
-  };
-
+  const handlePatientClick = (patientId, name, age, gender) => {
+    navigation.navigate('PatientFormScreen', { patientId,name,age,gender});
+  }
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -103,8 +101,8 @@ const AppointmentsTodayScreen = () => {
                 keyExtractor={(item) => item.id}
                 renderItem={({ item, index }) => (
                   <TouchableOpacity
-                    style={[styles.patientItem, { backgroundColor: 'rgba(169, 204, 207, 0.6)' }]}
-                    onPress={() => handlePatientClick(item.patientId, item.fname, item.lname, item.age, item.gender)}
+                  style={[styles.patientItem, { backgroundColor: 'rgba(169, 204, 207, 0.6)' }]}
+                  onPress={() => handlePatientClick(item.patientId, item.name, item.age, item.gender)}
                   >
                     <Text style={styles.serialNumber}>{index + 1}</Text>
                     <View style={styles.patientDetails}>
