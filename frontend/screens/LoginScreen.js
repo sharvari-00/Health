@@ -214,9 +214,13 @@ const LoginScreen = ({ route, navigation }) => {
         case 'nurse':
           navigation.navigate('NurseScreen', { accessToken: access_token, refreshToken: refresh_token });
           break;
-        case 'doctor':
-          navigation.navigate('DoctorScreen', { accessToken: access_token, refreshToken: refresh_token });
-          break;
+          case 'doctor':
+            navigation.navigate('DoctorScreen', { 
+              accessToken: access_token, 
+              refreshToken: refresh_token, 
+              email: email // Pass email as a parameter
+            });
+            break;
         case 'frontdesk':
           navigation.navigate('FrontDeskScreen', { });
           break;
