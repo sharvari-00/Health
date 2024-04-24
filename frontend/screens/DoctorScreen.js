@@ -37,7 +37,7 @@ const DoctorScreen = ({ navigation, route }) => {
   const greetingMessage = "Hope you have a great day today!";
 
   const handleAppointmentsToday = () => {
-    navigation.navigate('AppointmentsTodayScreen', { doctor: doctorDetails });
+    navigation.navigate('AppointmentsTodayScreen', { doctorId });
   };
   
   const handleRoundsForAdmittedPatients = () => {

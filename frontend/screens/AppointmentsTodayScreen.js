@@ -5,12 +5,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Existing imports
 
-const AppointmentsTodayScreen = () => {
+const AppointmentsTodayScreen = ({ route }) => {
   const navigation = useNavigation(); 
+  const { doctorId } = route.params; 
 
   const [appointmentsData, setAppointmentsData] = useState([]);
   const [accessToken, setAccessToken] = useState('');
-  const [doctorId, setDoctorId] = useState('');
+  
 
   useEffect(() => {
     const fetchAccessToken = async () => {
@@ -27,31 +28,30 @@ const AppointmentsTodayScreen = () => {
 
 
 
+  // useEffect(() => {
+  //   const fetchDoctorDetails = async () => {
+  //     try {
+  //       const response = await fetch('http://localhost:9090/api/v1/user/details', {
+  //         headers: {
+  //           Authorization: `Bearer ${accessToken}`
+  //         }
+  //       });
+
+  //       if (!response.ok) {
+  //         throw new Error('Failed to fetch doctor details');
+  //       }
+
+  //       const data = await response.json();
+  //       setDoctorId(data.id);
+  //     } catch (error) {
+  //       console.error('Error fetching doctor details:', error);
+  //     }
+  //   };
+
+  //   fetchDoctorDetails();
+  // }, [accessToken]);
+
   useEffect(() => {
-    const fetchDoctorDetails = async () => {
-      try {
-        const response = await fetch('http://localhost:9090/api/v1/user/details', {
-          headers: {
-            Authorization: `Bearer ${accessToken}`
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch doctor details');
-        }
-
-        const data = await response.json();
-        setDoctorId(data.id);
-      } catch (error) {
-        console.error('Error fetching doctor details:', error);
-      }
-    };
-
-    fetchDoctorDetails();
-  }, [accessToken]);
-
-  useEffect(() => {
-
     const fetchData = async () => {
       try {
         const response = await fetch(`http://localhost:9090/api/v1/doctor/doctors/${doctorId}/patients`, {
@@ -59,17 +59,21 @@ const AppointmentsTodayScreen = () => {
             Authorization: `Bearer ${accessToken}`
           }
         });
+        if (!response.ok) {
+          throw new Error('Failed to fetch appointments data');
+        }
         const data = await response.json();
         setAppointmentsData(data);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching appointments data:', error);
       }
     };
-
-    if (doctorId) {
+  
+    if (doctorId && accessToken) {
       fetchData();
     }
   }, [doctorId, accessToken]);
+  
 
   const handlePatientClick = (patientId, name, age, gender) => {
     navigation.navigate('PatientFormScreen', { patientId,name,age,gender});

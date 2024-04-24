@@ -175,8 +175,9 @@
 
 // export default LoginScreen;
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ImageBackground, Image, Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { TextInput as PaperTextInput } from 'react-native-paper'; // Import Paper TextInput
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
@@ -184,6 +185,7 @@ const LoginScreen = ({ route, navigation }) => {
   const { role } = route.params;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async () => {
     try {
@@ -202,9 +204,8 @@ const LoginScreen = ({ route, navigation }) => {
       const { access_token, refresh_token } = await response.json();
 
       // Store the access token securely (e.g., using AsyncStorage)
-       await AsyncStorage.setItem('accessToken', access_token);
-       await AsyncStorage.setItem('refreshToken', refresh_token);
-
+      await AsyncStorage.setItem('accessToken', access_token);
+      await AsyncStorage.setItem('refreshToken', refresh_token);
 
       // Navigate to the appropriate screen based on user's role
       switch (role) {
@@ -214,16 +215,16 @@ const LoginScreen = ({ route, navigation }) => {
         case 'nurse':
           navigation.navigate('NurseScreen', { accessToken: access_token, refreshToken: refresh_token });
           break;
-          case 'doctor':
-            navigation.navigate('DoctorScreen', { 
-              accessToken: access_token, 
-              refreshToken: refresh_token, 
-              email: email // Pass email as a parameter
-            });
-            break;
+        case 'doctor':
+          navigation.navigate('DoctorScreen', {
+            accessToken: access_token,
+            refreshToken: refresh_token,
+            email: email // Pass email as a parameter
+          });
+          break;
 
         case 'frontdesk':
-          navigation.navigate('FrontDeskScreen', { });
+          navigation.navigate('FrontDeskScreen', {});
           break;
         default:
           // Handle unrecognized roles
@@ -245,7 +246,7 @@ const LoginScreen = ({ route, navigation }) => {
         >
           <View style={styles.layer}>
             <View style={styles.leftContainer}>
-              
+
             </View>
             <View style={styles.rightContainer}>
               <View style={styles.overlay}>
@@ -253,18 +254,25 @@ const LoginScreen = ({ route, navigation }) => {
                   <Image style={styles.logo} source={require('../assets/logo2.png')} />
                   <Text style={styles.welcomeText}>Login</Text>
                 </View>
-                <TextInput
+                <PaperTextInput
                   style={styles.input}
-                  placeholder="Enter Email"
+                  label="Enter Email"
+                  placeholder="Email"
+                  value={email}
                   onChangeText={(text) => setEmail(text)}
-                  underlineColorAndroid="transparent"
+                  underlineColor="white"
+                  theme={{ colors: { primary: 'white', underlineColor: 'transparent' } }}
                 />
-                <TextInput
+                <PaperTextInput
                   style={styles.input}
-                  placeholder="Enter Password"
-                  secureTextEntry
+                  label="Enter Password"
+                  placeholder="Password"
+                  value={password}
+                  secureTextEntry={!showPassword}
+                  right={<PaperTextInput.Icon name={showPassword ? 'eye-off' : 'eye'} color="black" onPress={() => setShowPassword(!showPassword)} />}
                   onChangeText={(text) => setPassword(text)}
-                  underlineColorAndroid="transparent"
+                  underlineColor="white"
+                  theme={{ colors: { primary: 'white', underlineColor: 'transparent' } }}
                 />
                 <TouchableOpacity style={styles.button} onPress={handleLogin}>
                   <Text style={styles.buttonText}>Login</Text>
@@ -295,7 +303,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   layer: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 150, 136, 0.1)',
     flex: 1,
     width: '100%',
     justifyContent: 'center',
@@ -333,13 +341,10 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 80,
-    borderColor: '#FFFFFF',
-    borderWidth: 1,
     marginVertical: 10,
-    padding: 10,
     width: 400,
     borderRadius: 5,
-    color: '#ABC3CD',
+    color: 'white',
     fontSize: 30,
   },
   button: {
@@ -360,3 +365,5 @@ const styles = StyleSheet.create({
 });
 
 export default LoginScreen;
+
+

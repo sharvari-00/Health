@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image, ImageBackground, Dimensions } from 'react-native';
+import { Button, Avatar } from 'react-native-paper';
 
 const HomeScreen = ({ navigation }) => {
+  const [pressed, setPressed] = useState(false);
   const handleLogin = (role) => {
     navigation.navigate('Login', { role });
   };
@@ -26,25 +28,64 @@ const HomeScreen = ({ navigation }) => {
               <Text style={styles.welcomeText}>Login as:</Text>
             </View>
             {/* Role Buttons */}
-            <TouchableOpacity style={styles.roleButton} onPress={() => handleLogin('frontdesk')}>
-              <Text style={styles.buttonText}>FrontDesk</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.roleButton} onPress={() => handleLogin('doctor')}>
-              <Text style={styles.buttonText}>Doctor</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.roleButton} onPress={() => handleLogin('nurse')}>
-              <Text style={styles.buttonText}>Nurse</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.roleButton} onPress={() => handleLogin('pharmacist')}>
-              <Text style={styles.buttonText}>Pharmacist</Text>
-            </TouchableOpacity>
+            <Button
+              icon={({ size, color }) => (
+                <Avatar.Image size={size} source={require('../assets/logo2.png')} style={{ backgroundColor: '#61828a' }} />
+              )}
+              mode="contained"
+              onPress={() => handleLogin('frontdesk')}
+              style={[styles.roleButton, pressed && { backgroundColor: '#3C8C9D' }]}
+              labelStyle={styles.buttonText}
+              onPressIn={() => setPressed(true)}
+              onPressOut={() => setPressed(false)}
+            >
+              FrontDesk
+            </Button>
+            <Button
+              icon={({ size, color }) => (
+                <Avatar.Image size={size} source={require('../assets/logo2.png')} style={{ backgroundColor: '#61828a' }} />
+              )}
+              mode="contained"
+              onPress={() => handleLogin('doctor')}
+              style={[styles.roleButton, pressed && { backgroundColor: '#3C8C9D' }]}
+              labelStyle={styles.buttonText}
+              onPressIn={() => setPressed(true)}
+              onPressOut={() => setPressed(false)}
+            >
+              Doctor
+            </Button>
+            <Button
+              icon={({ size, color }) => (
+                <Avatar.Image size={size} source={require('../assets/logo2.png')} style={{ backgroundColor: '#61828a' }} />
+              )}
+              mode="contained"
+              onPress={() => handleLogin('nurse')}
+              style={[styles.roleButton, pressed && { backgroundColor: '#3C8C9D' }]}
+              labelStyle={styles.buttonText}
+              onPressIn={() => setPressed(true)}
+              onPressOut={() => setPressed(false)}
+            >
+              Nurse
+            </Button>
+            <Button
+              icon={({ size, color }) => (
+                <Avatar.Image size={size} source={require('../assets/logo2.png')} style={{ backgroundColor: '#61828a' }} />
+              )}
+              mode="contained"
+              onPress={() => handleLogin('pharmacist')}
+              style={[styles.roleButton, pressed && { backgroundColor: '#3C8C9D' }]}
+              labelStyle={styles.buttonText}
+              onPressIn={() => setPressed(true)}
+              onPressOut={() => setPressed(false)}
+            >
+              Pharmacist
+            </Button>
           </View>
         </View>
       </ImageBackground>
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -56,7 +97,7 @@ const styles = StyleSheet.create({
   },
   layer: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 150, 136, 0.1)',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -83,7 +124,7 @@ const styles = StyleSheet.create({
     fontSize: 40,
     fontFamily: 'Cursive',
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#F2C6975',
   },
   buttonText: {
     fontSize: 29,
@@ -99,6 +140,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 10,
     height: 80,
+    backgroundColor: '#2C6975',
   },
 });
 
