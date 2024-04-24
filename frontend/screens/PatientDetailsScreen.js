@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Image, TextInput, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { launchCamera } from 'react-native-image-picker';
 
 const PatientDetailsScreen = ({ route }) => {
   const navigation = useNavigation();
   const { patientId } = route.params;
 
-  // State variables to store patient details, symptoms, treatment plan, and prescription
   const [patientDetails, setPatientDetails] = useState({});
   const [symptoms, setSymptoms] = useState([]);
   const [treatmentPlan, setTreatmentPlan] = useState([]);
@@ -16,7 +16,6 @@ const PatientDetailsScreen = ({ route }) => {
   const [filePath, setFilePath] = useState('');
   const [uploadButtonText, setUploadButtonText] = useState('Upload');
 
-  // Fetch access token and patient data on component mount
   useEffect(() => {
     const fetchPatientData = async () => {
       try {
@@ -37,7 +36,6 @@ const PatientDetailsScreen = ({ route }) => {
     fetchPatientData();
   }, []);
 
-  // Function to fetch patient details
   const fetchPatientDetails = async (accessToken) => {
     try {
       const response = await fetch(`your_patient_details_api_endpoint/${patientId}`, {
@@ -54,7 +52,6 @@ const PatientDetailsScreen = ({ route }) => {
     }
   };
 
-  // Function to fetch symptoms
   const fetchSymptoms = async (accessToken) => {
     try {
       const response = await fetch(`your_symptoms_api_endpoint/${patientId}`, {
@@ -71,7 +68,6 @@ const PatientDetailsScreen = ({ route }) => {
     }
   };
 
-  // Function to fetch treatment plan
   const fetchTreatmentPlan = async (accessToken) => {
     try {
       const response = await fetch(`your_treatment_plan_api_endpoint/${patientId}`, {
@@ -88,7 +84,6 @@ const PatientDetailsScreen = ({ route }) => {
     }
   };
 
-  // Function to fetch prescription
   const fetchPrescription = async (accessToken) => {
     try {
       const response = await fetch(`your_prescription_api_endpoint/${patientId}`, {
@@ -105,7 +100,6 @@ const PatientDetailsScreen = ({ route }) => {
     }
   };
 
-  // Function to handle the upload button press
   const handleUpload = () => {
     setShowInput(!showInput);
     setUploadButtonText(showInput ? 'Upload' : 'Cancel');
@@ -114,10 +108,42 @@ const PatientDetailsScreen = ({ route }) => {
     }
   };
 
-  const handleSaveImage = () => {
-    // Logic to save the image path to the patient database
-    console.log('Image path saved:', filePath);
-    setShowInput(false); // Hide input after saving
+  const handleCamera = () => {
+    launchCamera({ mediaType: 'photo' }, (response) => {
+      if (!response.didCancel) {
+        setFilePath(response.uri);
+      }
+    });
+  };
+
+  const handleSaveImage = async () => {
+    try {
+      const accessToken = await AsyncStorage.getItem('accessToken');
+      const formData = new FormData();
+      formData.append('image', {
+        uri: filePath,
+        type: 'image/jpeg',
+        name: 'image.jpg',
+      });
+      const response = await fetch(`your_upload_image_api_endpoint/${patientId}`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          Accept: 'application/json',
+          'Content-Type': 'multipart/form-data',
+        },
+        body: formData,
+      });
+      if (response.ok) {
+        console.log('Image uploaded successfully');
+        fetchPatientDetails(accessToken);
+      } else {
+        console.error('Failed to upload image');
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+    }
+    setShowInput(false);
     setUploadButtonText('Upload');
     setFilePath('');
   };
@@ -152,12 +178,10 @@ const PatientDetailsScreen = ({ route }) => {
               </TouchableOpacity>
               {showInput && (
                 <View>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Enter file path"
-                    onChangeText={(text) => setFilePath(text)}
-                    value={filePath}
-                  />
+                  <TouchableOpacity style={styles.cameraButton} onPress={handleCamera}>
+                    <Text style={styles.buttonText}>Open Camera</Text>
+                  </TouchableOpacity>
+                  <Image source={{ uri: filePath }} style={styles.imagePreview} />
                   <TouchableOpacity style={styles.saveButton} onPress={handleSaveImage}>
                     <Text style={styles.buttonText}>Save</Text>
                   </TouchableOpacity>
@@ -218,7 +242,7 @@ const styles = StyleSheet.create({
   },
   layer: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent layer
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   upperContainer: {
     flex: 1,
@@ -303,6 +327,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
+  cameraButton: {
+    backgroundColor: '#61828a',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    marginBottom: 20,
+  },
   input: {
     backgroundColor: '#FFFFFF',
     paddingHorizontal: 10,
@@ -330,7 +361,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#FFFFFF',
   },
+  imagePreview: {
+    width: 150,
+    height: 150,
+    borderRadius: 10,
+    marginBottom: 20,
+  },
 });
-
 
 export default PatientDetailsScreen;
