@@ -136,7 +136,7 @@ const BookAppointmentScreen = ({ route, navigation }) => {
               data={availableDoctorsData}
               keyExtractor={(item) => item.id.toString()}
               renderItem={({ item, index }) => (
-                <View style={[styles.doctorItem, { backgroundColor: index % 2 === 0 ? 'rgba(169, 204, 207, 0.4)' : 'rgba(169, 204, 207, 0.4)' }]}>
+                <View style={[styles.doctorItem, { backgroundColor: index % 2 === 0 ? 'rgba(169, 204, 207, 0.6)' : 'rgba(169, 204, 207, 0.4)' }]}>
                   <View style={styles.doctorDetails}>
                     <Text style={styles.doctorText}>Doctor ID: {item.id}</Text>
                     <Text style={styles.doctorText}>Name: {item.fname} {item.lname}</Text>
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.78)',
     paddingHorizontal: 20,
     paddingTop: 40,
   },

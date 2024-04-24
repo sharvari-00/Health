@@ -3,11 +3,14 @@ import { View, Text, TouchableOpacity, FlatList, StyleSheet, ImageBackground, Im
 import { useNavigation } from '@react-navigation/native'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// Existing imports
+
 const AppointmentsTodayScreen = () => {
   const navigation = useNavigation(); 
 
   const [appointmentsData, setAppointmentsData] = useState([]);
   const [accessToken, setAccessToken] = useState('');
+  const [doctorId, setDoctorId] = useState('');
 
   useEffect(() => {
     const fetchAccessToken = async () => {
@@ -22,10 +25,36 @@ const AppointmentsTodayScreen = () => {
     fetchAccessToken();
   }, []);
 
+
+
   useEffect(() => {
+    const fetchDoctorDetails = async () => {
+      try {
+        const response = await fetch('http://localhost:9090/api/v1/user/details', {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch doctor details');
+        }
+
+        const data = await response.json();
+        setDoctorId(data.id);
+      } catch (error) {
+        console.error('Error fetching doctor details:', error);
+      }
+    };
+
+    fetchDoctorDetails();
+  }, [accessToken]);
+
+  useEffect(() => {
+
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:9090/api/v1/doctor/patients', {
+        const response = await fetch(`http://localhost:9090/api/v1/doctor/doctors/${doctorId}/patients`, {
           headers: {
             Authorization: `Bearer ${accessToken}`
           }
@@ -37,13 +66,14 @@ const AppointmentsTodayScreen = () => {
       }
     };
 
-    fetchData();
-  }, [accessToken]);
+    if (doctorId) {
+      fetchData();
+    }
+  }, [doctorId, accessToken]);
 
   const handlePatientClick = (patientId, name, age, gender) => {
     navigation.navigate('PatientFormScreen', { patientId,name,age,gender});
-  };
-
+  }
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -75,9 +105,10 @@ const AppointmentsTodayScreen = () => {
                 keyExtractor={(item) => item.id}
                 renderItem={({ item, index }) => (
                   <TouchableOpacity
-  style={[styles.patientItem, { backgroundColor: 'rgba(169, 204, 207, 0.6)' }]}
-  onPress={() => handlePatientClick(item.patientId, item.name, item.age, item.gender)}
->
+                  style={[styles.patientItem, { backgroundColor: 'rgba(169, 204, 207, 0.6)' }]}
+                  onPress={() => handlePatientClick(item.id, `${item.fname} ${item.lname}`, item.age, item.gender)}
+
+                  >
                     <Text style={styles.serialNumber}>{index + 1}</Text>
                     <View style={styles.patientDetails}>
                       <Text style={styles.detailLabel}>Id:</Text>
@@ -85,7 +116,7 @@ const AppointmentsTodayScreen = () => {
                     </View>
                     <View style={styles.patientDetails}>
                       <Text style={styles.detailLabel}>Name:</Text>
-                      <Text style={styles.detailText}>{item.name}</Text>
+                      <Text style={styles.detailText}>{item.fname} {item.lname}</Text>
                     </View>
                     <View style={styles.patientDetails}>
                       <Text style={styles.detailLabel}>Age:</Text>
@@ -108,6 +139,8 @@ const AppointmentsTodayScreen = () => {
     </View>
   );
 };
+
+
 
 const styles = StyleSheet.create({
   container: {
