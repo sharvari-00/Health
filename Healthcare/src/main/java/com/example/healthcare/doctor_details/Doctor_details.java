@@ -1,6 +1,6 @@
 package com.example.healthcare.doctor_details;
 
-import com.example.healthcare.appointment.Appointment;
+
 import com.example.healthcare.login.Login;
 import com.example.healthcare.patient_registration.Patient_registration;
 import io.swagger.v3.oas.annotations.info.Contact;
@@ -37,6 +37,10 @@ public class Doctor_details {
     @OneToOne(mappedBy = "doctor_details", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Login login;
 
+<<<<<<< HEAD
+=======
+    @OneToMany(mappedBy = "doctor")
+>>>>>>> 341eff551180fd7182610c02ba89c9c0d7a59ce5
 
 
     public Integer getId() {
@@ -96,6 +100,7 @@ public class Doctor_details {
         this.dept_name = dept_name;
     }
 
+<<<<<<< HEAD
 //    public List<Appointment> getAppointments() {
 //        return appointments;
 //    }
@@ -110,4 +115,6 @@ public class Doctor_details {
 //    @OneToMany(mappedBy = "doctor_details")
 //    private Set<Patient_registration> patient_registration;
 
+=======
+>>>>>>> 341eff551180fd7182610c02ba89c9c0d7a59ce5
 }

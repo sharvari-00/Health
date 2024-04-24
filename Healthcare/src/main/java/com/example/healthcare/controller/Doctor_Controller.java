@@ -44,30 +44,19 @@ public class Doctor_Controller {
         return new ResponseEntity<>(doctors, HttpStatus.OK);
     }
 
-@GetMapping("/patients")
-public ResponseEntity<List<Patient_registration>> getPatientsByLoggedInDoctor() {
-    try {
-        // Get the authentication object from the security context
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        // Check if the authentication object contains the doctor role
-        if (authentication != null && authentication.getAuthorities().stream()
-                .anyMatch(r -> r.getAuthority().equals("DOCTOR"))) {
-            // If the user is authenticated as a doctor, retrieve patients
-            String loggedInDoctorEmail = authentication.getName();
-            Optional<Login> loggedInDoctor = login_repo.findByEmail(loggedInDoctorEmail);
+    @GetMapping("/doctors/{doctorId}/patients")
+    public ResponseEntity getPatientsByDoctorIdAndTodayDate(@PathVariable Integer doctorId) {
+        try {
+            // Get the authentication object from the security context
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-            if (loggedInDoctor.isPresent()) {
-                String docId = String.valueOf(loggedInDoctor.get().getDoctorId());
+            // Check if the authentication object contains the doctor role
+            if (authentication != null && authentication.getAuthorities().stream()
+                    .anyMatch(r -> r.getAuthority().equals("DOCTOR"))) {
+                // If the user is authenticated as a doctor, retrieve patients
+                List patients = doctor_service.getPatientsByDoctorIdAndTodayDate(doctorId);
 
-                // Logging values for debugging
-                System.out.println("loggedInDoctorEmail: " + loggedInDoctorEmail);
-                System.out.println("docId: " + docId);
-
-                List<Patient_registration> patients = patient_repo.findByDocId(docId);
-
-                // Logging patients list size for debugging
-                System.out.println("Number of patients: " + patients.size());
 
                 // Check if the list of patients is empty
                 if (patients.isEmpty()) {
@@ -76,17 +65,14 @@ public ResponseEntity<List<Patient_registration>> getPatientsByLoggedInDoctor() 
 
                 return new ResponseEntity<>(patients, HttpStatus.OK);
             } else {
-                throw new RuntimeException("Doctor not found with email: " + loggedInDoctorEmail);
+                // If the user is not authenticated as a doctor, return unauthorized status
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
-        } else {
-            // If the user is not authenticated as a doctor, return unauthorized status
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (Exception e) {
+            // If an error occurs, return internal server error status
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-    } catch (Exception e) {
-        // If an error occurs, return internal server error status
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
-}
 
     @PostMapping("/symptoms/{patient_id}") //this api creates the symptoms for a particular patient
     public ResponseEntity<Symptoms> updateSymptoms(@PathVariable int patient_id, @RequestBody Symptoms symptoms) {

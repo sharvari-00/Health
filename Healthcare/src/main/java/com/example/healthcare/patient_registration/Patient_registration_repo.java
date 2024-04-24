@@ -13,4 +13,5 @@ public interface Patient_registration_repo<patient_registration> extends JpaRepo
     List<Patient_registration> findByDocId(String docId);
 
     List<Patient_registration> findByBedIdNotNull();
+    List<Patient_registration> findByDocIdAndRegistrationDate(String docId, LocalDate registrationDate);
 }

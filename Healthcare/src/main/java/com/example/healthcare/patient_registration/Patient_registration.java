@@ -127,4 +127,7 @@ public class Patient_registration {
                 ", registrationTime=" + registrationTime +
                 '}';
     }
+
+    public void setPatientId(Integer id) {
+    }
 }

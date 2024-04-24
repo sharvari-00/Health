@@ -15,9 +15,12 @@ import com.example.healthcare.symptoms.SymptomsRepository;
 import com.example.healthcare.patient_registration.Patient_registration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
 
 @Service
 public class Doctor_service<TreatmentDto> {
@@ -52,14 +55,13 @@ public class Doctor_service<TreatmentDto> {
         return doctor_details_repo.findAll();
     }
 
-    public List<Patient_registration> getPatientsByLoggedInDoctor(String loggedInDoctorEmail) {
-        Optional<Login> loggedInDoctor = login_repo.findByEmail(loggedInDoctorEmail);
-        if (loggedInDoctor.isPresent()) {
-            String docId = String.valueOf(loggedInDoctor.get().getDoctorId());
-            return patient_repo.findByDocId(docId);
-        } else {
-            throw new RuntimeException("Doctor not found with email: " + loggedInDoctorEmail);
-        }
+
+
+    public List<Patient_registration> getPatientsByDoctorIdAndTodayDate(Integer doctorId) {
+
+        LocalDate today = LocalDate.now();
+        return patient_repo.findByDocIdAndRegistrationDate(String.valueOf(doctorId), today);
+
     }
 
     public Symptoms updateSymptoms(int patient_id, Symptoms symptoms) {
@@ -83,7 +85,6 @@ public class Doctor_service<TreatmentDto> {
     public List<Symptoms> getSymptomsByPatientId(Integer patientId) {
         return symptomsRepository.findByPatientId(patientId);
     }
-
     public List<Prescription> getPrescriptionsByPatientId(Integer patientId) {
         return (List<Prescription>) prescriptionRepository.findByPatientId(patientId);
     }
@@ -91,4 +92,5 @@ public class Doctor_service<TreatmentDto> {
     public List<Diagnosis> getDiagnosesByPatientId(Integer patientId) {
         return (List<Diagnosis>) diagnosisRepository.findByPatientId(patientId);
     }
+
 }
