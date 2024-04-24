@@ -1,10 +1,12 @@
 package com.example.healthcare.controller;
 
-import com.example.healthcare.DTO.PatientsDTO;
 import com.example.healthcare.DTO.patientInfoDTO;
 import com.example.healthcare.diagnosis.Diagnosis;
 import com.example.healthcare.doctor_details.Doctor_details;
+import com.example.healthcare.login.Login;
+import com.example.healthcare.login.Login_repo;
 import com.example.healthcare.patient_registration.Patient_registration;
+import com.example.healthcare.patient_registration.Patient_registration_repo;
 import com.example.healthcare.prescription.Prescription;
 import com.example.healthcare.service.Doctor_service;
 import com.example.healthcare.service.Patient_service;
@@ -16,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Optional;
 
 
 @RestController
@@ -23,9 +26,12 @@ import java.util.List;
 public class Doctor_Controller {
     private final Doctor_service doctor_service;
     private final Patient_service patientRegistrationService;
-
-    public Doctor_Controller(Doctor_service doctorService, Patient_service patientRegistrationService) { this.doctor_service = doctorService;
+    private final Login_repo login_repo;
+    private final Patient_registration_repo patient_repo;
+    public Doctor_Controller(Doctor_service doctorService, Patient_service patientRegistrationService, Login_repo loginRepo, Patient_registration_repo patientRepo) { this.doctor_service = doctorService;
         this.patientRegistrationService = patientRegistrationService;
+        login_repo = loginRepo;
+        patient_repo = patientRepo;
     }
     @PutMapping("/{doctorEmail}")
     public ResponseEntity<Doctor_details> updateDoctorDetailsByAdmin(@PathVariable String doctorEmail, @RequestBody Doctor_details updatedDoctorDetails) {
@@ -38,32 +44,8 @@ public class Doctor_Controller {
         return new ResponseEntity<>(doctors, HttpStatus.OK);
     }
 
-//    @GetMapping("/patients")    //this api is used when the patient logs in and see the patient details in short hand when appointments for today is clicked.
-//    // doctor authenticates-> take the token,pass it into this API.
-//    //this api will also be used when the doctor clicks on the patient
-//    public ResponseEntity<List<PatientsDTO>> getPatientsByLoggedInDoctor() {
-//        try {
-//            // Get the authentication object from the security context
-//            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//
-//            // Check if the authentication object contains the doctor role
-//            if (authentication != null && authentication.getAuthorities().stream()
-//                    .anyMatch(r -> r.getAuthority().equals("DOCTOR"))) {
-//                // If the user is authenticated as a doctor, retrieve patients
-//                String loggedInDoctorEmail = authentication.getName();
-//                List<PatientsDTO> patients = doctor_service.getPatientsByLoggedInDoctor(loggedInDoctorEmail);
-//                return new ResponseEntity<>(patients, HttpStatus.OK);
-//            } else {
-//                // If the user is not authenticated as a doctor, return unauthorized status
-//                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-//            }
-//        } catch (Exception e) {
-//            // If an error occurs, return internal server error status
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//        }
-//    }
 @GetMapping("/patients")
-public ResponseEntity<List<PatientsDTO>> getPatientsByLoggedInDoctor() {
+public ResponseEntity<List<Patient_registration>> getPatientsByLoggedInDoctor() {
     try {
         // Get the authentication object from the security context
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -73,14 +55,29 @@ public ResponseEntity<List<PatientsDTO>> getPatientsByLoggedInDoctor() {
                 .anyMatch(r -> r.getAuthority().equals("DOCTOR"))) {
             // If the user is authenticated as a doctor, retrieve patients
             String loggedInDoctorEmail = authentication.getName();
-            List<PatientsDTO> patients = doctor_service.getPatientsByLoggedInDoctor(loggedInDoctorEmail);
+            Optional<Login> loggedInDoctor = login_repo.findByEmail(loggedInDoctorEmail);
 
-            // Check if the list of patients is empty
-            if (patients.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            if (loggedInDoctor.isPresent()) {
+                String docId = String.valueOf(loggedInDoctor.get().getDoctorId());
+
+                // Logging values for debugging
+                System.out.println("loggedInDoctorEmail: " + loggedInDoctorEmail);
+                System.out.println("docId: " + docId);
+
+                List<Patient_registration> patients = patient_repo.findByDocId(docId);
+
+                // Logging patients list size for debugging
+                System.out.println("Number of patients: " + patients.size());
+
+                // Check if the list of patients is empty
+                if (patients.isEmpty()) {
+                    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+                }
+
+                return new ResponseEntity<>(patients, HttpStatus.OK);
+            } else {
+                throw new RuntimeException("Doctor not found with email: " + loggedInDoctorEmail);
             }
-
-            return new ResponseEntity<>(patients, HttpStatus.OK);
         } else {
             // If the user is not authenticated as a doctor, return unauthorized status
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -90,6 +87,7 @@ public ResponseEntity<List<PatientsDTO>> getPatientsByLoggedInDoctor() {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 }
+
     @PostMapping("/symptoms/{patient_id}") //this api creates the symptoms for a particular patient
     public ResponseEntity<Symptoms> updateSymptoms(@PathVariable int patient_id, @RequestBody Symptoms symptoms) {
         try {
@@ -132,8 +130,7 @@ public ResponseEntity<List<PatientsDTO>> getPatientsByLoggedInDoctor() {
     }
     @PostMapping("/diagnosis/{patient_id}") //this api creates the prescription for a particular patient
     public ResponseEntity<Diagnosis> updateDiagnosis(@PathVariable int patient_id, @RequestBody Diagnosis diagnosis) {
-//        Prescription updatedPrescription = doctor_service.updatePrescription(patient_id, prescription);
-//        return ResponseEntity.ok(updatedPrescription);
+
         try {
             // Get the authentication object from the security context
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

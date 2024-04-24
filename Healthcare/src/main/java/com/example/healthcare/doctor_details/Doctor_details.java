@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.Time;
 import java.util.List;
@@ -31,11 +32,12 @@ public class Doctor_details {
     private Time shift_ends;
     private String dept_name;
 
+
+
     @OneToOne(mappedBy = "doctor_details", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Login login;
 
-    @OneToMany(mappedBy = "doctor")
-    private List<Appointment> appointments;
+
 
     public Integer getId() {
         return id;
@@ -94,13 +96,13 @@ public class Doctor_details {
         this.dept_name = dept_name;
     }
 
-    public List<Appointment> getAppointments() {
-        return appointments;
-    }
-
-    public void setAppointments(List<Appointment> appointments) {
-        this.appointments = appointments;
-    }
+//    public List<Appointment> getAppointments() {
+//        return appointments;
+//    }
+//
+//    public void setAppointments(List<Appointment> appointments) {
+//        this.appointments = appointments;
+//    }
 
     //    @OneToOne
 //    @JoinColumn (name = "login_id" )
