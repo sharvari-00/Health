@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image } from 'react-native';
+import { View, Text, Slider, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const PatientFormScreen = ({ route }) => {
   const navigation = useNavigation();
-  const { patientId,name,age,gender } = route.params;
+  const { patientId, name, age, gender } = route.params;
+
+  const [temperature, setTemperature] = useState(36.5);
 
   const [accessToken, setAccessToken] = useState('');
   const [patientDetails, setPatientDetails] = useState({
@@ -40,7 +42,8 @@ const PatientFormScreen = ({ route }) => {
       try {
         const response = await fetch(`http://localhost:9090/api/v1/patients/details/${patientId}`, {
           headers: {
-            Authorization: `Bearer ${accessToken}`
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
           }
         });
         const data = await response.json();
@@ -149,6 +152,10 @@ const PatientFormScreen = ({ route }) => {
     navigation.navigate('AppointmentsTodayScreen');
   };
 
+  const handleTemperatureChange = (value) => {
+    setTemperature(value);
+  };
+
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -170,6 +177,19 @@ const PatientFormScreen = ({ route }) => {
             </View>
             <View style={styles.middleRightContainer}>
               <Text style={styles.prescriptionFormHeading}>Consultation Form</Text>
+              <View style={styles.sliderContainer}>
+                <Text style={styles.sliderLabel}>Temperature: {temperature} °C</Text>
+                <Slider
+                  style={{ width: 200, height: 40 }}
+                  minimumValue={35}
+                  maximumValue={40}
+                  step={0.1}
+                  value={temperature}
+                  onValueChange={handleTemperatureChange}
+                  minimumTrackTintColor="#FFFFFF"
+                  maximumTrackTintColor="#000000"
+                />
+              </View>
               <TextInput
                 style={styles.input}
                 placeholder="Symptoms"
@@ -246,6 +266,11 @@ const styles = StyleSheet.create({
     flex: 1,
     resizeMode: 'cover',
   },
+  container1: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   layer: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -288,6 +313,17 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     marginBottom: 10,
   },
+  sliderContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  sliderLabel: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#FFFFFF',
+  },
   patientDetails: {
     fontSize: 16,
     color: '#FFFFFF',
@@ -311,22 +347,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     backgroundColor: '#FFFFFF',
     borderRadius: 5,
-    height:80,
+    height: 80,
   },
   addButton: {
     backgroundColor: '#61828a',
     padding: 10,
     marginVertical: 10,
-    width: '5%',
+    width: '50%',
     alignItems: 'center',
     borderRadius: 5,
-    marginBottom:20,
+    marginBottom: 20,
   },
   updateButton: {
     backgroundColor: '#61828a',
     padding: 10,
     marginVertical: 10,
-    width: '10%',
+    width: '50%',
     alignItems: 'center',
     borderRadius: 5,
   },

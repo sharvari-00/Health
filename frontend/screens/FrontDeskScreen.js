@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ImageBackground, Image, TextInput } from 'react-native';
 import { Calendar } from 'react-native-calendars';
+import { useNavigation } from '@react-navigation/native';
 
 const FrontDeskScreen = ({ navigation }) => {
   const [showInput, setShowInput] = useState(false); // State to control the visibility of input and buttons
@@ -48,9 +49,10 @@ const FrontDeskScreen = ({ navigation }) => {
               <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
                 <Text style={styles.buttonText}>Back</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Logout')}>
-                <Text style={styles.buttonText}>Logout</Text>
-              </TouchableOpacity>
+              <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Home')}>
+              <Text style={styles.buttonText}>Logout</Text>
+             </TouchableOpacity>
+
             </View>
           </View>
           {/* Middle Container */}

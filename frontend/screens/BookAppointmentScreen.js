@@ -97,12 +97,13 @@ const BookAppointmentScreen = ({ route, navigation }) => {
           <Text style={styles.heading}>Available Doctors </Text>
           <View style={styles.divider} />
           <View style={styles.headerButtons}>
-            <TouchableOpacity>
-              <Text style={styles.buttonText}>Back</Text>
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <Text style={styles.buttonText}>Logout</Text>
-            </TouchableOpacity>
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+                <Text style={styles.buttonText}>Back</Text>
+              </TouchableOpacity>
+            <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Home')}>
+  <Text style={styles.buttonText}>Logout</Text>
+</TouchableOpacity>
+
           </View>
         </View>
 

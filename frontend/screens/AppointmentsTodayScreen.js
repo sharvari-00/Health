@@ -59,9 +59,10 @@ const AppointmentsTodayScreen = () => {
               <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('DoctorScreen')}>
                 <Text style={styles.buttonText}>Back</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.logoutButton}>
-                <Text style={styles.buttonText}>Logout</Text>
-              </TouchableOpacity>
+              <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Home')}>
+  <Text style={styles.buttonText}>Logout</Text>
+</TouchableOpacity>
+
             </View>
           </View>
           <View style={styles.middleContainer}>

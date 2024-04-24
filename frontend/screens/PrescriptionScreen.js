@@ -50,8 +50,8 @@ const PrescriptionScreen = ({ route }) => {
               <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('PatientIdScreen')}>
                 <Text style={styles.buttonText}>Back</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.logoutButton}>
-                <Text style={styles.buttonText}>Logout</Text>
+              <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Home')}>
+              <Text style={styles.buttonText}>Logout</Text>
               </TouchableOpacity>
             </View>
           </View>

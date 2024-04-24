@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image, Picker } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { useNavigation } from '@react-navigation/native';
 const ViewEditPatientDetailsScreen = ({ route }) => {
   const { patientId } = route.params;
+  const navigation = useNavigation();
   //const [changesSaved, setChangesSaved] = useState(false);
   
   const [accessToken, setAccessToken] = useState('');
@@ -114,12 +115,13 @@ const ViewEditPatientDetailsScreen = ({ route }) => {
           <Text style={[styles.heading, styles.largeFont]}>Edit Details</Text>
           <View style={styles.divider} />
           <View style={styles.headerButtons}>
-            <TouchableOpacity>
-              <Text style={styles.buttonText}>Back</Text>
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+                <Text style={styles.buttonText}>Back</Text>
+              </TouchableOpacity>
+            <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Home')}>
+            <Text style={styles.buttonText}>Logout</Text>
             </TouchableOpacity>
-            <TouchableOpacity>
-              <Text style={styles.buttonText}>Logout</Text>
-            </TouchableOpacity>
+
           </View>
         </View>
         

@@ -42,9 +42,10 @@ const DoctorScreen = ({ navigation }) => {
               <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
                 <Text style={styles.buttonText}>Back</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Logout')}>
-                <Text style={styles.buttonText}>Logout</Text>
+              <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Home')}>
+              <Text style={styles.buttonText}>Logout</Text>
               </TouchableOpacity>
+
             </View>
           </View>
           {/* Middle Container */}

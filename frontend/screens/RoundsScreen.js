@@ -51,12 +51,13 @@ const RoundsScreen = ({ navigation }) => {
             <Text style={styles.headerText}>On Round Consultation</Text>
             <View style={styles.divider} />
             <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.backButton}>
+            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
                 <Text style={styles.buttonText}>Back</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.logoutButton}>
-                <Text style={styles.buttonText}>Logout</Text>
-              </TouchableOpacity>
+              <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Home')}>
+  <Text style={styles.buttonText}>Logout</Text>
+</TouchableOpacity>
+
             </View>
           </View>
           <View style={styles.middleContainer}>

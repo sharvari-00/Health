@@ -298,9 +298,11 @@ const styles = StyleSheet.create({
   },
   leftContainer: {
     // Add styling for left container if needed
+    flex: 1,
   },
   rightContainer: {
     // Add styling for right container if needed
+    flex: 9,
   },
   overlay: {
     alignItems: 'center',
@@ -308,8 +310,8 @@ const styles = StyleSheet.create({
     paddingTop: 50,
   },
   logo: {
-    width: 220,
-    height: 220,
+    width: 420,
+    height: 420,
     marginBottom: 10,
     resizeMode: 'contain',
   },
@@ -319,31 +321,33 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   welcomeText: {
-    fontSize: 30,
+    fontSize: 60,
     fontFamily: 'Cursive',
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
   input: {
-    height: 40,
+    height: 80,
     borderColor: '#FFFFFF',
     borderWidth: 1,
     marginVertical: 10,
     padding: 10,
-    width: 200,
+    width: 400,
     borderRadius: 5,
     color: '#ABC3CD',
+    fontSize: 30,
   },
   button: {
     backgroundColor: '#61828a',
     padding: 15,
     margin: 10,
-    width: 200,
+    width: 400,
     alignItems: 'center',
     borderRadius: 10,
+    height: 80,
   },
   buttonText: {
-    fontSize: 18,
+    fontSize: 29,
     fontFamily: 'Arial',
     fontWeight: 'bold',
     color: '#FFFFFF',
