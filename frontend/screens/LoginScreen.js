@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   layer: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: '#CEDFCC',
     flex: 1,
     width: '100%',
     justifyContent: 'center',

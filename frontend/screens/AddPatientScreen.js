@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(26, 95, 116, 0.13)',
     paddingHorizontal: 20,
     paddingTop: 40,
   },
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#61828a',
     marginBottom: 10,
   },
   largeFont: {
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   buttonText: {
-    color: '#FFFFFF',
+    color: '#61828a',
     marginHorizontal: 10,
     fontSize: 18,
     fontWeight:'bold'
@@ -247,12 +247,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   dateText: {
-    color: '#FFFFFF',
+    color: '#61828a',
     fontSize: 16,
     marginBottom: 10,
   },
   middleHeading: {
-    color: '#FFFFFF',
+    color: '#61828a',
     fontSize: 20,
     fontWeight: 'bold',
   },
@@ -270,15 +270,15 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 50,
-    borderColor: '#FFFFFF',
+    borderColor: '#61828a',
     borderWidth: 1,
     marginVertical: 5,
     paddingHorizontal: 10,
-    color: '#FFFFFF',
+    backgroundColor:'#FFFFFF',
   },
   dropdownContainer: {
     borderWidth: 1,
-    borderColor: '#FFFFFF',
+    borderColor: '#61828a',
     borderRadius: 5,
     marginVertical: 5,
     color: '#000000',

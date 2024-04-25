@@ -58,7 +58,7 @@ const FrontDeskScreen = ({ navigation }) => {
             {/* Left Container with Calendar */}
             <View style={styles.leftContainer}>
               <Calendar
-                style={{ width: '100%' }} // Make the calendar fit the width
+                style={{ width: '200%' }} // Make the calendar fit the width
                 // Configure the Calendar component here
                 onDayPress={(day) => {
                   console.log('Selected day', day);
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
   },
   layer: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent layer
+    backgroundColor: '#CEDFCC', // Semi-transparent layer
   },
   upperContainer: {
     flex: 3, // 3 parts out of 10
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     fontSize: 40,
     fontFamily: 'Cursive',
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#61828a',
   },
   divider: {
     width: '80%',
@@ -165,10 +165,10 @@ const styles = StyleSheet.create({
     width: '80%',
   },
   backButton: {
-    backgroundColor: 'transparent',
+    backgroundColor: '#61828a',
   },
   logoutButton: {
-    backgroundColor: 'transparent',
+    backgroundColor: '#61828a',
   },
   buttonText: {
     fontSize: 20,
@@ -181,12 +181,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#61828a', // Button background color
     padding: 15,
     margin: 10,
-    width: 200,
+    width: 300,
+    height: 80,
     alignItems: 'center',
     borderRadius: 10,
   },
   input: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#E0ECDE',
     paddingHorizontal: 20,
     paddingVertical: 15,
     borderRadius: 10,
