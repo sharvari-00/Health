@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   },
   layer: {
     flex: 1,
-    backgroundColor: 'rgba(0, 150, 136, 0.1)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -140,7 +140,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 10,
     height: 80,
-    backgroundColor: '#2C6975',
   },
 });
 

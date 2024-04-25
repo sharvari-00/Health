@@ -87,6 +87,11 @@ const DoctorScreen = ({ navigation, route }) => {
               <Text style={styles.departmentText}>{doctorDepartment}</Text>
               <Text style={styles.infoText}>ID: {doctorId}</Text>
               <Text style={styles.infoText}>{greetingMessage}</Text>
+              <Image 
+                source={require('../assets/doc.png')} 
+                style={styles.opacityImage} 
+                resizeMode="cover"
+              />
             </View>
             {/* Right Container */}
             <View style={styles.middleRightContainer}>
@@ -224,6 +229,14 @@ const styles = StyleSheet.create({
     width: 200,
     height: 200,
     resizeMode: 'contain',
+  },
+  opacityImage: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    width: 300,
+    height: 300,
+    opacity: 0.6,
   },
 });
 

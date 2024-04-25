@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Slider from '@react-native-community/slider';
+import { Switch } from 'react-native-paper'; // Import Switch from react-native-paper
+import Slider from '@react-native-community/slider'; // Import Slider from react-native-community
 
 const PatientFormScreen = ({ route }) => {
   const navigation = useNavigation();
-  const { patientId,name,age,gender } = route.params;
+  const { patientId, name, age, gender } = route.params;
 
   const [accessToken, setAccessToken] = useState('');
   const [patientDetails, setPatientDetails] = useState({
@@ -18,11 +19,10 @@ const PatientFormScreen = ({ route }) => {
   const [diagnosis, setDiagnosis] = useState('');
   const [prescription, setPrescription] = useState('');
   const [admitPatient, setAdmitPatient] = useState('No');
-  const [symptomsAdded, setSymptomsAdded] = useState(false);
-  const [diagnosisAdded, setDiagnosisAdded] = useState(false);
-  const [prescriptionAdded, setPrescriptionAdded] = useState(false);
-  const [admissionUpdated, setAdmissionUpdated] = useState(false);
-  const [temperature, setTemperature] = useState(36.5); // Initialize temperature state
+  const [formSaved, setFormSaved] = useState(false);
+  const [isConsultationConfirmed, setIsConsultationConfirmed] = useState(false); // New state for switch
+  const [temperature, setTemperature] = useState(98.6); // State for temperature
+  const [bloodPressure, setBloodPressure] = useState({ systolic: 120, diastolic: 80 }); // State for blood pressure
 
   useEffect(() => {
     const fetchAccessToken = async () => {
@@ -37,113 +37,102 @@ const PatientFormScreen = ({ route }) => {
     fetchAccessToken();
   }, []);
 
-  useEffect(() => {
-    const fetchPatientDetails = async () => {
-      try {
-        const response = await fetch(`http://localhost:9090/api/v1/patients/details/${patientId}`, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`
-          }
-        });
-        const data = await response.json();
-        setPatientDetails(data);
-      } catch (error) {
-        console.error('Error fetching patient details:', error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchPatientDetails = async () => {
+  //     try {
+  //       const response = await fetch(`http://localhost:9090/api/v1/patients/details/${patientId}`, {
+  //         headers: {
+  //           Authorization: `Bearer ${accessToken}`
+  //         }
+  //       });
+  //       const data = await response.json();
+  //       setPatientDetails(data);
+  //     } catch (error) {
+  //       console.error('Error fetching patient details:', error);
+  //     }
+  //   };
 
-    fetchPatientDetails();
-  }, [accessToken, patientId]);
+  //   fetchPatientDetails();
+  // }, [accessToken, patientId]);
 
-  const handleAddSymptoms = async () => {
+  const handleSaveForm = async () => {
     try {
-      const response = await fetch(`http://localhost:9090/api/v1/doctor/symptoms/${patientId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`
-        },
-        body: JSON.stringify({
-          patient_id: patientId,
-          sym_text: symptoms
-        })
-      });
-      if (response.ok) {
-        setSymptomsAdded(true);
-      } else {
-        console.error('Failed to add symptoms');
-      }
+      await Promise.all([
+        addSymptoms(),
+        addDiagnosis(),
+        addPrescription(),
+        //updateAdmission()
+      ]);
+      setFormSaved(true);
     } catch (error) {
-      console.error('Error adding symptoms:', error);
+      console.error('Error saving form:', error);
     }
   };
 
-  const handleAddDiagnosis = async () => {
-    try {
-      const response = await fetch(`http://localhost:9090/api/v1/doctor/diagnosis/${patientId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`
-        },
-        body: JSON.stringify({
-          patient_id: patientId,
-          dia_text: diagnosis
-        })
-      });
-      if (response.ok) {
-        setDiagnosisAdded(true);
-      } else {
-        console.error('Failed to add diagnosis');
-      }
-    } catch (error) {
-      console.error('Error adding diagnosis:', error);
+  const addSymptoms = async () => {
+    const response = await fetch(`http://localhost:9090/api/v1/doctor/symptoms/${patientId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`
+      },
+      body: JSON.stringify({
+        patient_id: patientId,
+        sym_text: symptoms
+      })
+    });
+    if (!response.ok) {
+      throw new Error('Failed to add symptoms');
     }
   };
 
-  const handleAddPrescription = async () => {
-    try {
-      const response = await fetch(`http://localhost:9090/api/v1/doctor/prescription/${patientId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`
-        },
-        body: JSON.stringify({
-          patient_id: patientId,
-          pre_text: prescription
-        })
-      });
-      if (response.ok) {
-        setPrescriptionAdded(true);
-      } else {
-        console.error('Failed to add prescription');
-      }
-    } catch (error) {
-      console.error('Error adding prescription:', error);
+  const addDiagnosis = async () => {
+    const response = await fetch(`http://localhost:9090/api/v1/doctor/diagnosis/${patientId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`
+      },
+      body: JSON.stringify({
+        patient_id: patientId,
+        dia_text: diagnosis
+      })
+    });
+    if (!response.ok) {
+      throw new Error('Failed to add diagnosis');
     }
   };
 
-  const handleUpdateAdmission = async () => {
-    try {
-      const response = await fetch(`http://localhost:9090/api/v1/admission/admit/${patientId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`
-        },
-        body: JSON.stringify({
-          patientId: patientId
-          //admitPatient: admitPatient
-        })
-      });
-      if (response.ok) {
-        setAdmissionUpdated(true);
-      } else {
-        console.error('Failed to update admission');
-      }
-    } catch (error) {
-      console.error('Error updating admission:', error);
+  const addPrescription = async () => {
+    const response = await fetch(`http://localhost:9090/api/v1/doctor/prescription/${patientId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`
+      },
+      body: JSON.stringify({
+        patient_id: patientId,
+        pre_text: prescription
+      })
+    });
+    if (!response.ok) {
+      throw new Error('Failed to add prescription');
+    }
+  };
+
+  const updateAdmission = async () => {
+    const response = await fetch(`http://localhost:9090/api/v1/admission/admit/${patientId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`
+      },
+      body: JSON.stringify({
+        patientId: patientId
+      })
+    });
+    if (!response.ok) {
+      throw new Error('Failed to update admission');
     }
   };
 
@@ -173,69 +162,63 @@ const PatientFormScreen = ({ route }) => {
             <View style={styles.middleRightContainer}>
               <Text style={styles.prescriptionFormHeading}>Consultation Form</Text>
               <Slider
-                style={{ width: '100%', marginBottom: 20 }} // Adjust width and margin as needed
-                minimumValue={35}
-                maximumValue={40}
+                style={styles.slider}
+                minimumValue={95}
+                maximumValue={105}
                 step={0.1}
                 value={temperature}
-                onValueChange={(value) => setTemperature(value)}
+                onValueChange={(temp) => setTemperature(temp)}
               />
+              <Text style={styles.sliderLabel}>Temperature: {temperature.toFixed(1)} °F</Text>
+              <View style={styles.bloodPressureSliderContainer}>
+                <Slider
+                  style={styles.slider}
+                  minimumValue={90}
+                  maximumValue={180}
+                  step={1}
+                  value={bloodPressure.systolic}
+                  onValueChange={(systolic) => setBloodPressure({ ...bloodPressure, systolic })}
+                />
+                <Slider
+                  style={styles.slider}
+                  minimumValue={60}
+                  maximumValue={120}
+                  step={1}
+                  value={bloodPressure.diastolic}
+                  onValueChange={(diastolic) => setBloodPressure({ ...bloodPressure, diastolic })}
+                />
+              </View>
+              <Text style={styles.sliderLabel}>Blood Pressure: {bloodPressure.systolic}/{bloodPressure.diastolic} mmHg</Text>
               <TextInput
                 style={styles.input}
                 placeholder="Symptoms"
                 value={symptoms}
                 onChangeText={(text) => setSymptoms(text)}
               />
-              <TouchableOpacity
-                style={[styles.addButton, { backgroundColor: symptomsAdded ? '#888888' : '#61828a' }]}
-                onPress={handleAddSymptoms}
-                disabled={symptomsAdded}
-              >
-                <Text style={styles.buttonText}>{symptomsAdded ? 'Added' : 'Save'}</Text>
-              </TouchableOpacity>
               <TextInput
                 style={styles.input}
                 placeholder="Treatment Plan"
                 value={diagnosis}
                 onChangeText={(text) => setDiagnosis(text)}
               />
-              <TouchableOpacity
-                style={[styles.addButton, { backgroundColor: diagnosisAdded ? '#888888' : '#61828a' }]}
-                onPress={handleAddDiagnosis}
-                disabled={diagnosisAdded}
-              >
-                <Text style={styles.buttonText}>{diagnosisAdded ? 'Added' : 'Save'}</Text>
-              </TouchableOpacity>
               <TextInput
                 style={styles.input}
                 placeholder="Prescription"
                 value={prescription}
                 onChangeText={(text) => setPrescription(text)}
               />
+              <View style={styles.switchContainer}></View>
+              <Text style={styles.switchText}>Admit Patient:</Text>
+              <Switch
+                value={isConsultationConfirmed}
+                onValueChange={(value) => setIsConsultationConfirmed(value)}
+              />
               <TouchableOpacity
-                style={[styles.addButton, { backgroundColor: prescriptionAdded ? '#888888' : '#61828a' }]}
-                onPress={handleAddPrescription}
-                disabled={prescriptionAdded}
+                style={[styles.addButton, { backgroundColor: formSaved ? '#888888' : '#61828a' }]}
+                onPress={handleSaveForm}
+                disabled={formSaved}
               >
-                <Text style={styles.buttonText}>{prescriptionAdded ? 'Added' : 'Save'}</Text>
-              </TouchableOpacity>
-              {/* <Picker
-                selectedValue={admitPatient}
-                style={styles.dropdown}
-                onValueChange={(itemValue) => setAdmitPatient(itemValue)}
-              >
-                <Picker.Item label="No" value={true} />
-                <Picker.Item label="Yes" value={false} />
-              </Picker> */}
-              <TouchableOpacity
-                style={[styles.updateButton, { backgroundColor: admissionUpdated ? '#888888' : '#61828a' }]}
-                onPress={handleUpdateAdmission}
-                disabled={admissionUpdated}
-              >
-                <Text style={styles.buttonText}>{admissionUpdated ? 'Admission Updated' : 'Admit Patient?'}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmConsultation}>
-                <Text style={styles.buttonText}>Confirm Consultation</Text>
+                <Text style={styles.buttonText}>{formSaved ? 'Saved' : 'Save'}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -321,29 +304,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     backgroundColor: '#FFFFFF',
     borderRadius: 5,
-    height:80,
+    height: 80,
   },
   addButton: {
     backgroundColor: '#61828a',
     padding: 10,
     marginVertical: 10,
-    width: '5%',
     alignItems: 'center',
     borderRadius: 5,
-    marginBottom:20,
-  },
-  updateButton: {
-    backgroundColor: '#61828a',
-    padding: 10,
-    marginVertical: 10,
-    width: '10%',
-    alignItems: 'center',
-    borderRadius: 5,
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
   },
   confirmButton: {
     backgroundColor: '#61828a',
@@ -354,11 +322,31 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     borderRadius: 5,
   },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
   logo: {
     width: 200,
     height: 200,
     resizeMode: 'contain',
   },
+  switchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  switchText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    marginRight: 10,
+  },
+  admitText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    marginTop: 10,
+  },
+  
 });
 
 export default PatientFormScreen;

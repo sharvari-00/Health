@@ -269,10 +269,10 @@ const LoginScreen = ({ route, navigation }) => {
                   placeholder="Password"
                   value={password}
                   secureTextEntry={!showPassword}
-                  right={<PaperTextInput.Icon name={showPassword ? 'eye-off' : 'eye'} color="black" onPress={() => setShowPassword(!showPassword)} />}
+                  right={<PaperTextInput.Icon name={showPassword ? 'eye-off' : 'eye'} color= 'black' onPress={() => setShowPassword(!showPassword)} />}
                   onChangeText={(text) => setPassword(text)}
                   underlineColor="white"
-                  theme={{ colors: { primary: 'white', underlineColor: 'transparent' } }}
+                  theme={{ colors: { primary: 'black', underlineColor: 'transparent' } }}
                 />
                 <TouchableOpacity style={styles.button} onPress={handleLogin}>
                   <Text style={styles.buttonText}>Login</Text>
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   layer: {
-    backgroundColor: 'rgba(0, 150, 136, 0.1)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     flex: 1,
     width: '100%',
     justifyContent: 'center',

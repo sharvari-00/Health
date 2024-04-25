@@ -10,108 +10,81 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
   const [accessToken, setAccessToken] = useState('');
   const [patientDetails, setPatientDetails] = useState(null);
   const [symptoms, setSymptoms] = useState([]);
-  const [treatmentPlan, setTreatmentPlan] = useState([]);
+  const [diagnosis, setDiagnosis] = useState([]);
   const [prescription, setPrescription] = useState([]);
   const [dischargeProcessing, setDischargeProcessing] = useState(false);
 
   useEffect(() => {
-    const fetchPatientDetails = async () => {
+    const fetchData = async () => {
       try {
         const token = await AsyncStorage.getItem('accessToken');
         setAccessToken(token);
 
-        const response = await fetch(`http://localhost:9090/api/v1/doctor/patient/${patientId}`, {
+        // Fetch patient details
+        const patientResponse = await fetch(`http://localhost:9090/api/v1/doctor/patient/${patientId}`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         });
-
-        if (response.ok) {
-          const data = await response.json();
-          setPatientDetails(data);
+        if (patientResponse.ok) {
+          const patientData = await patientResponse.json();
+          setPatientDetails(patientData);
         } else {
           console.error('Failed to fetch patient details');
         }
-      } catch (error) {
-        console.error('Error fetching patient details:', error);
-      }
-    };
 
-    const fetchSymptoms = async () => {
-      try {
-        const token = await AsyncStorage.getItem('accessToken');
-        setAccessToken(token);
-        const response = await fetch(`http://localhost:9090/api/v1/doctor/symptoms_patient/${patientId}`, {
+        // Fetch symptoms
+        const symptomsResponse = await fetch(`http://localhost:9090/api/v1/doctor/symptoms_patient/${patientId}`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         });
-
-        if (response.ok) {
-          const data = await response.json();
-          setSymptoms(data);
+        if (symptomsResponse.ok) {
+          const symptomsData = await symptomsResponse.json();
+          setSymptoms(symptomsData);
         } else {
           console.error('Failed to fetch symptoms');
         }
-      } catch (error) {
-        console.error('Error fetching symptoms:', error);
-      }
-    };
 
-    const fetchTreatmentPlan = async () => {
-      try {
-        const token = await AsyncStorage.getItem('accessToken');
-        setAccessToken(token);
-        const response = await fetch(`http://localhost:9090/api/v1/doctor/diagnosis_patient/${patientId}`, {
+        // Fetch diagnosis
+        const diagnosisResponse = await fetch(`http://localhost:9090/api/v1/doctor/diagnosis_patient/${patientId}`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         });
-
-        if (response.ok) {
-          const data = await response.json();
-          setTreatmentPlan(data);
+        if (diagnosisResponse.ok) {
+          const diagnosisData = await diagnosisResponse.json();
+          setDiagnosis(diagnosisData);
         } else {
-          console.error('Failed to fetch treatment plan');
+          console.error('Failed to fetch diagnosis');
         }
-      } catch (error) {
-        console.error('Error fetching treatment plan:', error);
-      }
-    };
 
-    const fetchPrescription = async () => {
-      try {
-        const token = await AsyncStorage.getItem('accessToken');
-        setAccessToken(token);
-        const response = await fetch(`http://localhost:9090/api/v1/doctor/prescriptions_patient/${patientId}`, {
+        // Fetch prescription
+        const prescriptionResponse = await fetch(`http://localhost:9090/api/v1/doctor/prescriptions_patient/${patientId}`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         });
-
-        if (response.ok) {
-          const data = await response.json();
-          setPrescription(data);
+        if (prescriptionResponse.ok) {
+          const prescriptionData = await prescriptionResponse.json();
+          setPrescription(prescriptionData);
         } else {
           console.error('Failed to fetch prescription');
         }
       } catch (error) {
-        console.error('Error fetching prescription:', error);
+        console.error('Error fetching data:', error);
       }
     };
 
-    fetchPatientDetails();
-    fetchSymptoms();
-    fetchTreatmentPlan();
-    fetchPrescription();
+    fetchData();
   }, []);
 
   const handleAddConsultation = () => {
@@ -127,13 +100,11 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
 
   const handleDischarge = async () => {
     try {
-      // Call backend API to discharge patient using token and patientId
-      //const token = await AsyncStorage.getItem('accessToken');
       const token = await AsyncStorage.getItem('accessToken');
       setAccessToken(token);
       setDischargeProcessing(true);
       const response = await fetch(`http://localhost:9090/api/v1/admission/discharge/${patientId}`, {
-        method: 'POST', // Adjust the method according to your API endpoint
+        method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -141,11 +112,8 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
       });
   
       if (response.ok) {
-        // After successful discharge
         setDischargeProcessing(false);
-        // Perform any necessary actions after successful discharge
       } else {
-        // Handle non-OK response from the server
         console.error('Failed to discharge patient:', response.status);
       }
     } catch (error) {
@@ -169,9 +137,8 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
                 <Text style={styles.buttonText}>Back</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Home')}>
-  <Text style={styles.buttonText}>Logout</Text>
-</TouchableOpacity>
-
+                <Text style={styles.buttonText}>Logout</Text>
+              </TouchableOpacity>
             </View>
           </View>
           <View style={styles.middleContainer}>
@@ -202,29 +169,29 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
               <Text style={styles.patientDetail}>Bed No.: {patientDetails?.bedId}</Text>
               
               <Text style={styles.sectionHeading}>Symptoms</Text>
-  <FlatList
-    data={symptoms}
-    keyExtractor={(item, index) => index.toString()}
-    renderItem={({ item, index }) => (
-      <Text style={styles.item}>{`${index + 1}. ${item.sym_text}`}</Text>
-    )}
-  />
-  <Text style={styles.sectionHeading}>Treatment Plan</Text>
-  <FlatList
-    data={treatmentPlan}
-    keyExtractor={(item, index) => index.toString()}
-    renderItem={({ item, index }) => (
-      <Text style={styles.item}>{`${index + 1}. ${item.dia_text}`}</Text>
-    )}
-  />
-  <Text style={styles.sectionHeading}>Prescription</Text>
-  <FlatList
-    data={prescription}
-    keyExtractor={(item, index) => index.toString()}
-    renderItem={({ item, index }) => (
-      <Text style={styles.item}>{`${index + 1}. ${item.pre_text}`}</Text>
-    )}
-  />
+              <FlatList
+                data={symptoms}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item, index }) => (
+                  <Text style={styles.item}>{`${index + 1}. ${item.sym_text}`}</Text>
+                )}
+              />
+              <Text style={styles.sectionHeading}>Treatment Plan</Text>
+              <FlatList
+                data={diagnosis}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item, index }) => (
+                  <Text style={styles.item}>{`${index + 1}. ${item.dia_text}`}</Text>
+                )}
+              />
+              <Text style={styles.sectionHeading}>Prescription</Text>
+              <FlatList
+                data={prescription}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item, index }) => (
+                  <Text style={styles.item}>{`${index + 1}. ${item.pre_text}`}</Text>
+                )}
+              />
             </View>
           </View>
           <View style={styles.lowerContainer}>
@@ -296,7 +263,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     justifyContent: 'center',
-    alignItems: 'center', // Align items horizontally
+    alignItems: 'center',
     marginBottom: 20,
   },
   middleRightContainer: {
@@ -321,7 +288,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#FFFFFF',
     marginBottom: 5,
-
   },
   item: {
     fontSize: 16,
