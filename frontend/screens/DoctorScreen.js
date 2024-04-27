@@ -37,7 +37,7 @@ const DoctorScreen = ({ navigation, route }) => {
   const greetingMessage = "Hope you have a great day today!";
 
   const handleAppointmentsToday = () => {
-    navigation.navigate('AppointmentsTodayScreen', { doctor: doctorDetails });
+    navigation.navigate('AppointmentsTodayScreen', { doctorId });
   };
   
   const handleRoundsForAdmittedPatients = () => {
@@ -71,9 +71,10 @@ const DoctorScreen = ({ navigation, route }) => {
               <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
                 <Text style={styles.buttonText}>Back</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Logout')}>
-                <Text style={styles.buttonText}>Logout</Text>
+              <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Home')}>
+              <Text style={styles.buttonText}>Logout</Text>
               </TouchableOpacity>
+
             </View>
           </View>
           {/* Middle Container */}
@@ -86,6 +87,11 @@ const DoctorScreen = ({ navigation, route }) => {
               <Text style={styles.departmentText}>{doctorDepartment}</Text>
               <Text style={styles.infoText}>ID: {doctorId}</Text>
               <Text style={styles.infoText}>{greetingMessage}</Text>
+              {/* <Image 
+                source={require('../assets/doc.png')} 
+                style={styles.opacityImage} 
+                resizeMode="cover"
+              /> */}
             </View>
             {/* Right Container */}
             <View style={styles.middleRightContainer}>
@@ -122,7 +128,8 @@ const styles = StyleSheet.create({
   },
   layer: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent layer
+    backgroundColor: 'rgba(26, 95, 116, 0.13)',
+    //backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent layer
   },
   upperContainer: {
     flex: 3,
@@ -150,9 +157,10 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   headerText: {
-    fontSize: 40,
+    fontSize: 50,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#004849',
+    fontFamily: 'Cursive',
   },
   divider: {
     width: '80%',
@@ -163,29 +171,29 @@ const styles = StyleSheet.create({
   dateText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#004849',
     alignSelf: 'flex-start',
     marginBottom: 10,
     marginLeft: 20,
   },
   greetingText: {
     paddingTop: 80, 
-    fontSize: 24,
+    fontSize: 29,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#004849',
     marginBottom: 10,
   },
   departmentText: {
-    fontSize: 20,
+    fontSize: 25,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#004849',
     marginBottom: 10,
   },
   infoText: {
     paddingTop: 40,
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#004849',
     marginBottom: 10,
   },
   buttonContainer: {
@@ -200,16 +208,16 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   buttonText: {
-    fontSize: 18,
+    fontSize: 25,
     fontWeight: 'bold',
     color: '#FFFFFF',
     paddingHorizontal: 20,
   },
   button: {
-    backgroundColor: '#61828a', // Button background color
+    backgroundColor: '#326974', // Button background color
     padding: 15,
     margin: 10,
-    width: 300,
+    width: 380,
     alignItems: 'center',
     borderRadius: 10,
   },
@@ -223,6 +231,14 @@ const styles = StyleSheet.create({
     width: 200,
     height: 200,
     resizeMode: 'contain',
+  },
+  opacityImage: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    width: 300,
+    height: 300,
+    opacity: 0.96,
   },
 });
 

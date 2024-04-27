@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Image, TextInput, Button } from 'react-native';
-
+import { useNavigation } from '@react-navigation/native'; 
 const PatientDetailsScreen = ({ route }) => {
   const { patientId } = route.params; // Get the patient ID from the navigation params
-
+  const navigation = useNavigation(); 
   // Fetch patient details based on patientId (you might have an API call or local data)
   const patientDetails = {
     name: 'John Doe',
@@ -52,12 +52,13 @@ const PatientDetailsScreen = ({ route }) => {
             <Text style={styles.headerText}> Patient Diagnosis</Text>
             <View style={styles.divider} />
             <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.backButton}>
+            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
                 <Text style={styles.buttonText}>Back</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.logoutButton}>
-                <Text style={styles.buttonText}>Logout</Text>
-              </TouchableOpacity>
+              <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Home')}>
+  <Text style={styles.buttonText}>Logout</Text>
+</TouchableOpacity>
+
             </View>
           </View>
           {/* Middle Container */}
@@ -88,7 +89,7 @@ const PatientDetailsScreen = ({ route }) => {
                     onChangeText={(text) => setFilePath(text)}
                     value={filePath}
                   />
-                  <Button title="Save" onPress={handleSaveImage} color="#61828a" />
+                  <Button title="Save" onPress={handleSaveImage} color="#326974" />
                 </View>
               )}
             </View>
@@ -182,7 +183,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   uploadButton: {
-    backgroundColor: '#61828a',
+    backgroundColor: '#326974',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,

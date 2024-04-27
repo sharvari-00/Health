@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image, Picker } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { useNavigation } from '@react-navigation/native';
 const ViewEditPatientDetailsScreen = ({ route }) => {
   const { patientId } = route.params;
+  const navigation = useNavigation();
   //const [changesSaved, setChangesSaved] = useState(false);
   
   const [accessToken, setAccessToken] = useState('');
@@ -114,12 +115,13 @@ const ViewEditPatientDetailsScreen = ({ route }) => {
           <Text style={[styles.heading, styles.largeFont]}>Edit Details</Text>
           <View style={styles.divider} />
           <View style={styles.headerButtons}>
-            <TouchableOpacity>
-              <Text style={styles.buttonText}>Back</Text>
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+                <Text style={styles.buttonText}>Back</Text>
+              </TouchableOpacity>
+            <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Home')}>
+            <Text style={styles.buttonText}>Logout</Text>
             </TouchableOpacity>
-            <TouchableOpacity>
-              <Text style={styles.buttonText}>Logout</Text>
-            </TouchableOpacity>
+
           </View>
         </View>
         
@@ -237,7 +239,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(26, 95, 116, 0.13)',
     paddingHorizontal: 20,
     paddingTop: 40,
   },
@@ -247,13 +249,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   heading: {
-    fontSize: 24,
+    fontSize: 40,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#004849',
     marginBottom:10,
   },
   largeFont: {
-    fontSize: 28,
+    fontSize: 40,
   },
   divider: {
     width: '100%',
@@ -269,7 +271,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#FFFFFF',
     marginHorizontal: 10,
-    fontSize: 16,
+    fontSize: 29,
   },
   middleContainer: {
     flex: 6,
@@ -288,10 +290,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   subHeading: {
-    fontSize: 20,
+    fontSize: 30,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: '#FFFFFF',
+    color: '#326974',
   },
   formRow: {
     flexDirection: 'row',
@@ -299,14 +301,14 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   formLabel: {
-    fontSize: 18,
+    fontSize: 25,
     fontWeight: 'bold',
     color: '#000000',
     marginRight: 10,
   },
   formValue: {
-    fontSize: 18,
-    color: '#FFFFFF',
+    fontSize: 25,
+    color: '#000000',
   },
   input: {
     height: 40,
@@ -315,9 +317,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     backgroundColor: '#FFFFFF',
     flex: 1,
+    fontSize:25,
+    
   },
   saveButton: {
-    backgroundColor: '#61828a',
+    backgroundColor: '#326974',
     padding: 15,
     alignItems: 'center',
     marginVertical: 20,

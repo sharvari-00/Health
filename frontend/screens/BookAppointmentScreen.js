@@ -81,8 +81,14 @@ const BookAppointmentScreen = ({ route, navigation }) => {
     .then(data => {
       setRegisteredPatientId(data.id);
       setConfirmationText(`Patient ID: ${data.id}\nRegistered Doctor ID: ${selectedDoctor.id}`);
-      Alert.alert('Success', `Appointment scheduled with Doctor ID: ${selectedDoctor.id}.\nRegistered patient ID is ${data.id}`);
+      Alert.alert(
+        'Success',
+        <Text style={styles.middleHeading}>
+          {`Appointment scheduled with Doctor ID: ${selectedDoctor.id}.\nRegistered patient ID is ${data.id}`}
+        </Text>
+      );
     })
+    
     .catch(error => {
       console.error('Error registering patient:', error);
       Alert.alert('Error', 'Failed to register patient. Please try again.');
@@ -97,12 +103,13 @@ const BookAppointmentScreen = ({ route, navigation }) => {
           <Text style={styles.heading}>Available Doctors </Text>
           <View style={styles.divider} />
           <View style={styles.headerButtons}>
-            <TouchableOpacity>
-              <Text style={styles.buttonText}>Back</Text>
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <Text style={styles.buttonText}>Logout</Text>
-            </TouchableOpacity>
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+                <Text style={styles.buttonText}>Back</Text>
+              </TouchableOpacity>
+            <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Home')}>
+  <Text style={styles.buttonText}>Logout</Text>
+</TouchableOpacity>
+
           </View>
         </View>
 
@@ -135,7 +142,7 @@ const BookAppointmentScreen = ({ route, navigation }) => {
               data={availableDoctorsData}
               keyExtractor={(item) => item.id.toString()}
               renderItem={({ item, index }) => (
-                <View style={[styles.doctorItem, { backgroundColor: index % 2 === 0 ? 'rgba(169, 204, 207, 0.6)' : 'rgba(169, 204, 207, 0.4)' }]}>
+                <View style={[styles.doctorItem, { backgroundColor:'rgba(169, 204, 207, 0.6)', marginBottom: 10 }]}>
                   <View style={styles.doctorDetails}>
                     <Text style={styles.doctorText}>Doctor ID: {item.id}</Text>
                     <Text style={styles.doctorText}>Name: {item.fname} {item.lname}</Text>
@@ -165,7 +172,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: '#CEDFCC',
+    backgroundColor: 'rgba(26, 95, 116, 0.13)',
     paddingHorizontal: 20,
     paddingTop: 40,
   },
@@ -175,9 +182,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   heading: {
-    fontSize: 30,
+    fontSize: 50,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#004849',
     marginBottom: 10,
   },
   divider: {
@@ -194,7 +201,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#FFFFFF',
     marginHorizontal: 10,
-    fontSize: 18,
+    fontSize: 25,
     fontWeight: 'bold'
   },
   middleContainer: {
@@ -216,10 +223,11 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     paddingHorizontal: 10,
     color: '#000000',
-    backgroundColor:'#FFFFFF'
+    backgroundColor:'#FFFFFF',
+    fontSize:20,
   },
   confirmButton: {
-    backgroundColor: '#61828a',
+    backgroundColor: '#326974',
     padding: 10,
     marginTop: 10,
     borderRadius: 5,
@@ -228,9 +236,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#4CAF50', // Change color when confirmed
   },
   middleHeading: {
-    fontSize: 25,
+    fontSize: 29,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#004849',
     marginBottom: 10,
   },
   rightMiddleContainer: {
@@ -251,19 +259,19 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   doctorText: {
-    fontSize: 16,
+    fontSize: 25,
     color: '#000000',
     fontWeight: 'bold'
   },
   bookButton: {
-    backgroundColor: '#61828a',
+    backgroundColor: '#326974',
     padding: 10,
     marginTop: 10,
     borderRadius: 5,
   },
   saveButtonText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: 'bold',
   },
   lowerContainer: {
@@ -278,14 +286,14 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   confirmationText: {
-    color: '#FFFFFF',
-    fontSize: 16,
+    color: '#004849',
+    fontSize: 25,
     marginTop: 10,
     textAlign: 'center',
   },
   errorText: {
     color: 'red',
-    fontSize: 16,
+    fontSize: 20,
     marginTop: 10,
     textAlign: 'center',
   },

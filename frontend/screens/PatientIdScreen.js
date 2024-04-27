@@ -38,9 +38,10 @@ const PatientIdScreen = ({ navigation }) => {
               <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
                 <Text style={styles.buttonText}>Back</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Logout')}>
-                <Text style={styles.buttonText}>Logout</Text>
-              </TouchableOpacity>
+              <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Home')}>
+  <Text style={styles.buttonText}>Logout</Text>
+</TouchableOpacity>
+
             </View>
           </View>
           {/* Middle Container */}
@@ -90,7 +91,7 @@ const styles = StyleSheet.create({
   },
   layer: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent layer
+    backgroundColor: 'rgba(26, 95, 116, 0.13)',// Semi-transparent layer
   },
   upperContainer: {
     flex: 3,
@@ -119,9 +120,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   headerText: {
-    fontSize: 40,
+    fontSize: 60,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#004849,',
   },
   divider: {
     width: '80%',
@@ -130,9 +131,9 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   dateText: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#004849,',
     marginBottom: 10,
     paddingBottom:80,
   },
@@ -141,20 +142,20 @@ const styles = StyleSheet.create({
     textAlign: 'justify',
     fontSize: 25,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#004849,',
     marginBottom: 10,
     
   },
   smallText: {
-    fontSize: 16,
+    fontSize: 23,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#004849,',
     marginBottom: 30,
   },
   enterIdText: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#000000',
     marginBottom: 10,
   },
   input: {
@@ -165,6 +166,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     width: 200,
     backgroundColor: '#FFFFFF',
+    fontSize: 23,
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -178,13 +180,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   buttonText: {
-    fontSize: 18,
+    fontSize: 25,
     fontWeight: 'bold',
     color: '#FFFFFF',
     paddingHorizontal: 20,
   },
   button: {
-    backgroundColor: '#61828a', // Button background color
+    backgroundColor: '#326974', // Button background color
     padding: 10,
     marginVertical: 10,
     width: 200,

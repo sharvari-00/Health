@@ -30,7 +30,7 @@ const HomeScreen = ({ navigation }) => {
             {/* Role Buttons */}
             <Button
               icon={({ size, color }) => (
-                <Avatar.Image size={size} source={require('../assets/logo2.png')} style={{ backgroundColor: '#61828a' }} />
+                <Avatar.Image size={size} source={require('../assets/recep.png')} style={{ backgroundColor: '#FFFFFF' }} />
               )}
               mode="contained"
               onPress={() => handleLogin('frontdesk')}
@@ -43,7 +43,7 @@ const HomeScreen = ({ navigation }) => {
             </Button>
             <Button
               icon={({ size, color }) => (
-                <Avatar.Image size={size} source={require('../assets/logo2.png')} style={{ backgroundColor: '#61828a' }} />
+                <Avatar.Image size={size} source={require('../assets/doc.avif')} style={{ backgroundColor: '#FFFFFF' }} />
               )}
               mode="contained"
               onPress={() => handleLogin('doctor')}
@@ -56,7 +56,7 @@ const HomeScreen = ({ navigation }) => {
             </Button>
             <Button
               icon={({ size, color }) => (
-                <Avatar.Image size={size} source={require('../assets/logo2.png')} style={{ backgroundColor: '#61828a' }} />
+                <Avatar.Image size={size} source={require('../assets/nurse.jpg')} style={{ backgroundColor: '#FFFFFF' }} />
               )}
               mode="contained"
               onPress={() => handleLogin('nurse')}
@@ -69,7 +69,7 @@ const HomeScreen = ({ navigation }) => {
             </Button>
             <Button
               icon={({ size, color }) => (
-                <Avatar.Image size={size} source={require('../assets/logo2.png')} style={{ backgroundColor: '#61828a' }} />
+                <Avatar.Image size={size} source={require('../assets/pharma.webp')} style={{ backgroundColor: '#FFFFFF' }} />
               )}
               mode="contained"
               onPress={() => handleLogin('pharmacist')}
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   roleButton: {
-    backgroundColor: '#61828a',
+    backgroundColor: '#326974',
     padding: 20,
     marginVertical: 10,
     width: 400,

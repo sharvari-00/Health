@@ -66,12 +66,13 @@ const AddPatientScreen = ({ navigation }) => {
           <Text style={[styles.heading, styles.largeFont]}>Patient Registration Form</Text>
           <View style={styles.divider} />
           <View style={styles.headerButtons}>
-            <TouchableOpacity>
-              <Text style={styles.buttonText}>Back</Text>
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <Text style={styles.buttonText}>Logout</Text>
-            </TouchableOpacity>
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+                <Text style={styles.buttonText}>Back</Text>
+              </TouchableOpacity>
+            <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Home')}>
+  <Text style={styles.buttonText}>Logout</Text>
+</TouchableOpacity>
+
           </View>
         </View>
         
@@ -80,7 +81,7 @@ const AddPatientScreen = ({ navigation }) => {
           {/* Middle Left Container */}
           <View style={styles.middleLeftContainer}>
             <Text style={styles.dateText}>Date: {new Date().toLocaleDateString()}</Text>
-            <Text style={styles.middleHeading}>New Patient Registration</Text>
+            <Text style={styles.middleHeading}>Patient Details</Text>
           </View>
           
           {/* Middle Right Container */}
@@ -110,21 +111,46 @@ const AddPatientScreen = ({ navigation }) => {
               />
             </View>
             <View style={styles.inputContainer}>
+  <Text style={styles.inputLabel}>Gender:</Text>
+  <Picker
+    style={styles.input}
+    selectedValue={gender}
+    onValueChange={(itemValue, itemIndex) => setGender(itemValue)}
+  >
+    <Picker.Item label="Male" value="male" />
+    <Picker.Item label="Female" value="female" />
+    <Picker.Item label="Other" value="other" />
+  </Picker>
+</View>
+
+            {/* <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>Gender:</Text>
               <TextInput
                 style={styles.input}
                 placeholder="Enter gender"
                 onChangeText={(text) => setGender(text)}
               />
-            </View>
-            <View style={styles.inputContainer}>
+            </View> */}
+            {/* <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>Phone Number:</Text>
               <TextInput
                 style={styles.input}
                 placeholder="Enter phone number"
                 onChangeText={(text) => setPhoneNumber(text)}
               />
-            </View>
+            </View> */}
+            <View style={styles.inputContainer}>
+  <Text style={styles.inputLabel}>Phone Number:</Text>
+  <View style={styles.phoneInputContainer}>
+    <Text style={styles.countryCode}>+91</Text>
+    <TextInput
+      style={[styles.input, styles.phoneNumberInput]}
+      placeholder="Phone number"
+      onChangeText={(text) => setPhoneNumber(text)}
+    />
+  </View>
+</View>
+
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>Email:</Text>
               <TextInput
@@ -204,19 +230,20 @@ const styles = StyleSheet.create({
     paddingTop: 40,
   },
   upperContainer: {
-    flex: 1,
+    flex: 0.4,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 10,
   },
   heading: {
-    fontSize: 24,
+    fontSize: 60,
     fontWeight: 'bold',
-    color: '#61828a',
+    color: '#004849',
     marginBottom: 10,
+    fontFamily: 'Cursive',
   },
   largeFont: {
-    fontSize: 28,
+    fontSize: 50,
   },
   divider: {
     width: '100%',
@@ -230,13 +257,14 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   buttonText: {
-    color: '#61828a',
+    color: '#FFFFFF',
     marginHorizontal: 10,
-    fontSize: 18,
+    fontSize: 28,
     fontWeight:'bold'
   },
   middleContainer: {
-    flex: 6,
+    flex: 4.5,
+    justifyContent:'left',
     flexDirection: 'row',
   },
   middleLeftContainer: {
@@ -247,17 +275,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   dateText: {
-    color: '#61828a',
-    fontSize: 16,
+    color: '#326974',
+    fontSize: 23,
     marginBottom: 10,
   },
   middleHeading: {
-    color: '#61828a',
-    fontSize: 20,
+    color: '#326974',
+    fontSize: 27,
     fontWeight: 'bold',
   },
   middleRightContainer: {
-    flex: 2,
+    flex: 3,
     justifyContent: 'center',
     paddingHorizontal: 20,
   },
@@ -266,19 +294,20 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     color: '#000000',
-    fontSize: 20,
+    fontSize: 24,
   },
   input: {
-    height: 50,
-    borderColor: '#61828a',
+    height: 60,
+    borderColor: '#326974',
     borderWidth: 1,
     marginVertical: 5,
     paddingHorizontal: 10,
     backgroundColor:'#FFFFFF',
+    fontSize: 22
   },
   dropdownContainer: {
     borderWidth: 1,
-    borderColor: '#61828a',
+    borderColor: '#326974',
     borderRadius: 5,
     marginVertical: 5,
     color: '#000000',
@@ -288,13 +317,13 @@ const styles = StyleSheet.create({
     color: '#000000',
   },
   saveButton: {
-    backgroundColor: '#61828a',
+    backgroundColor: '#326974',
     padding: 15,
     alignItems: 'center',
     marginVertical: 20,
   },
   lowerContainer: {
-    flex: 2,
+    flex: 1,
     justifyContent: 'flex-end',
     alignItems: 'flex-start',
     marginBottom: 20,
@@ -302,6 +331,17 @@ const styles = StyleSheet.create({
   logo: {
     width: 200,
     height: 200,
+  },
+  phoneInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  countryCode: {
+    marginRight: 8, // Adjust the spacing between the country code and the phone number input
+    fontSize:22,
+  },
+  phoneNumberInput: {
+    flex: 1, // Allow the phone number input to take up remaining space
   },
 });
 

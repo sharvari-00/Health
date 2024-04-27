@@ -36,9 +36,10 @@ const NurseScreen = ({ navigation }) => {
               <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
                 <Text style={styles.buttonText}>Back</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Logout')}>
-                <Text style={styles.buttonText}>Logout</Text>
-              </TouchableOpacity>
+              <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Home')}>
+              <Text style={styles.buttonText}>Logout</Text>
+          </TouchableOpacity>
+
             </View>
           </View>
           {/* Middle Container */}
@@ -80,7 +81,7 @@ const NurseScreen = ({ navigation }) => {
   );
 };
 
-const lightBorderColor = '#61828a'; // Light brown color for borders
+const lightBorderColor = '#326974'; // Light brown color for borders
 
 const styles = StyleSheet.create({
   container: {

@@ -51,12 +51,13 @@ const RoundsScreen = ({ navigation }) => {
             <Text style={styles.headerText}>On Round Consultation</Text>
             <View style={styles.divider} />
             <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.backButton}>
+            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
                 <Text style={styles.buttonText}>Back</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.logoutButton}>
-                <Text style={styles.buttonText}>Logout</Text>
-              </TouchableOpacity>
+              <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Home')}>
+  <Text style={styles.buttonText}>Logout</Text>
+</TouchableOpacity>
+
             </View>
           </View>
           <View style={styles.middleContainer}>
@@ -68,14 +69,14 @@ const RoundsScreen = ({ navigation }) => {
                   style={styles.patientItem}
                   onPress={() => handlePatientClick(patient.id)}
                 >
-                  <Text style={[styles.patientInfo, { fontWeight: 'bold', fontSize: 18 }]}>Patient {patient.id}</Text>
+                  <Text style={[styles.patientInfo, { fontWeight: 'bold', fontSize: 25 }]}>Patient {patient.id}</Text>
                   <Text style={styles.patientInfo}>Name: {patient.fname}</Text>
                   <Text style={styles.patientInfo}>Bed No: {patient.bedId}</Text>
                 </TouchableOpacity>
               ))}
             </View>
             <View style={styles.middleRightContainer}>
-              <Text style={styles.middleRightHeader}>Patients</Text>
+            {/* <Text style={styles.middleRightHeader}>Patients</Text> */}
             </View>
           </View>
           <View style={styles.lowerContainer}>
@@ -97,7 +98,7 @@ const styles = StyleSheet.create({
   },
   layer: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(26, 95, 116, 0.13)',
     padding: 20,
   },
   upperContainer: {
@@ -113,11 +114,11 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   headerText: {
-    fontSize: 30,
+    fontSize: 50,
     fontFamily: 'Cursive',
     fontWeight: 'bold',
     marginBottom: 30,
-    color: '#FFFFFF',
+    color: '#004849',
   },
   divider: {
     width: '100%',
@@ -137,29 +138,29 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   buttonText: {
-    fontSize: 16,
+    fontSize: 29,
     fontFamily: 'Arial',
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
   middleLeftContainer: {
-    flex: 7,
-    backgroundColor: 'rgba(223, 233, 235, 0.2)',
+    flex: 1,
+    //backgroundColor: 'rgba(223, 233, 235, 0.2)',
     padding: 10,
     borderRadius: 5,
     marginRight: 10,
   },
   middleRightContainer: {
-    flex: 3,
+    flex: 0,
     alignItems: 'center',
     justifyContent: 'center',
   },
   middleLeftHeader: {
-    fontSize: 25,
+    fontSize: 30,
     fontFamily: 'Cursive',
     fontWeight: 'bold',
     marginBottom: 10,
-    color: '#FFFFFF',
+    color: '#004849,',
   },
   middleRightHeader: {
     fontSize: 25,
@@ -178,9 +179,9 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   patientInfo: {
-    fontSize: 16,
+    fontSize: 25,
     fontFamily: 'Arial',
-    color: '#564335',
+    color: '#000000',
   },
   logo: {
     width: 200,

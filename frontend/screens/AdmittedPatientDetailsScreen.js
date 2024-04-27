@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, ImageBackground, Image } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, ImageBackground, Image,Picker} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native'; 
+import Slider from '@react-native-community/slider'; // Import Slider from react-native-community
 
 const AdmittedPatientDetailsScreen = ({ route }) => {
   const navigation = useNavigation();
@@ -10,108 +11,84 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
   const [accessToken, setAccessToken] = useState('');
   const [patientDetails, setPatientDetails] = useState(null);
   const [symptoms, setSymptoms] = useState([]);
-  const [treatmentPlan, setTreatmentPlan] = useState([]);
+  const [diagnosis, setDiagnosis] = useState([]);
   const [prescription, setPrescription] = useState([]);
   const [dischargeProcessing, setDischargeProcessing] = useState(false);
+  const [temperature, setTemperature] = useState(98.6); // State for temperature
+  const [bloodPressure, setBloodPressure] = useState({ systolic: 120, diastolic: 80 }); // State for blood pressure
+ 
 
   useEffect(() => {
-    const fetchPatientDetails = async () => {
+    const fetchData = async () => {
       try {
         const token = await AsyncStorage.getItem('accessToken');
         setAccessToken(token);
 
-        const response = await fetch(`http://localhost:9090/api/v1/doctor/patient/${patientId}`, {
+        // Fetch patient details
+        const patientResponse = await fetch(`http://localhost:9090/api/v1/doctor/patient/${patientId}`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         });
-
-        if (response.ok) {
-          const data = await response.json();
-          setPatientDetails(data);
+        if (patientResponse.ok) {
+          const patientData = await patientResponse.json();
+          setPatientDetails(patientData);
         } else {
           console.error('Failed to fetch patient details');
         }
-      } catch (error) {
-        console.error('Error fetching patient details:', error);
-      }
-    };
 
-    const fetchSymptoms = async () => {
-      try {
-        const token = await AsyncStorage.getItem('accessToken');
-        setAccessToken(token);
-        const response = await fetch(`http://localhost:9090/api/v1/doctor/symptoms_patient/${patientId}`, {
+        // Fetch symptoms
+        const symptomsResponse = await fetch(`http://localhost:9090/api/v1/doctor/symptoms_patient/${patientId}`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         });
-
-        if (response.ok) {
-          const data = await response.json();
-          setSymptoms(data);
+        if (symptomsResponse.ok) {
+          const symptomsData = await symptomsResponse.json();
+          setSymptoms(symptomsData);
         } else {
           console.error('Failed to fetch symptoms');
         }
-      } catch (error) {
-        console.error('Error fetching symptoms:', error);
-      }
-    };
 
-    const fetchTreatmentPlan = async () => {
-      try {
-        const token = await AsyncStorage.getItem('accessToken');
-        setAccessToken(token);
-        const response = await fetch(`http://localhost:9090/api/v1/doctor/diagnosis_patient/${patientId}`, {
+        // Fetch diagnosis
+        const diagnosisResponse = await fetch(`http://localhost:9090/api/v1/doctor/diagnosis_patient/${patientId}`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         });
-
-        if (response.ok) {
-          const data = await response.json();
-          setTreatmentPlan(data);
+        if (diagnosisResponse.ok) {
+          const diagnosisData = await diagnosisResponse.json();
+          setDiagnosis(diagnosisData);
         } else {
-          console.error('Failed to fetch treatment plan');
+          console.error('Failed to fetch diagnosis');
         }
-      } catch (error) {
-        console.error('Error fetching treatment plan:', error);
-      }
-    };
 
-    const fetchPrescription = async () => {
-      try {
-        const token = await AsyncStorage.getItem('accessToken');
-        setAccessToken(token);
-        const response = await fetch(`http://localhost:9090/api/v1/doctor/prescriptions_patient/${patientId}`, {
+        // Fetch prescription
+        const prescriptionResponse = await fetch(`http://localhost:9090/api/v1/doctor/prescriptions_patient/${patientId}`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         });
-
-        if (response.ok) {
-          const data = await response.json();
-          setPrescription(data);
+        if (prescriptionResponse.ok) {
+          const prescriptionData = await prescriptionResponse.json();
+          setPrescription(prescriptionData);
         } else {
           console.error('Failed to fetch prescription');
         }
       } catch (error) {
-        console.error('Error fetching prescription:', error);
+        console.error('Error fetching data:', error);
       }
     };
 
-    fetchPatientDetails();
-    fetchSymptoms();
-    fetchTreatmentPlan();
-    fetchPrescription();
+    fetchData();
   }, []);
 
   const handleAddConsultation = () => {
@@ -127,13 +104,11 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
 
   const handleDischarge = async () => {
     try {
-      // Call backend API to discharge patient using token and patientId
-      //const token = await AsyncStorage.getItem('accessToken');
       const token = await AsyncStorage.getItem('accessToken');
       setAccessToken(token);
       setDischargeProcessing(true);
       const response = await fetch(`http://localhost:9090/api/v1/admission/discharge/${patientId}`, {
-        method: 'POST', // Adjust the method according to your API endpoint
+        method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -141,11 +116,8 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
       });
   
       if (response.ok) {
-        // After successful discharge
         setDischargeProcessing(false);
-        // Perform any necessary actions after successful discharge
       } else {
-        // Handle non-OK response from the server
         console.error('Failed to discharge patient:', response.status);
       }
     } catch (error) {
@@ -168,17 +140,53 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
               <TouchableOpacity style={styles.backButton}>
                 <Text style={styles.buttonText}>Back</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.logoutButton}>
+              <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Home')}>
                 <Text style={styles.buttonText}>Logout</Text>
               </TouchableOpacity>
             </View>
           </View>
           <View style={styles.middleContainer}>
             <View style={styles.middleLeftContainer}>
+            <Text style={styles.consultationFormHeading}>Patient Vitals</Text>
+              <View style={styles.toolContainer}>
+                <Text style={styles.sliderLabel}>Temperature: {temperature.toFixed(1)} °F</Text>
+                <Slider
+                  style={styles.slider}
+                  minimumValue={95}
+                  maximumValue={105}
+                  step={0.1}
+                  value={temperature}
+                  onValueChange={(temp) => setTemperature(temp)}
+                />
+                
+                <View style={styles.bloodPressureSliderContainer}>
+                  <Text style={styles.sliderLabel}>Systolic:</Text>
+                  <Slider
+                    style={styles.slider}
+                    minimumValue={90}
+                    maximumValue={180}
+                    step={1}
+                    value={bloodPressure.systolic}
+                    onValueChange={(systolic) => setBloodPressure({ ...bloodPressure, systolic })}
+                  />
+                  <Text style={styles.sliderLabel}>Diastolic:</Text>
+                  <Slider
+                    style={styles.slider}
+                    minimumValue={60}
+                    maximumValue={120}
+                    step={1}
+                    value={bloodPressure.diastolic}
+                    onValueChange={(diastolic) => setBloodPressure({ ...bloodPressure, diastolic })}
+                  />
+                </View>
+                <Text style={styles.sliderLabel}>Blood Pressure: {bloodPressure.systolic}/{bloodPressure.diastolic} mmHg</Text>
+              </View>
+              
               <TouchableOpacity
                 style={[styles.button, styles.updateButton]}
                 onPress={handleAddConsultation}
               >
+                
                 <Text style={styles.buttonText}>Add Consultation</Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -190,6 +198,7 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
                   {dischargeProcessing ? 'Discharge in Processing' : 'Discharge'}
                 </Text>
               </TouchableOpacity>
+              
             </View>
             <View style={styles.middleRightContainer}>
               <Text style={styles.sectionHeading}>Patient Details</Text>
@@ -201,29 +210,29 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
               <Text style={styles.patientDetail}>Bed No.: {patientDetails?.bedId}</Text>
               
               <Text style={styles.sectionHeading}>Symptoms</Text>
-  <FlatList
-    data={symptoms}
-    keyExtractor={(item, index) => index.toString()}
-    renderItem={({ item, index }) => (
-      <Text style={styles.item}>{`${index + 1}. ${item.sym_text}`}</Text>
-    )}
-  />
-  <Text style={styles.sectionHeading}>Treatment Plan</Text>
-  <FlatList
-    data={treatmentPlan}
-    keyExtractor={(item, index) => index.toString()}
-    renderItem={({ item, index }) => (
-      <Text style={styles.item}>{`${index + 1}. ${item.dia_text}`}</Text>
-    )}
-  />
-  <Text style={styles.sectionHeading}>Prescription</Text>
-  <FlatList
-    data={prescription}
-    keyExtractor={(item, index) => index.toString()}
-    renderItem={({ item, index }) => (
-      <Text style={styles.item}>{`${index + 1}. ${item.pre_text}`}</Text>
-    )}
-  />
+              <FlatList
+                data={symptoms}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item, index }) => (
+                  <Text style={styles.item}>{`${index + 1}. ${item.sym_text}`}</Text>
+                )}
+              />
+              <Text style={styles.sectionHeading}>Treatment Plan</Text>
+              <FlatList
+                data={diagnosis}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item, index }) => (
+                  <Text style={styles.item}>{`${index + 1}. ${item.dia_text}`}</Text>
+                )}
+              />
+              <Text style={styles.sectionHeading}>Prescription</Text>
+              <FlatList
+                data={prescription}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item, index }) => (
+                  <Text style={styles.item}>{`${index + 1}. ${item.pre_text}`}</Text>
+                )}
+              />
             </View>
           </View>
           <View style={styles.lowerContainer}>
@@ -245,7 +254,7 @@ const styles = StyleSheet.create({
   },
   layer: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(26, 95, 116, 0.13)',
     padding: 20,
   },
   upperContainer: {
@@ -261,9 +270,10 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   headerText: {
-    fontSize: 30,
+    fontSize: 50,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#004849',
+
     marginBottom: 10,
   },
   divider: {
@@ -285,7 +295,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   buttonText: {
-    fontSize: 16,
+    fontSize: 25,
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
@@ -295,7 +305,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     justifyContent: 'center',
-    alignItems: 'center', // Align items horizontally
+    alignItems: 'center',
     marginBottom: 20,
   },
   middleRightContainer: {
@@ -303,34 +313,58 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
   },
   button: {
-    backgroundColor: '#61828a',
+    backgroundColor: '#326974',
     padding: 10,
     marginVertical: 10,
-    width: '60%',
+    width: '70%',
     alignItems: 'center',
     borderRadius: 5,
   },
   sectionHeading: {
-    fontSize: 20,
+    fontSize: 27,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#004849',
+    marginTop:10,
     marginBottom: 10,
   },
   patientDetail: {
-    fontSize: 16,
-    color: '#FFFFFF',
+    fontSize: 23,
+    color: '#000000',
     marginBottom: 5,
-
   },
   item: {
-    fontSize: 16,
-    color: '#FFFFFF',
+    fontSize: 23,
+    color: '#000000',
     marginBottom: 5,
   },
   logo: {
     width: 200,
     height: 200,
     resizeMode: 'contain',
+  },
+  toolContainer: {
+    marginTop:15,
+    marginBottom:15,
+    backgroundColor: '#f0f0f0', // Background color of the tool container
+    borderRadius: 10, // Curved corners
+    padding: 10, // Padding around the content
+  },
+  sliderLabel: {
+    fontSize: 20, // Adjust font size as needed
+    marginBottom: 5, // Spacing between labels
+  },
+  slider: {
+    marginBottom: 15, // Spacing between sliders
+  },
+  bloodPressureSliderContainer: {
+    marginBottom: 15, // Spacing between blood pressure sliders and text
+  },
+  consultationFormHeading: {
+    marginTop: 30,
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: '#004849',
+    marginBottom: 10,
   },
 });
 

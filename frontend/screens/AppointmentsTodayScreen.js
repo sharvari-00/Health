@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, ImageBackground, Image } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, FlatList, StyleSheet, ImageBackground, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+
 // Existing imports
 
-const AppointmentsTodayScreen = () => {
+const AppointmentsTodayScreen = ({ route }) => {
   const navigation = useNavigation(); 
+  const { doctorId } = route.params; 
 
   const [appointmentsData, setAppointmentsData] = useState([]);
   const [accessToken, setAccessToken] = useState('');
-  const [doctorId, setDoctorId] = useState('');
+  
 
   useEffect(() => {
     const fetchAccessToken = async () => {
@@ -25,33 +27,7 @@ const AppointmentsTodayScreen = () => {
     fetchAccessToken();
   }, []);
 
-
-
   useEffect(() => {
-    const fetchDoctorDetails = async () => {
-      try {
-        const response = await fetch('http://localhost:9090/api/v1/user/details', {
-          headers: {
-            Authorization: `Bearer ${accessToken}`
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch doctor details');
-        }
-
-        const data = await response.json();
-        setDoctorId(data.id);
-      } catch (error) {
-        console.error('Error fetching doctor details:', error);
-      }
-    };
-
-    fetchDoctorDetails();
-  }, [accessToken]);
-
-  useEffect(() => {
-
     const fetchData = async () => {
       try {
         const response = await fetch(`http://localhost:9090/api/v1/doctor/doctors/${doctorId}/patients`, {
@@ -59,14 +35,17 @@ const AppointmentsTodayScreen = () => {
             Authorization: `Bearer ${accessToken}`
           }
         });
+        if (!response.ok) {
+          throw new Error('Failed to fetch appointments data');
+        }
         const data = await response.json();
         setAppointmentsData(data);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching appointments data:', error);
       }
     };
-
-    if (doctorId) {
+  
+    if (doctorId && accessToken) {
       fetchData();
     }
   }, [doctorId, accessToken]);
@@ -74,6 +53,7 @@ const AppointmentsTodayScreen = () => {
   const handlePatientClick = (patientId, name, age, gender) => {
     navigation.navigate('PatientFormScreen', { patientId,name,age,gender});
   }
+
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -89,29 +69,28 @@ const AppointmentsTodayScreen = () => {
               <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('DoctorScreen')}>
                 <Text style={styles.buttonText}>Back</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.logoutButton}>
+              <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Home')}>
                 <Text style={styles.buttonText}>Logout</Text>
               </TouchableOpacity>
             </View>
           </View>
           <View style={styles.middleContainer}>
             <View style={styles.middleLeftContainer}>
-              <Text style={styles.heading}>Appointments</Text>
+              {/* <Text style={styles.heading}></Text> */}
             </View>
-            <View style={styles.middleRightContainer}>
+            <ScrollView style={styles.middleRightContainer}>
               <FlatList
                 data={appointmentsData}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item, index }) => (
                   <TouchableOpacity
-                  style={[styles.patientItem, { backgroundColor: 'rgba(169, 204, 207, 0.6)' }]}
-                  onPress={() => handlePatientClick(item.id, `${item.fname} ${item.lname}`, item.age, item.gender)}
-
+                    style={[styles.patientItem, { backgroundColor: 'rgba(255, 255, 242, 0.45)' }]}
+                    onPress={() => handlePatientClick(item.id, `${item.fname} ${item.lname}`, item.age, item.gender)}
                   >
                     <Text style={styles.serialNumber}>{index + 1}</Text>
                     <View style={styles.patientDetails}>
-                      <Text style={styles.detailLabel}>Id:</Text>
-                      <Text style={styles.detailText}>{item.patientId}</Text>
+                      {/* <Text style={styles.detailLabel}>Patient Id:</Text>
+                      <Text style={styles.detailText}>{item.patientId}</Text> */}
                     </View>
                     <View style={styles.patientDetails}>
                       <Text style={styles.detailLabel}>Name:</Text>
@@ -128,7 +107,7 @@ const AppointmentsTodayScreen = () => {
                   </TouchableOpacity>
                 )}
               />
-            </View>
+            </ScrollView>
           </View>
           <View style={styles.lowerContainer}>
             <Image style={styles.logo} source={require('../assets/logo2.png')} />
@@ -151,7 +130,7 @@ const styles = StyleSheet.create({
   },
   layer: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(26, 95, 116, 0.13)',
     padding: 20,
   },
   upperContainer: {
@@ -169,15 +148,16 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   headerText: {
-    fontSize: 30,
+    fontSize: 50,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#004849',
     marginBottom: 10,
+    fontFamily: 'Cursive',
   },
   dateText: {
-    fontSize: 14,
-    color: '#FFFFFF',
-    marginBottom: 10,
+    fontSize: 20,
+    color: '#004849',
+    marginBottom: 18,
   },
   divider: {
     width: '100%',
@@ -198,24 +178,24 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   buttonText: {
-    fontSize: 16,
+    fontSize: 29,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#326974',
   },
   middleLeftContainer: {
-    flex: 1,
-    backgroundColor: 'rgba(223, 233, 235, 0.2)',
+    flex: 0,
+    backgroundColor: 'rgba(200, 200, 200, 0.9)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   middleRightContainer: {
-    flex: 2,
+    flex: 1,
     paddingLeft: 20,
   },
   heading: {
-    fontSize: 25,
+    fontSize: 29,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#004849',
     marginBottom: 10,
   },
   patientItem: {
@@ -224,24 +204,29 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     padding: 10,
     borderRadius: 5,
+    //height: 200,
   },
   serialNumber: {
     marginRight: 10,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#004849',
+    fontSize: 25,
   },
   patientDetails: {
     flexDirection: 'row',
     alignItems: 'center',
     marginRight: 20,
+    fontSize: 25,
   },
   detailLabel: {
     fontWeight: 'bold',
     color: '#000000',
+    fontSize: 25,
   },
   detailText: {
     marginLeft: 5,
-    color: '#FFFFFF',
+    color: '#000000',
+    fontSize: 25,
   },
   logo: {
     width: 200,

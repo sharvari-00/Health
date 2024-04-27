@@ -50,8 +50,8 @@ const PrescriptionScreen = ({ route }) => {
               <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('PatientIdScreen')}>
                 <Text style={styles.buttonText}>Back</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.logoutButton}>
-                <Text style={styles.buttonText}>Logout</Text>
+              <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Home')}>
+              <Text style={styles.buttonText}>Logout</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   },
   layer: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(26, 95, 116, 0.13)',
     padding: 20,
   },
   upperContainer: {
@@ -116,9 +116,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   headerText: {
-    fontSize: 40,
+    fontSize: 50,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#004849,',
     marginBottom: 20,
   },
   divider: {
@@ -138,19 +138,19 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   buttonText: {
-    fontSize: 18,
+    fontSize: 25,
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
   patientDetailText: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#000000',
     marginBottom: 10,
   },
   text: {
-    fontSize: 16,
-    color: '#FFFFFF',
+    fontSize: 23,
+    color: '#000000',
     marginBottom: 10,
   },
   error: {

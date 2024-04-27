@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ImageBackground, Image, TextInput } from 'react-native';
 import { Calendar } from 'react-native-calendars';
+import { useNavigation } from '@react-navigation/native';
 
 const FrontDeskScreen = ({ navigation }) => {
   const [showInput, setShowInput] = useState(false); // State to control the visibility of input and buttons
   const [patientId, setPatientId] = useState(''); // State to store the entered patient ID
+  
 
   const handleAddPatient = () => {
     // Implement logic for adding a patient
@@ -48,9 +50,10 @@ const FrontDeskScreen = ({ navigation }) => {
               <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
                 <Text style={styles.buttonText}>Back</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Logout')}>
-                <Text style={styles.buttonText}>Logout</Text>
-              </TouchableOpacity>
+              <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Home')}>
+              <Text style={styles.buttonText}>Logout</Text>
+             </TouchableOpacity>
+
             </View>
           </View>
           {/* Middle Container */}
@@ -58,7 +61,7 @@ const FrontDeskScreen = ({ navigation }) => {
             {/* Left Container with Calendar */}
             <View style={styles.leftContainer}>
               <Calendar
-                style={{ width: '200%' }} // Make the calendar fit the width
+                style={{ width: '180%', height: '160%' }} // Make the calendar fit the width
                 // Configure the Calendar component here
                 onDayPress={(day) => {
                   console.log('Selected day', day);
@@ -120,7 +123,8 @@ const styles = StyleSheet.create({
   },
   layer: {
     flex: 1,
-    backgroundColor: '#CEDFCC', // Semi-transparent layer
+    backgroundColor: 'rgba(26, 95, 116, 0.13)'
+     // Semi-transparent layer
   },
   upperContainer: {
     flex: 3, // 3 parts out of 10
@@ -133,9 +137,10 @@ const styles = StyleSheet.create({
   },
   leftContainer: {
     flex: 1, // Takes up half of the middle container
-    backgroundColor: 'rgba(223, 233, 235, 0.2)', // Background color with opacity
-    justifyContent: 'center',
+    //backgroundColor: 'rgba(223, 233, 235, 0.2)', // Background color with opacity
+    justifyContent: 'right',
     alignItems: 'center',
+    fontSize: '25'
   },
   rightContainer: {
     flex: 1, // Takes up half of the middle container
@@ -148,10 +153,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   dashboardText: {
-    fontSize: 40,
+    fontSize: 60,
     fontFamily: 'Cursive',
     fontWeight: 'bold',
-    color: '#61828a',
+    color: '#004849',
   },
   divider: {
     width: '80%',
@@ -163,26 +168,28 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '80%',
+
   },
   backButton: {
-    backgroundColor: '#61828a',
+    backgroundColor: '#326974',
+    fontSize:25
   },
   logoutButton: {
-    backgroundColor: '#61828a',
+    backgroundColor: '#326974',
   },
   buttonText: {
-    fontSize: 20,
+    fontSize: 29,
     fontFamily: 'Arial',
     fontWeight: 'bold',
     color: '#FFFFFF',
     paddingHorizontal: 20,
   },
   button: {
-    backgroundColor: '#61828a', // Button background color
+    backgroundColor: '#326974', // Button background color
     padding: 15,
     margin: 10,
-    width: 300,
-    height: 80,
+    width: 350,
+    height: 70,
     alignItems: 'center',
     borderRadius: 10,
   },
@@ -193,12 +200,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 10,
     width: 250,
+    fontSize: 28,
   },
   buttonRow: {
     flexDirection: 'row',
   },
   nextButton: {
-    backgroundColor: '#61828a', // Button background color
+    backgroundColor: '#326974', // Button background color
     padding: 15,
     margin: 10,
     width: 100,
