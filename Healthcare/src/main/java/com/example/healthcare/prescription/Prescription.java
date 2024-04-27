@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Data
 @Entity
 @AllArgsConstructor
@@ -18,6 +20,8 @@ public class Prescription {
     private Integer id;
     private Integer patientId;
     private String pre_text;
+    @Temporal(TemporalType.TIMESTAMP) // Optional for database storage as timestamp
+    private Date prescriptionDate; // New field for date
 
     public Integer getId() {
         return id;
@@ -28,6 +32,14 @@ public class Prescription {
 
     public String getPre_text() {
         return pre_text;
+    }
+
+    public Date getPrescriptionDate() {
+        return prescriptionDate;
+    }
+
+    public void setPrescriptionDate(Date prescriptionDate) {
+        this.prescriptionDate = prescriptionDate;
     }
 
     public void setId(Integer id) {

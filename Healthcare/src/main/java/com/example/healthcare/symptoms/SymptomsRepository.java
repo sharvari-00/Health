@@ -9,6 +9,8 @@ import java.util.List;
 
 public interface SymptomsRepository extends JpaRepository<Symptoms, Integer> {
     List<Symptoms> findByPatientId(Integer patientId);
+
+    List<Symptoms> findByPatientIdOrderBySymptomDate(int patientId);
 }
 
 
