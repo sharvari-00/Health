@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Image, TextInput, FlatList, Modal, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Image, Modal, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import { launchCamera } from 'expo-image-picker';
-
+import { useNavigation } from '@react-navigation/native';
 
 const PatientDetailsScreen = ({ route }) => {
-  const navigation = useNavigation();
   const { patientId } = route.params;
+  const navigation = useNavigation();
   const [visits, setVisits] = useState([]);
   const [selectedVisit, setSelectedVisit] = useState(null);
-
   const [patientDetails, setPatientDetails] = useState({});
   const [showInput, setShowInput] = useState(false);
   const [filePath, setFilePath] = useState('');
@@ -21,22 +19,42 @@ const PatientDetailsScreen = ({ route }) => {
   const [fullscreenImage, setFullscreenImage] = useState('');
 
   useEffect(() => {
-    const fetchPatientData = async () => {
+    const fetchData = async () => {
       try {
-        const accessToken = await AsyncStorage.getItem('accessToken');
-        if (accessToken) {
-          fetchPatientDetails(accessToken);
-        } else {
-          console.error('Access token not found.');
-        }
+        const token = await AsyncStorage.getItem('accessToken');
+
+        // Fetch patient details and visits
+        const [patientResponse, visitsResponse] = await Promise.all([
+          fetch(`http://localhost:9090/api/v1/doctor/patient/${patientId}`, {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          }),
+          fetch(`http://localhost:9090/api/v1/doctor/visits/${patientId}`, {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          }),
+        ]);
+
+        const [patientData, visitsData] = await Promise.all([
+          patientResponse.json(),
+          visitsResponse.json(),
+        ]);
+
+        setPatientDetails(patientData);
+        setVisits(visitsData);
       } catch (error) {
-        console.error('Error fetching access token:', error);
+        console.error('Error fetching data:', error);
       }
     };
 
-    fetchPatientData();
-  }, []);
-
+    fetchData();
+  }, [patientId]);
   const requestCameraPermission = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
