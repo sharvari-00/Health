@@ -1,20 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Image, TextInput, FlatList } from 'react-native';
+import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Image, TextInput, FlatList, Modal, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { launchCamera } from 'react-native-image-picker';
+import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system';
+import { launchCamera } from 'expo-image-picker';
+
 
 const PatientDetailsScreen = ({ route }) => {
   const navigation = useNavigation();
   const { patientId } = route.params;
+  const [visits, setVisits] = useState([]);
+  const [selectedVisit, setSelectedVisit] = useState(null);
 
   const [patientDetails, setPatientDetails] = useState({});
-  const [symptoms, setSymptoms] = useState([]);
-  const [treatmentPlan, setTreatmentPlan] = useState([]);
-  const [prescription, setPrescription] = useState([]);
   const [showInput, setShowInput] = useState(false);
   const [filePath, setFilePath] = useState('');
   const [uploadButtonText, setUploadButtonText] = useState('Upload');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [fullscreenImage, setFullscreenImage] = useState('');
 
   useEffect(() => {
     const fetchPatientData = async () => {
@@ -22,9 +26,6 @@ const PatientDetailsScreen = ({ route }) => {
         const accessToken = await AsyncStorage.getItem('accessToken');
         if (accessToken) {
           fetchPatientDetails(accessToken);
-          fetchSymptoms(accessToken);
-          fetchTreatmentPlan(accessToken);
-          fetchPrescription(accessToken);
         } else {
           console.error('Access token not found.');
         }
@@ -36,68 +37,94 @@ const PatientDetailsScreen = ({ route }) => {
     fetchPatientData();
   }, []);
 
-  const fetchPatientDetails = async (accessToken) => {
-    try {
-      const response = await fetch(`your_patient_details_api_endpoint/${patientId}`, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      const data = await response.json();
-      setPatientDetails(data);
-    } catch (error) {
-      console.error('Error fetching patient details:', error);
+  const requestCameraPermission = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission denied', 'You need to allow camera access to take pictures.');
+    } else {
+      launchCameraWithPermission();
     }
   };
 
-  const fetchSymptoms = async (accessToken) => {
-    try {
-      const response = await fetch(`your_symptoms_api_endpoint/${patientId}`, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      const data = await response.json();
-      setSymptoms(data);
-    } catch (error) {
-      console.error('Error fetching symptoms:', error);
+  const launchCameraWithPermission = async () => {
+    let result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      setFilePath(result.uri);
     }
   };
 
-  const fetchTreatmentPlan = async (accessToken) => {
+  const handleCamera = async () => {
     try {
-      const response = await fetch(`your_treatment_plan_api_endpoint/${patientId}`, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission denied', 'You need to allow camera access to take pictures.');
+      } else {
+        const result = await ImagePicker.launchCameraAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          quality: 1,
+        });
+  
+        if (!result.cancelled) {
+          // Display the captured image
+          setFilePath(result.uri);
+          // Show the modal for image preview
+          setModalVisible(true);
         }
-      });
-      const data = await response.json();
-      setTreatmentPlan(data);
+      }
     } catch (error) {
-      console.error('Error fetching treatment plan:', error);
+      console.error('Error launching camera:', error);
     }
   };
+  
 
-  const fetchPrescription = async (accessToken) => {
-    try {
-      const response = await fetch(`your_prescription_api_endpoint/${patientId}`, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      const data = await response.json();
-      setPrescription(data);
-    } catch (error) {
-      console.error('Error fetching prescription:', error);
-    }
+  const handlePreviewImage = (imageUri) => {
+    setFullscreenImage(imageUri);
+    setModalVisible(true);
+  };
+
+  const handleViewTestReport = () => {
+    navigation.navigate('ViewImageScreen', { patientId: patientId });
+  };
+
+  const handleToggleVisit = (visitIndex) => {
+    setSelectedVisit(selectedVisit === visitIndex ? null : visitIndex);
+  };
+
+  const renderVisitItems = (visitData) => {
+    return (
+      <View style={styles.visitContainer}>
+        {visitData.map((item, itemIndex) => {
+          switch (item.type) {
+            case 'prescription':
+              return (
+                <Text key={itemIndex} style={styles.visitItem}>
+                  Prescription: {item.data.pre_text}
+                </Text>
+              );
+            case 'diagnosis':
+              return (
+                <Text key={itemIndex} style={styles.visitItem}>
+                  Diagnosis: {item.data.dia_text}
+                </Text>
+              );
+            case 'symptom':
+              return (
+                <Text key={itemIndex} style={styles.visitItem}>
+                  Symptom: {item.data.sym_text}
+                </Text>
+              );
+            default:
+              return null;
+          }
+        })}
+      </View>
+    );
   };
 
   const handleUpload = () => {
@@ -108,32 +135,23 @@ const PatientDetailsScreen = ({ route }) => {
     }
   };
 
-  const handleCamera = () => {
-    launchCamera({ mediaType: 'photo' }, (response) => {
-      if (!response.didCancel) {
-        setFilePath(response.uri);
-      }
-    });
-  };
-
   const handleSaveImage = async () => {
     try {
       const accessToken = await AsyncStorage.getItem('accessToken');
-      const formData = new FormData();
-      formData.append('image', {
-        uri: filePath,
-        type: 'image/jpeg',
-        name: 'image.jpg',
-      });
+      const base64Image = await FileSystem.readAsStringAsync(filePath, { encoding: FileSystem.EncodingType.Base64 });
+
       const response = await fetch(`your_upload_image_api_endpoint/${patientId}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${accessToken}`,
           Accept: 'application/json',
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'application/json',
         },
-        body: formData,
+        body: JSON.stringify({
+          image: base64Image,
+        }),
       });
+
       if (response.ok) {
         console.log('Image uploaded successfully');
         fetchPatientDetails(accessToken);
@@ -143,6 +161,7 @@ const PatientDetailsScreen = ({ route }) => {
     } catch (error) {
       console.error('Error uploading image:', error);
     }
+
     setShowInput(false);
     setUploadButtonText('Upload');
     setFilePath('');
@@ -170,6 +189,17 @@ const PatientDetailsScreen = ({ route }) => {
           <View style={styles.middleContainer}>
             {/* Right Middle Container */}
             <View style={styles.rightMiddleContainer}>
+              <Text style={[styles.patientDetailText, { fontSize: 24, textAlign: 'center' }]}>Patient History</Text>
+              <Text style={styles.patientDetailText}>Patient Id: {patientDetails.id}</Text>
+              <Text style={styles.patientDetailText}>Name: {patientDetails.name}</Text>
+              <Text style={styles.patientDetailText}>Age: {patientDetails.age}</Text>
+              <Text style={styles.patientDetailText}>Gender: {patientDetails.gender}</Text>
+              <TouchableOpacity
+                style={[styles.button, styles.viewReportButton]}
+                onPress={handleViewTestReport}
+              >
+                <Text style={styles.buttonText}>View Test Report</Text>
+              </TouchableOpacity>
               <Text style={styles.imageUploadText}>Test Report</Text>
               <TouchableOpacity style={[styles.uploadButton, showInput ? styles.cancelButton : null]} onPress={handleUpload}>
                 <Text style={[styles.buttonText, showInput ? styles.cancelButtonText : null]}>
@@ -181,44 +211,23 @@ const PatientDetailsScreen = ({ route }) => {
                   <TouchableOpacity style={styles.cameraButton} onPress={handleCamera}>
                     <Text style={styles.buttonText}>Open Camera</Text>
                   </TouchableOpacity>
-                  <Image source={{ uri: filePath }} style={styles.imagePreview} />
+                  <Image source={{ uri: filePath }} style={styles.imagePreview} onPress={() => handlePreviewImage(filePath)} />
                   <TouchableOpacity style={styles.saveButton} onPress={handleSaveImage}>
                     <Text style={styles.buttonText}>Save</Text>
                   </TouchableOpacity>
+                  
                 </View>
               )}
             </View>
             {/* Left Middle Container */}
             <View style={styles.leftMiddleContainer}>
-              <Text style={[styles.patientDetailText, { fontSize: 24, textAlign: 'center' }]}>Patient History</Text>
-              <Text style={styles.patientDetailText}>Patient Id: {patientDetails.id}</Text>
-              <Text style={styles.patientDetailText}>Name: {patientDetails.name}</Text>
-              <Text style={styles.patientDetailText}>Age: {patientDetails.age}</Text>
-              <Text style={styles.patientDetailText}>Gender: {patientDetails.gender}</Text>
-              <Text style={styles.patientDetailText}>Symptoms:</Text>
-              <FlatList
-                data={symptoms}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item, index }) => (
-                  <Text style={styles.detailText}>{index + 1}. {item.symptom}</Text>
-                )}
-              />
-              <Text style={styles.patientDetailText}>Treatment Plan:</Text>
-              <FlatList
-                data={treatmentPlan}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item, index }) => (
-                  <Text style={styles.detailText}>{index + 1}. {item.treatment}</Text>
-                )}
-              />
-              <Text style={styles.patientDetailText}>Prescription:</Text>
-              <FlatList
-                data={prescription}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item, index }) => (
-                  <Text style={styles.detailText}>{index + 1}. {item.medication}</Text>
-                )}
-              />
+              {visits.map((visitData, index) => (
+                <TouchableOpacity key={index} onPress={() => handleToggleVisit(index)}>
+                  <Text style={styles.visitDate}>Visit {index + 1}</Text>
+                  <Text style={styles.visitDate}>Date: {visitData[0].data.diagnosisDate}</Text>
+                  {selectedVisit === index && renderVisitItems(visitData)}
+                </TouchableOpacity>
+              ))}
             </View>
           </View>
           <View style={styles.bottomContainer}>
@@ -226,6 +235,19 @@ const PatientDetailsScreen = ({ route }) => {
               <Image style={styles.logo} source={require('../assets/logo2.png')} />
             </View>
           </View>
+          <Modal
+            visible={modalVisible}
+            animationType="slide"
+            transparent={false}
+            onRequestClose={() => setModalVisible(false)}
+          >
+            <View style={styles.modalContainer}>
+              <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+                <Text style={styles.closeButtonText}>Close</Text>
+              </TouchableOpacity>
+              <Image source={{ uri: fullscreenImage }} style={styles.fullscreenImage} />
+            </View>
+          </Modal>
         </View>
       </ImageBackground>
     </View>
@@ -366,6 +388,45 @@ const styles = StyleSheet.create({
     height: 150,
     borderRadius: 10,
     marginBottom: 20,
+  },
+  visitContainer: {
+    backgroundColor: '#2E5B8B',
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 10,
+  },
+  visitDate: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#FFFFFF',
+  },
+  visitItem: {
+    fontSize: 16,
+    color: '#FFFFFF',
+    marginBottom: 5,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    padding: 10,
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+  },
+  fullscreenImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'contain',
   },
 });
 
