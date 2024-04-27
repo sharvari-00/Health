@@ -30,7 +30,7 @@ const HomeScreen = ({ navigation }) => {
             {/* Role Buttons */}
             <Button
               icon={({ size, color }) => (
-                <Avatar.Image size={size} source={require('../assets/recep.png')} style={{ backgroundColor: '#FFFFFF' }} />
+                <Avatar.Image size={size*1.5} source={require('../assets/recep.png')} style={{ backgroundColor: '#FFFFFF', marginRight: 10 }} />
               )}
               mode="contained"
               onPress={() => handleLogin('frontdesk')}
@@ -43,7 +43,7 @@ const HomeScreen = ({ navigation }) => {
             </Button>
             <Button
               icon={({ size, color }) => (
-                <Avatar.Image size={size} source={require('../assets/doc.avif')} style={{ backgroundColor: '#FFFFFF' }} />
+                <Avatar.Image size={size*1.5} source={require('../assets/doc.avif')} style={{ backgroundColor: '#FFFFFF', marginRight: 10 }} />
               )}
               mode="contained"
               onPress={() => handleLogin('doctor')}
@@ -56,7 +56,7 @@ const HomeScreen = ({ navigation }) => {
             </Button>
             <Button
               icon={({ size, color }) => (
-                <Avatar.Image size={size} source={require('../assets/nurse.jpg')} style={{ backgroundColor: '#FFFFFF' }} />
+                <Avatar.Image size={size*1.5} source={require('../assets/nurse.jpg')} style={{ backgroundColor: '#FFFFFF', marginRight: 10 }} />
               )}
               mode="contained"
               onPress={() => handleLogin('nurse')}
@@ -69,7 +69,7 @@ const HomeScreen = ({ navigation }) => {
             </Button>
             <Button
               icon={({ size, color }) => (
-                <Avatar.Image size={size} source={require('../assets/pharma.webp')} style={{ backgroundColor: '#FFFFFF' }} />
+                <Avatar.Image size={size*1.5} source={require('../assets/pharma.webp')} style={{ backgroundColor: '#FFFFFF' , marginRight: 10}} />
               )}
               mode="contained"
               onPress={() => handleLogin('pharmacist')}
@@ -78,7 +78,7 @@ const HomeScreen = ({ navigation }) => {
               onPressIn={() => setPressed(true)}
               onPressOut={() => setPressed(false)}
             >
-              Pharmacist
+                  Pharmacist
             </Button>
           </View>
         </View>

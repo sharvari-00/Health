@@ -263,17 +263,22 @@ const LoginScreen = ({ route, navigation }) => {
                   underlineColor="white"
                   theme={{ colors: { primary: 'white', underlineColor: 'transparent' } }}
                 />
-                <PaperTextInput
-                  style={styles.input}
-                  label="Enter Password"
-                  placeholder="Password"
-                  value={password}
-                  secureTextEntry={!showPassword}
-                  right={<PaperTextInput.Icon name={showPassword ? 'eye-off' : 'eye'} color= 'black' onPress={() => setShowPassword(!showPassword)} />}
-                  onChangeText={(text) => setPassword(text)}
-                  underlineColor="white"
-                  theme={{ colors: { primary: 'black', underlineColor: 'transparent' } }}
-                />
+                <View style={styles.passwordInput}>
+  <PaperTextInput
+    style={styles.input}
+    label="Enter Password"
+    placeholder="Password"
+    value={password}
+    secureTextEntry={!showPassword}
+    onChangeText={(text) => setPassword(text)}
+    underlineColor="white"
+    theme={{ colors: { primary: 'black', underlineColor: 'transparent' } }}
+  />
+  <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
+    <Image source={require('../assets/eyeicon.jpeg')} style={styles.eyeIconImage} />
+  </TouchableOpacity>
+</View>
+
                 <TouchableOpacity style={styles.button} onPress={handleLogin}>
                   <Text style={styles.buttonText}>Login</Text>
                 </TouchableOpacity>
@@ -362,7 +367,23 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
+  passwordInput: {
+    position: 'relative',
+    width: '100%',
+    marginBottom: 20, // Add margin-bottom for separation
+  },
+  eyeIcon: {
+    position: 'absolute',
+    top: '50%',
+    right: 10, // Adjust right value for alignment
+    transform: [{ translateY: -15 }], // Adjust translateY for vertical alignment
+  },
+  eyeIconImage: {
+    width: 30,
+    height: 30,
+  },
 });
+
 
 export default LoginScreen;
 
