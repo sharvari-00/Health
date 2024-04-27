@@ -1,112 +1,90 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet, ImageBackground, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native'; 
+import { useNavigation } from '@react-navigation/native';
 
 const AdmittedPatientDetailsScreen = ({ route }) => {
   const navigation = useNavigation();
   const { patientId } = route.params;
 
   const [accessToken, setAccessToken] = useState('');
-  const [patientDetails, setPatientDetails] = useState(null);
-  const [symptoms, setSymptoms] = useState([]);
-  const [treatmentPlan, setTreatmentPlan] = useState([]);
-  const [prescription, setPrescription] = useState([]);
+  const [visits, setVisits] = useState([]);
+  const [selectedVisit, setSelectedVisit] = useState(null);
   const [dischargeProcessing, setDischargeProcessing] = useState(false);
+  const [patientDetails, setPatientDetails] = useState(null);
 
   useEffect(() => {
-    const fetchPatientDetails = async () => {
+    const fetchData = async () => {
       try {
         const token = await AsyncStorage.getItem('accessToken');
         setAccessToken(token);
 
-        const response = await fetch(`YOUR_BACKEND_API_ENDPOINT/patients/${patientId}`, {
+        // Fetch patient details
+        const patientResponse = await fetch(`http://localhost:9090/api/v1/doctor/patient/${patientId}`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         });
+        const patientData = await patientResponse.json();
+        setPatientDetails(patientData);
 
-        if (response.ok) {
-          const data = await response.json();
-          setPatientDetails(data);
-        } else {
-          console.error('Failed to fetch patient details');
-        }
-      } catch (error) {
-        console.error('Error fetching patient details:', error);
-      }
-    };
-
-    const fetchSymptoms = async () => {
-      try {
-        const response = await fetch(`YOUR_BACKEND_API_ENDPOINT/symptoms/${patientId}`, {
+        // Fetch visits
+        const visitsResponse = await fetch(`http://localhost:9090/api/v1/doctor/visits/${patientId}`, {
           method: 'GET',
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         });
-
-        if (response.ok) {
-          const data = await response.json();
-          setSymptoms(data);
-        } else {
-          console.error('Failed to fetch symptoms');
-        }
+        const visitsData = await visitsResponse.json();
+        setVisits(visitsData);
       } catch (error) {
-        console.error('Error fetching symptoms:', error);
+        console.error('Error fetching data:', error);
       }
     };
 
-    const fetchTreatmentPlan = async () => {
-      try {
-        const response = await fetch(`YOUR_BACKEND_API_ENDPOINT/treatment/${patientId}`, {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setTreatmentPlan(data);
-        } else {
-          console.error('Failed to fetch treatment plan');
-        }
-      } catch (error) {
-        console.error('Error fetching treatment plan:', error);
-      }
-    };
-
-    const fetchPrescription = async () => {
-      try {
-        const response = await fetch(`YOUR_BACKEND_API_ENDPOINT/prescription/${patientId}`, {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setPrescription(data);
-        } else {
-          console.error('Failed to fetch prescription');
-        }
-      } catch (error) {
-        console.error('Error fetching prescription:', error);
-      }
-    };
-
-    fetchPatientDetails();
-    fetchSymptoms();
-    fetchTreatmentPlan();
-    fetchPrescription();
+    fetchData();
   }, []);
+  const handleViewTestReport = () => {
+    navigation.navigate('ViewImageScreen', { patientId: patientId });
+  };
+
+  const handleToggleVisit = (visitIndex) => {
+    setSelectedVisit(selectedVisit === visitIndex ? null : visitIndex);
+  };
+
+  const renderVisitItems = (visitData) => {
+    return (
+      <View style={styles.visitContainer}>
+        {visitData.map((item, itemIndex) => {
+          switch (item.type) {
+            case 'prescription':
+              return (
+                <Text key={itemIndex} style={styles.visitItem}>
+                  Prescription: {item.data.pre_text}
+                </Text>
+              );
+            case 'diagnosis':
+              return (
+                <Text key={itemIndex} style={styles.visitItem}>
+                  Diagnosis: {item.data.dia_text}
+                </Text>
+              );
+            case 'symptom':
+              return (
+                <Text key={itemIndex} style={styles.visitItem}>
+                  Symptom: {item.data.sym_text}
+                </Text>
+              );
+            default:
+              return null;
+          }
+        })}
+      </View>
+    );
+  };
 
   const handleAddConsultation = () => {
     navigation.navigate('AddConsultationScreen', { 
@@ -115,17 +93,17 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
       lastName: patientDetails?.lname,
       age: patientDetails?.age,
       gender: patientDetails?.gender,
-      bedNo: patientDetails?.bed_id,
+      bedNo: patientDetails?.bedId,
     });
   };
 
   const handleDischarge = async () => {
     try {
-      // Call backend API to discharge patient using token and patientId
-      //const token = await AsyncStorage.getItem('accessToken');
+      const token = await AsyncStorage.getItem('accessToken');
+      setAccessToken(token);
       setDischargeProcessing(true);
-      const response = await fetch(`YOUR_BACKEND_DISCHARGE_API_ENDPOINT/${patientId}`, {
-        method: 'POST', // Adjust the method according to your API endpoint
+      const response = await fetch(`http://localhost:9090/api/v1/admission/discharge/${patientId}`, {
+        method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -133,18 +111,15 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
       });
   
       if (response.ok) {
-        // After successful discharge
         setDischargeProcessing(false);
         // Perform any necessary actions after successful discharge
       } else {
-        // Handle non-OK response from the server
         console.error('Failed to discharge patient:', response.status);
       }
     } catch (error) {
       console.error('Error discharging patient:', error);
     }
   };
-  
 
   return (
     <View style={styles.container}>
@@ -167,6 +142,14 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
           </View>
           <View style={styles.middleContainer}>
             <View style={styles.middleLeftContainer}>
+              <Text style={styles.sectionHeading}>Patient Details</Text>
+              <Text style={styles.patientDetail}>Patient ID: {patientDetails?.id}</Text>
+              <Text style={styles.patientDetail}>First Name: {patientDetails?.fname}</Text>
+              <Text style={styles.patientDetail}>Last Name: {patientDetails?.lname}</Text>
+              <Text style={styles.patientDetail}>Gender: {patientDetails?.gender}</Text>
+              <Text style={styles.patientDetail}>Age: {patientDetails?.age}</Text>
+              <Text style={[styles.patientDetail, { textAlign: 'left' }]}>Bed No.: {patientDetails?.bedId}</Text>
+
               <TouchableOpacity
                 style={[styles.button, styles.updateButton]}
                 onPress={handleAddConsultation}
@@ -182,40 +165,21 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
                   {dischargeProcessing ? 'Discharge in Processing' : 'Discharge'}
                 </Text>
               </TouchableOpacity>
+              <TouchableOpacity
+          style={[styles.button, styles.viewReportButton]}
+          onPress={handleViewTestReport}
+        >
+          <Text style={styles.buttonText}>View Test Report</Text>
+        </TouchableOpacity>
             </View>
             <View style={styles.middleRightContainer}>
-              <Text style={styles.sectionHeading}>Patient Details</Text>
-              <Text style={styles.patientDetail}>Patient ID: {patientDetails?.id}</Text>
-              <Text style={styles.patientDetail}>First Name: {patientDetails?.fname}</Text>
-              <Text style={styles.patientDetail}>Last Name: {patientDetails?.lname}</Text>
-              <Text style={styles.patientDetail}>Gender: {patientDetails?.gender}</Text>
-              <Text style={styles.patientDetail}>Age: {patientDetails?.age}</Text>
-              <Text style={styles.patientDetail}>Bed No.: {patientDetails?.bed_id}</Text>
-              
-              <Text style={styles.sectionHeading}>Symptoms</Text>
-  <FlatList
-    data={symptoms}
-    keyExtractor={(item, index) => index.toString()}
-    renderItem={({ item, index }) => (
-      <Text style={styles.item}>{`${index + 1}. ${item}`}</Text>
-    )}
-  />
-  <Text style={styles.sectionHeading}>Treatment Plan</Text>
-  <FlatList
-    data={treatmentPlan}
-    keyExtractor={(item, index) => index.toString()}
-    renderItem={({ item, index }) => (
-      <Text style={styles.item}>{`${index + 1}. ${item}`}</Text>
-    )}
-  />
-  <Text style={styles.sectionHeading}>Prescription</Text>
-  <FlatList
-    data={prescription}
-    keyExtractor={(item, index) => index.toString()}
-    renderItem={({ item, index }) => (
-      <Text style={styles.item}>{`${index + 1}. ${item}`}</Text>
-    )}
-  />
+              {visits.map((visitData, index) => (
+                <TouchableOpacity key={index} onPress={() => handleToggleVisit(index)}>
+                  <Text style={styles.visitDate}>Visit {index + 1}</Text>
+                  <Text style={styles.visitDate}>Date: {visitData[0].data.diagnosisDate}</Text>
+                  {selectedVisit === index && renderVisitItems(visitData)}
+                </TouchableOpacity>
+              ))}
             </View>
           </View>
           <View style={styles.lowerContainer}>
@@ -281,13 +245,30 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
+  visitContainer: {
+    backgroundColor: '#2E5B8B',
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 10,
+  },
+  visitDate: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#FFFFFF',
+  },
+  visitItem: {
+    fontSize: 16,
+    color: '#FFFFFF',
+    marginBottom: 5,
+  },
   middleLeftContainer: {
     flex: 1,
     backgroundColor: 'rgba(223, 233, 235, 0.2)',
     padding: 10,
     borderRadius: 5,
-    justifyContent: 'center',
-    alignItems: 'center', // Align items horizontally
+    justifyContent: 'left',
+    alignItems: 'left',
     marginBottom: 20,
   },
   middleRightContainer: {
@@ -309,12 +290,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   patientDetail: {
-    fontSize: 16,
-    color: '#FFFFFF',
-    marginBottom: 5,
-
-  },
-  item: {
     fontSize: 16,
     color: '#FFFFFF',
     marginBottom: 5,
