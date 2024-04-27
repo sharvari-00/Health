@@ -16,13 +16,27 @@ const TestReportsScreen = ({ route }) => {
         // Fetch access token from AsyncStorage
         const token = await AsyncStorage.getItem('accessToken');
         setAccessToken(token);
-
-        // Fetch test reports using patientId and access token
-        const response = await fetch(`http://your-backend-url/api/test-reports/${patientId}`, {
+    
+        // Create FormData object to construct the request body
+        const formData = new FormData();
+        formData.append('patientId', patientId);
+    
+        // Make the fetch request
+        const response = await fetch('http://your-backend-url/api/test-reports', {
+          method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,
+            Accept: 'application/json',
+            'Content-Type': 'multipart/form-data', // Specify the content type as multipart form data
           },
+          body: formData, // Pass the FormData object as the body
         });
+    
+        if (!response.ok) {
+          throw new Error('Failed to fetch test reports');
+        }
+    
+        // Parse the response as JSON
         const data = await response.json();
         setTestReports(data);
       } catch (error) {
