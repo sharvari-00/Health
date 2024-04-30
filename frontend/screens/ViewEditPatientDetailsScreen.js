@@ -6,7 +6,8 @@ const ViewEditPatientDetailsScreen = ({ route }) => {
   const { patientId } = route.params;
   const navigation = useNavigation();
   //const [changesSaved, setChangesSaved] = useState(false);
-  
+  const [isSaving, setIsSaving] = useState(false);
+
   const [accessToken, setAccessToken] = useState('');
   const [patientDetails, setPatientDetails] = useState(null);
 
@@ -66,6 +67,7 @@ const ViewEditPatientDetailsScreen = ({ route }) => {
   const handleSaveChanges = async () => {
     try {
       //setIsSaving(true);
+      setIsSaving(true);
       const response = await fetch(`http://localhost:9090/api/v1/patients/${patientId}`, {
         method: 'PUT',
         headers: {
@@ -88,6 +90,9 @@ const ViewEditPatientDetailsScreen = ({ route }) => {
         console.log('Changes saved successfully');
         //setChangesSaved(true); 
         // Optionally, update the local state or any UI feedback here
+        setTimeout(() => {
+          setIsSaving(false);
+        }, 2000);
       } else {
         console.error('Failed to save changes');
       }
@@ -208,7 +213,7 @@ const ViewEditPatientDetailsScreen = ({ route }) => {
               <Text style={styles.formLabel}>Consent for data sharing:</Text>
               <Picker
                 selectedValue={editedConsent}
-                style={{ height: 50, width: 150 }}
+                style={{ height: 50, width: 150,fontSize:22 }}
                 onValueChange={(itemValue) => setEditedConsent(itemValue)}
               >
                 <Picker.Item label="Yes" value={true} />
@@ -216,10 +221,13 @@ const ViewEditPatientDetailsScreen = ({ route }) => {
               </Picker>
             </View>
 
-            <TouchableOpacity style={styles.saveButton} onPress={handleSaveChanges}>
-            <Text style={styles.buttonText}>Save Changes</Text>
-
-            </TouchableOpacity>
+            <TouchableOpacity
+      style={[styles.saveButton, isSaving && styles.disabledButton]}
+      onPress={!isSaving ? handleSaveChanges : null} // Disable onPress event when saving
+      disabled={isSaving} // Disable the button when saving
+    >
+      <Text style={styles.buttonText}>{isSaving ? 'Saving...' : 'Save Changes'}</Text>
+    </TouchableOpacity>
           </View>
         </View>
         
@@ -325,6 +333,9 @@ const styles = StyleSheet.create({
     padding: 15,
     alignItems: 'center',
     marginVertical: 20,
+  },
+  disabledButton: {
+    opacity: 0.5, // Example of how to style a disabled button
   },
   lowerContainer: {
     flex: 2,

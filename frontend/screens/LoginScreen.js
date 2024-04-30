@@ -181,11 +181,66 @@ import { TextInput as PaperTextInput } from 'react-native-paper'; // Import Pape
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
+// const LoginScreen = ({ route, navigation }) => {
+//   const { role } = route.params;
+//   const [email, setEmail] = useState('');
+//   const [password, setPassword] = useState('');
+//   const [showPassword, setShowPassword] = useState(false);
+
+//   const handleLogin = async () => {
+//     try {
+//       const response = await fetch('http://localhost:9090/api/v1/auth/authenticate', {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify({ "email": email, "password": password }),
+//       });
+
+//       if (!response.ok) {
+//         throw new Error('Authentication failed');
+//       }
+
+//       const { access_token, refresh_token } = await response.json();
+
+//       // Store the access token securely (e.g., using AsyncStorage)
+//       await AsyncStorage.setItem('accessToken', access_token);
+//       await AsyncStorage.setItem('refreshToken', refresh_token);
+
+//       // Navigate to the appropriate screen based on user's role
+//       switch (role) {
+//         case 'pharmacist':
+//           navigation.navigate('PatientIdScreen', { accessToken: access_token, refreshToken: refresh_token });
+//           break;
+//         case 'nurse':
+//           navigation.navigate('NurseScreen', { accessToken: access_token, refreshToken: refresh_token });
+//           break;
+//         case 'doctor':
+//           navigation.navigate('DoctorScreen', {
+//             accessToken: access_token,
+//             refreshToken: refresh_token,
+//             email: email // Pass email as a parameter
+//           });
+//           break;
+
+//         case 'frontdesk':
+//           navigation.navigate('FrontDeskScreen', {});
+//           break;
+//         default:
+//           // Handle unrecognized roles
+//           break;
+//       }
+//     } catch (error) {
+//       console.error('Login error:', error.message);
+//       // Handle login error
+//     }
+//   };
 const LoginScreen = ({ route, navigation }) => {
   const { role } = route.params;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleLogin = async () => {
     try {
@@ -198,44 +253,47 @@ const LoginScreen = ({ route, navigation }) => {
       });
 
       if (!response.ok) {
-        throw new Error('Authentication failed');
-      }
+        if (response.status === 403) {
+          setErrorMessage('Invalid credentials');
+        } else {
+          throw new Error('Authentication failed');
+        }
+      } else {
+        const { access_token, refresh_token } = await response.json();
 
-      const { access_token, refresh_token } = await response.json();
+        // Store the access token securely (e.g., using AsyncStorage)
+        await AsyncStorage.setItem('accessToken', access_token);
+        await AsyncStorage.setItem('refreshToken', refresh_token);
 
-      // Store the access token securely (e.g., using AsyncStorage)
-      await AsyncStorage.setItem('accessToken', access_token);
-      await AsyncStorage.setItem('refreshToken', refresh_token);
+        // Navigate to the appropriate screen based on user's role
+        switch (role) {
+          case 'pharmacist':
+            navigation.navigate('PatientIdScreen', { accessToken: access_token, refreshToken: refresh_token });
+            break;
+          case 'nurse':
+            navigation.navigate('NurseScreen', { accessToken: access_token, refreshToken: refresh_token });
+            break;
+          case 'doctor':
+            navigation.navigate('DoctorScreen', {
+              accessToken: access_token,
+              refreshToken: refresh_token,
+              email: email // Pass email as a parameter
+            });
+            break;
 
-      // Navigate to the appropriate screen based on user's role
-      switch (role) {
-        case 'pharmacist':
-          navigation.navigate('PatientIdScreen', { accessToken: access_token, refreshToken: refresh_token });
-          break;
-        case 'nurse':
-          navigation.navigate('NurseScreen', { accessToken: access_token, refreshToken: refresh_token });
-          break;
-        case 'doctor':
-          navigation.navigate('DoctorScreen', {
-            accessToken: access_token,
-            refreshToken: refresh_token,
-            email: email // Pass email as a parameter
-          });
-          break;
-
-        case 'frontdesk':
-          navigation.navigate('FrontDeskScreen', {});
-          break;
-        default:
-          // Handle unrecognized roles
-          break;
+          case 'frontdesk':
+            navigation.navigate('FrontDeskScreen', {});
+            break;
+            default:
+            // Handle unrecognized roles
+            break;
+        }
       }
     } catch (error) {
       console.error('Login error:', error.message);
       // Handle login error
     }
   };
-
   return (
     <View style={styles.container}>
       <View style={styles.background}>
@@ -282,6 +340,7 @@ const LoginScreen = ({ route, navigation }) => {
                 <TouchableOpacity style={styles.button} onPress={handleLogin}>
                   <Text style={styles.buttonText}>Login</Text>
                 </TouchableOpacity>
+                {errorMessage ? <Text>{errorMessage}</Text> : null}
               </View>
             </View>
           </View>

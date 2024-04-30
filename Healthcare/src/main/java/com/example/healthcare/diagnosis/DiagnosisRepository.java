@@ -10,5 +10,7 @@ public interface DiagnosisRepository extends JpaRepository<Diagnosis, Integer> {
 
     Diagnosis save(Diagnosis diagnosis);
 
+    List<Diagnosis> findByPatientIdOrderByDiagnosisDate(int patientId);
+
     // Diagnosis save(Diagnosis diagnosis);
 }

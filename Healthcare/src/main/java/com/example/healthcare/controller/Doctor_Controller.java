@@ -3,11 +3,16 @@ package com.example.healthcare.controller;
 import com.example.healthcare.DTO.patientInfoDTO;
 import com.example.healthcare.diagnosis.Diagnosis;
 import com.example.healthcare.doctor_details.Doctor_details;
+import com.example.healthcare.login.Login;
+import com.example.healthcare.login.Login_repo;
 import com.example.healthcare.patient_registration.Patient_registration;
+import com.example.healthcare.patient_registration.Patient_registration_repo;
 import com.example.healthcare.prescription.Prescription;
 import com.example.healthcare.service.Doctor_service;
 import com.example.healthcare.service.Patient_service;
+import com.example.healthcare.service.Reports_service;
 import com.example.healthcare.symptoms.Symptoms;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -15,6 +20,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Optional;
 
 
 @RestController
@@ -22,9 +28,13 @@ import java.util.List;
 public class Doctor_Controller {
     private final Doctor_service doctor_service;
     private final Patient_service patientRegistrationService;
+    private final Login_repo login_repo;
 
-    public Doctor_Controller(Doctor_service doctorService, Patient_service patientRegistrationService) { this.doctor_service = doctorService;
+    private final Patient_registration_repo patient_repo;
+    public Doctor_Controller(Doctor_service doctorService, Patient_service patientRegistrationService, Login_repo loginRepo, Patient_registration_repo patientRepo) { this.doctor_service = doctorService;
         this.patientRegistrationService = patientRegistrationService;
+        login_repo = loginRepo;
+        patient_repo = patientRepo;
     }
     @PutMapping("/{doctorEmail}")
     public ResponseEntity<Doctor_details> updateDoctorDetailsByAdmin(@PathVariable String doctorEmail, @RequestBody Doctor_details updatedDoctorDetails) {
@@ -37,6 +47,7 @@ public class Doctor_Controller {
         return new ResponseEntity<>(doctors, HttpStatus.OK);
     }
 
+
     @GetMapping("/doctors/{doctorId}/patients")
     public ResponseEntity getPatientsByDoctorIdAndTodayDate(@PathVariable Integer doctorId) {
         try {
@@ -48,6 +59,7 @@ public class Doctor_Controller {
                     .anyMatch(r -> r.getAuthority().equals("DOCTOR"))) {
                 // If the user is authenticated as a doctor, retrieve patients
                 List patients = doctor_service.getPatientsByDoctorIdAndTodayDate(doctorId);
+
 
                 // Check if the list of patients is empty
                 if (patients.isEmpty()) {
@@ -64,6 +76,7 @@ public class Doctor_Controller {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
     @PostMapping("/symptoms/{patient_id}") //this api creates the symptoms for a particular patient
     public ResponseEntity<Symptoms> updateSymptoms(@PathVariable int patient_id, @RequestBody Symptoms symptoms) {
         try {
@@ -106,8 +119,7 @@ public class Doctor_Controller {
     }
     @PostMapping("/diagnosis/{patient_id}") //this api creates the prescription for a particular patient
     public ResponseEntity<Diagnosis> updateDiagnosis(@PathVariable int patient_id, @RequestBody Diagnosis diagnosis) {
-//        Prescription updatedPrescription = doctor_service.updatePrescription(patient_id, prescription);
-//        return ResponseEntity.ok(updatedPrescription);
+
         try {
             // Get the authentication object from the security context
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -222,5 +234,6 @@ public class Doctor_Controller {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
 
 }

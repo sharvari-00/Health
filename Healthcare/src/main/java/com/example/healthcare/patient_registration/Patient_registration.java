@@ -15,6 +15,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @Data
 public class Patient_registration {
+
     @Id
     @GeneratedValue
     private Integer id;
@@ -61,9 +62,12 @@ public class Patient_registration {
     private Boolean admitted = false;
     @Getter
     private Long bedId; // Integer to store the bed id
-    // Constructor including new fields
+//    @ManyToOne
+//    @JoinColumn(name = "docId", referencedColumnName = "id")
+//    private Doctor_details doctorDetails;
+
     public Patient_registration(Integer id, String fname, String lname, Integer age, String gender, String phone_number,
-                                String email_id, Boolean consent, String doc_id, String address_line, String city,
+                                String email_id, Boolean consent, String docId, String address_line, String city,
                                 String state, LocalDate registrationDate, LocalTime registrationTime) {
         this.id = id;
         this.fname = fname;
@@ -88,6 +92,10 @@ public class Patient_registration {
         // Set registrationTime to current time only if not provided
         this.registrationTime = registrationTime != null ? registrationTime : LocalTime.now();
     }
+
+
+
+
 
     // Update setters for new fields
     public void setRegistrationDate(LocalDate registrationDate) {

@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet, ImageBackground, Image,Picker} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native'; 
+
 import Slider from '@react-native-community/slider'; // Import Slider from react-native-community
+
+import { useNavigation } from '@react-navigation/native';
+
 
 const AdmittedPatientDetailsScreen = ({ route }) => {
   const navigation = useNavigation();
   const { patientId } = route.params;
 
   const [accessToken, setAccessToken] = useState('');
+
   const [patientDetails, setPatientDetails] = useState(null);
   const [symptoms, setSymptoms] = useState([]);
   const [diagnosis, setDiagnosis] = useState([]);
@@ -17,6 +21,10 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
   const [temperature, setTemperature] = useState(98.6); // State for temperature
   const [bloodPressure, setBloodPressure] = useState({ systolic: 120, diastolic: 80 }); // State for blood pressure
  
+
+  const [visits, setVisits] = useState([]);
+  const [selectedVisit, setSelectedVisit] = useState(null);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,57 +40,76 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
             'Content-Type': 'application/json',
           },
         });
-        if (patientResponse.ok) {
-          const patientData = await patientResponse.json();
-          setPatientDetails(patientData);
-        } else {
-          console.error('Failed to fetch patient details');
-        }
+// <<<<<<< HEAD
+//         if (patientResponse.ok) {
+//           const patientData = await patientResponse.json();
+//           setPatientDetails(patientData);
+//         } else {
+//           console.error('Failed to fetch patient details');
+//         }
 
-        // Fetch symptoms
-        const symptomsResponse = await fetch(`http://localhost:9090/api/v1/doctor/symptoms_patient/${patientId}`, {
+//         // Fetch symptoms
+//         const symptomsResponse = await fetch(`http://localhost:9090/api/v1/doctor/symptoms_patient/${patientId}`, {
+//           method: 'GET',
+//           headers: {
+//             Authorization: `Bearer ${token}`,
+//             'Content-Type': 'application/json',
+//           },
+//         });
+//         if (symptomsResponse.ok) {
+//           const symptomsData = await symptomsResponse.json();
+//           setSymptoms(symptomsData);
+//         } else {
+//           console.error('Failed to fetch symptoms');
+//         }
+
+//         // Fetch diagnosis
+//         const diagnosisResponse = await fetch(`http://localhost:9090/api/v1/doctor/diagnosis_patient/${patientId}`, {
+
+        const patientData = await patientResponse.json();
+        setPatientDetails(patientData);
+
+        // Fetch visits
+        const visitsResponse = await fetch(`http://localhost:9090/api/v1/nurse/patient_history/${patientId}`, {
+
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         });
-        if (symptomsResponse.ok) {
-          const symptomsData = await symptomsResponse.json();
-          setSymptoms(symptomsData);
-        } else {
-          console.error('Failed to fetch symptoms');
-        }
+// <<<<<<< HEAD
+//         if (diagnosisResponse.ok) {
+//           const diagnosisData = await diagnosisResponse.json();
+//           setDiagnosis(diagnosisData);
+//         } else {
+//           console.error('Failed to fetch diagnosis');
+//         }
 
-        // Fetch diagnosis
-        const diagnosisResponse = await fetch(`http://localhost:9090/api/v1/doctor/diagnosis_patient/${patientId}`, {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-        if (diagnosisResponse.ok) {
-          const diagnosisData = await diagnosisResponse.json();
-          setDiagnosis(diagnosisData);
-        } else {
-          console.error('Failed to fetch diagnosis');
-        }
+//         // Fetch prescription
+//         const prescriptionResponse = await fetch(`http://localhost:9090/api/v1/doctor/prescriptions_patient/${patientId}`, {
+//           method: 'GET',
+//           headers: {
+//             Authorization: `Bearer ${token}`,
+//             'Content-Type': 'application/json',
+//           },
+//         });
+//         if (prescriptionResponse.ok) {
+//           const prescriptionData = await prescriptionResponse.json();
+//           setPrescription(prescriptionData);
+//         } else {
+//           console.error('Failed to fetch prescription');
+//         }
+//       } catch (error) {
+//         console.error('Error fetching data:', error);
+//       }
+//     };
 
-        // Fetch prescription
-        const prescriptionResponse = await fetch(`http://localhost:9090/api/v1/doctor/prescriptions_patient/${patientId}`, {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-        if (prescriptionResponse.ok) {
-          const prescriptionData = await prescriptionResponse.json();
-          setPrescription(prescriptionData);
-        } else {
-          console.error('Failed to fetch prescription');
-        }
+//     fetchData();
+//   }, []);
+
+        const visitsData = await visitsResponse.json();
+        setVisits(visitsData);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -90,6 +117,44 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
 
     fetchData();
   }, []);
+  const handleViewTestReport = () => {
+    navigation.navigate('ViewImageScreen', { patientId: patientId });
+  };
+
+  const handleToggleVisit = (visitIndex) => {
+    setSelectedVisit(selectedVisit === visitIndex ? null : visitIndex);
+  };
+
+  const renderVisitItems = (visitData) => {
+    return (
+      <View style={styles.visitContainer}>
+        {visitData.map((item, itemIndex) => {
+          switch (item.type) {
+            case 'prescription':
+              return (
+                <Text key={itemIndex} style={styles.visitItem}>
+                  Prescription: {item.data.pre_text}
+                </Text>
+              );
+            case 'diagnosis':
+              return (
+                <Text key={itemIndex} style={styles.visitItem}>
+                  Diagnosis: {item.data.dia_text}
+                </Text>
+              );
+            case 'symptom':
+              return (
+                <Text key={itemIndex} style={styles.visitItem}>
+                  Symptom: {item.data.sym_text}
+                </Text>
+              );
+            default:
+              return null;
+          }
+        })}
+      </View>
+    );
+  };
 
   const handleAddConsultation = () => {
     navigation.navigate('AddConsultationScreen', { 
@@ -124,7 +189,6 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
       console.error('Error discharging patient:', error);
     }
   };
-  
 
   return (
     <View style={styles.container}>
@@ -147,6 +211,7 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
           </View>
           <View style={styles.middleContainer}>
             <View style={styles.middleLeftContainer}>
+
             <Text style={styles.consultationFormHeading}>Patient Vitals</Text>
               <View style={styles.toolContainer}>
                 <Text style={styles.sliderLabel}>Temperature: {temperature.toFixed(1)} °F</Text>
@@ -182,6 +247,7 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
                 <Text style={styles.sliderLabel}>Blood Pressure: {bloodPressure.systolic}/{bloodPressure.diastolic} mmHg</Text>
               </View>
               
+
               <TouchableOpacity
                 style={[styles.button, styles.updateButton]}
                 onPress={handleAddConsultation}
@@ -198,6 +264,13 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
                   {dischargeProcessing ? 'Discharge in Processing' : 'Discharge'}
                 </Text>
               </TouchableOpacity>
+              <TouchableOpacity
+          style={[styles.button, styles.viewReportButton]}
+          onPress={handleViewTestReport}
+        >
+          <Text style={styles.buttonText}>View Test Report</Text>
+        </TouchableOpacity>
+
               
             </View>
             <View style={styles.middleRightContainer}>
@@ -209,30 +282,14 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
               <Text style={styles.patientDetail}>Age: {patientDetails?.age}</Text>
               <Text style={styles.patientDetail}>Bed No.: {patientDetails?.bedId}</Text>
               
-              <Text style={styles.sectionHeading}>Symptoms</Text>
-              <FlatList
-                data={symptoms}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item, index }) => (
-                  <Text style={styles.item}>{`${index + 1}. ${item.sym_text}`}</Text>
-                )}
-              />
-              <Text style={styles.sectionHeading}>Treatment Plan</Text>
-              <FlatList
-                data={diagnosis}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item, index }) => (
-                  <Text style={styles.item}>{`${index + 1}. ${item.dia_text}`}</Text>
-                )}
-              />
-              <Text style={styles.sectionHeading}>Prescription</Text>
-              <FlatList
-                data={prescription}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item, index }) => (
-                  <Text style={styles.item}>{`${index + 1}. ${item.pre_text}`}</Text>
-                )}
-              />
+              {visits.map((visitData, index) => (
+                <TouchableOpacity key={index} onPress={() => handleToggleVisit(index)}>
+                  <Text style={styles.visitDate}>Visit {index + 1}</Text>
+                  {/* <Text style={styles.visitDate}>Date: {visitData[0].data.diagnosisDate}</Text> */}
+                  {selectedVisit === index && renderVisitItems(visitData)}
+                </TouchableOpacity>
+              ))}
+
             </View>
           </View>
           <View style={styles.lowerContainer}>
@@ -299,13 +356,35 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
+  visitContainer: {
+    backgroundColor: '#2E5B8B',
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 10,
+  },
+  visitDate: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#FFFFFF',
+  },
+  visitItem: {
+    fontSize: 16,
+    color: '#FFFFFF',
+    marginBottom: 5,
+  },
   middleLeftContainer: {
     flex: 1,
     backgroundColor: 'rgba(223, 233, 235, 0.2)',
     padding: 10,
     borderRadius: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
+// <<<<<<< HEAD
+//     justifyContent: 'center',
+//     alignItems: 'center',
+// =======
+    justifyContent: 'left',
+    alignItems: 'left',
+
     marginBottom: 20,
   },
   middleRightContainer: {
@@ -331,11 +410,13 @@ const styles = StyleSheet.create({
     fontSize: 23,
     color: '#000000',
     marginBottom: 5,
+
   },
   item: {
     fontSize: 23,
     color: '#000000',
     marginBottom: 5,
+
   },
   logo: {
     width: 200,

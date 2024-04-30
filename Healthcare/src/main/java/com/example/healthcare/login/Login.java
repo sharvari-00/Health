@@ -136,7 +136,9 @@ public class Login implements UserDetails {
     }
 
     public Integer getDoctorId() {
-        return id;
+
+            return doctor_details != null ? doctor_details.getId() : null;
+
     }
 
 //    public void setDocId(Integer id) {

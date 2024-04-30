@@ -1,5 +1,6 @@
 package com.example.healthcare.reports;
 
+import com.example.healthcare.patient_registration.Patient_registration;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,13 +21,14 @@ public class Reports {
     private Integer id;
     private Integer patient_id;
     @Lob
-    private Blob images;
+    @Column(length = 2000)
+    private byte[] images;
 
     public Integer getPatient_id() {
         return patient_id;
     }
 
-    public Blob getImages() {
+    public byte[] getImages() {
         return images;
     }
 
@@ -42,7 +44,10 @@ public class Reports {
         this.patient_id = patient_id;
     }
 
-    public void setImages(Blob images) {
+    public void setImages(byte[] images) {
         this.images = images;
+    }
+
+    public void setPatient(Patient_registration patient_registration) {
     }
 }
