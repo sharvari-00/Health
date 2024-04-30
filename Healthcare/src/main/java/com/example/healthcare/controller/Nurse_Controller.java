@@ -150,6 +150,18 @@ public class Nurse_Controller {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Patient not found");
         }
     }
+    @GetMapping("/patientImages/{patientId}")
+    public ResponseEntity<?> getPatientImages(@PathVariable("patientId") Long patientId) {
+        try {
+            List<Reports> patientImages = reports_service.getPatientImages(patientId);
+            return ResponseEntity.ok(patientImages);
+        } catch (Exception e) {
+            e.printStackTrace(); // Log the exception for debugging purposes
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error occurred while retrieving patient images: " + e.getMessage());
+        }
+    }
+
 
 
     private Map<String, Object> createEntry(Object entity) {

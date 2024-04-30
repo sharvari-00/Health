@@ -9,34 +9,39 @@ const TestReportsScreen = ({ route }) => {
   const [testReports, setTestReports] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-
+  const [fetchedImages, setFetchedImages] = useState([]);
+  const [image, setImage] = useState(null);
   useEffect(() => {
-    const fetchTestReports = async () => {
-      try {
-        // Fetch access token from AsyncStorage
-        const token = await AsyncStorage.getItem('accessToken');
-        setAccessToken(token);
+    console.log('image state updated:', image);
+  }, [image]); // Log 'image' whenever it changes
 
-        // Fetch test reports using patientId and access token
-        const response = await fetch(`http://your-backend-url/api/test-reports/${patientId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const data = await response.json();
-        setTestReports(data);
-      } catch (error) {
-        console.error('Error fetching test reports:', error);
+
+  const fetchPatientImages = async (patientId) => {
+    try {
+      const apiUrl = `http://localhost:9090/api/v1/nurse/patientImages/${patientId}`;
+      const response = await fetch(apiUrl);
+      if (response.ok) {
+        const images = await response.json();
+        console.log('Patient images:', images);
+        setFetchedImages(images);
+        //console.log('Fetched images:', images[0].images);
+      } else {
+        console.error('Failed to retrieve patient images:', response.statusText);
+        // Handle error response
       }
-    };
-
-    fetchTestReports();
-  }, [patientId]); // Fetch test reports whenever patientId changes
-
+    } catch (error) {
+      console.error('Error retrieving patient images:', error);
+      // Handle fetch error
+    }
+  };
+  useEffect(() => {
+    fetchPatientImages(patientId);
+  }, []); 
+ 
   const renderTestReportItem = ({ item }) => {
     return (
       <TouchableOpacity onPress={() => setSelectedImage(item.image)}>
-        <Image source={{ uri: `data:image/png;base64,${item.image}` }} style={styles.testReportImage} />
+        <Image source={{ uri: `data:image/png;base64,${item.images}` }} style={styles.testReportImage} />
         <Text style={styles.testReportDate}>{item.date}</Text>
       </TouchableOpacity>
     );
@@ -44,6 +49,10 @@ const TestReportsScreen = ({ route }) => {
 
   const toggleFullScreen = () => {
     setModalVisible(!modalVisible);
+  };
+  const handleImageClick = (imageUri) => {
+    setSelectedImage(imageUri);
+    setModalVisible(true);
   };
 
   return (
@@ -62,7 +71,19 @@ const TestReportsScreen = ({ route }) => {
               </TouchableOpacity>
             </View>
           </View>
+          <Text style={styles.headerText}>Patient Reports:</Text>
           <View style={styles.reportsContainer}>
+          
+  
+  <View style={styles.fetchedImagesContainer}>
+  <View style={styles.imageGrid}>
+  {fetchedImages.map((image, index) => (
+    <TouchableOpacity key={index} onPress={() => handleImageClick(image.images)}>
+    <Image key={index} source={{ uri: 'data:image/jpeg;base64,' + image.images }} style={styles.fetchedImage} />
+    </TouchableOpacity>
+  ))}
+  </View>
+</View>
             <FlatList
               data={testReports}
               renderItem={renderTestReportItem}
@@ -97,16 +118,17 @@ const styles = StyleSheet.create({
   },
   layer: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(26, 95, 116, 0.13)',
     padding: 20,
   },
   upperContainer: {
-    flex: 8,
+    flex: 1,
   },
   heading: {
-    fontSize: 24,
+    fontSize: 50,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#004849',
+
     marginBottom: 10,
   },
   divider: {
@@ -126,12 +148,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   buttonText: {
-    fontSize: 18,
+    fontSize: 25,
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
   reportsContainer: {
-    flex: 2,
+    flex: 4,
+    backgroundColor: 'rgba(255, 255, 242, 0.45)',
   },
   flatListContent: {
     flexGrow: 1,
@@ -139,8 +162,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   testReportImage: {
-    width: 200,
-    height: 200,
+    width: 500,
+    height: 500,
     marginBottom: 10,
   },
   testReportDate: {
@@ -168,9 +191,10 @@ const styles = StyleSheet.create({
     top: 40,
     left: 20,
     zIndex: 1,
+   
   },
   closeButtonText: {
-    fontSize: 20,
+    fontSize: 29,
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
@@ -178,6 +202,29 @@ const styles = StyleSheet.create({
     width: Dimensions.get('window').width - 40,
     height: Dimensions.get('window').height - 100,
   },
+  fetchedImagesContainer: {
+    marginTop: 20,
+    
+  },
+  fetchedImage: {
+    width: 200, // Adjust the width as needed
+    height: 200, // Adjust the height as needed
+    marginBottom: 10,
+    borderRadius: 10, // Optional: Add border radius for rounded corners
+    marginLeft: 10,
+  },
+  imageGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
+    marginBottom: 10, // Add margin bottom to create space between rows
+  },
+  headerText:{
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: '#004849',
+    marginBottom: 10,
+  }
 });
 
 export default TestReportsScreen;

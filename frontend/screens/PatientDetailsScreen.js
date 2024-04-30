@@ -2,42 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Image, Modal, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
-import * as FileSystem from 'expo-file-system';
-import { launchCamera } from 'expo-image-picker';
 import { useNavigation } from '@react-navigation/native';
-import { Permissions } from 'expo';
-import { CameraRoll } from 'react-native';
-
-
-const requestMediaLibraryPermission = async () => {
-  try {
-    await CameraRoll.getPhotos({ first: 1 }); // Attempt to access the media library
-    return true; // Permission granted
-  } catch (error) {
-    console.error('Permission to access the photo library is required:', error);
-    return false; // Permission denied
-  }
-};
 
 
 const PatientDetailsScreen = ({ route }) => {
-  //const { patientId } = route.params;
   const [patientId, setPatientId] = useState(1);
 
   const navigation = useNavigation();
   const [visits, setVisits] = useState([]);
   const [selectedVisit, setSelectedVisit] = useState(null);
   const [patientDetails, setPatientDetails] = useState({});
-  const [showInput, setShowInput] = useState(false);
-  const [filePath, setFilePath] = useState('');
-  const [uploadButtonText, setUploadButtonText] = useState('Upload');
-  const [modalVisible, setModalVisible] = useState(false);
-  const [fullscreenImage, setFullscreenImage] = useState('');
-
+  const [fetchedImages, setFetchedImages] = useState([]);
   const [image, setImage] = useState(null);
   useEffect(() => {
     console.log('image state updated:', image);
-  }, [image]); // Log 'image' whenever it changes
+  }, [image]); 
 
 
   useEffect(() => {
@@ -104,41 +83,6 @@ const PatientDetailsScreen = ({ route }) => {
     }
   };
   
-
-  // const saveImage = async () => {
-  //   try {
-  //     console.log('FormData:', formData);
-  
-  //     const token = await AsyncStorage.getItem('accessToken');
-  
-  //     const formData = new FormData();
-  //     formData.append('file', {
-  //       uri: image,
-  //       name: 'image.jpg',
-  //       type: 'image/jpeg',
-  //     });
-  
-  //     const response = await fetch(`http://localhost:9090/api/v1/nurse/uploadImage/${patientId}`, {
-  //       method: 'POST',
-  //       headers: {
-  //         // 'Content-Type': 'multipart/form-data',
-  //         // 'Authorization': `Bearer ${token}`, // Include the authorization token
-  //       },
-  //       body: formData,
-  //     });
-  
-  //     console.log('Response from server:', response);
-  
-  //     if (response.ok) {
-  //       const savedReport = await response.json();
-  //       console.log('Image uploaded successfully:', savedReport);
-  //     } else {
-  //       console.error('Failed to upload image:', response.status);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error uploading image:', error);
-  //   }
-  // };
   const saveImage = async (uri, patientId) => {
     try {
       const apiUrl = `http://localhost:9090/api/v1/nurse/uploadImage/${patientId}`;
@@ -172,74 +116,11 @@ const PatientDetailsScreen = ({ route }) => {
   };
   const handleSaveImage = async () => {
     if (image) {
-      // Replace 123 with the actual patientId or fetch it from context/props
       await saveImage(image, patientId);
     } else {
       alert('Please select an image first.');
     }
   };
-  
-  // const saveImage = async (uri, patientId) => {
-  //   try {
-  //     const apiUrl = `http://localhost:9090/api/v1/nurse/uploadImage/${patientId}`;
-  
-  //     const formData = new FormData();
-  //     formData.append('file', {
-  //       uri: uri,
-  //       name: 'image.jpg', // You can modify the name as per your requirement
-  //       type: 'image/jpeg', // Change the type if it's different
-  //     });
-  
-  //     const response = await fetch(apiUrl, {
-  //       method: 'POST',
-  //       body: formData,
-  //       headers: {
-  //         'Content-Type': 'multipart/form-data',
-  //         // Add any additional headers if needed
-  //       },
-  //     });
-  
-  //     if (response.ok) {
-  //       const responseData = await response.json();
-  //       console.log('Response from backend:', responseData);
-  //       // Handle successful response
-  //     } else {
-  //       console.error('Error:', response.statusText);
-  //       // Handle error response
-  //     }
-  //   } catch (error) {
-  //     console.error('Error saving image:', error);
-  //   }
-  // };
-  
-  // const pickImage = async () => {
-  //   try {
-  //     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-  //     if (status !== 'granted') {
-  //       alert('Sorry, we need camera roll permissions to make this work!');
-  //       return;
-  //     }
-  
-  //     let result = await ImagePicker.launchImageLibraryAsync({
-  //       mediaTypes: ImagePicker.MediaTypeOptions.All,
-  //       allowsEditing: true,
-  //       aspect: [4, 3],
-  //       quality: 1,
-  //     });
-  
-  //     if (!result.cancelled && result.assets && result.assets.length > 0) {
-  //       const selectedAsset = result.assets[0];
-  //       setImage(selectedAsset.uri);
-  //       console.log('Selected image URI:', selectedAsset.uri);
-  
-  //       await saveImage(selectedAsset.uri, patientId);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error picking image:', error);
-  //   }
-  // };
-  
-  
   
   
   const handleToggleVisit = (visitIndex) => {
@@ -277,9 +158,29 @@ const PatientDetailsScreen = ({ route }) => {
     );
   };
 
-  
-  
-  return (
+  const fetchPatientImages = async (patientId) => {
+    try {
+      const apiUrl = `http://localhost:9090/api/v1/nurse/patientImages/${patientId}`;
+      const response = await fetch(apiUrl);
+      if (response.ok) {
+        const images = await response.json();
+        console.log('Patient images:', images);
+        setFetchedImages(images);
+        //console.log('Fetched images:', images[0].images);
+      } else {
+        console.error('Failed to retrieve patient images:', response.statusText);
+        // Handle error response
+      }
+    } catch (error) {
+      console.error('Error retrieving patient images:', error);
+      // Handle fetch error
+    }
+  };
+  useEffect(() => {
+    fetchPatientImages(patientId);
+  }, []); 
+ 
+   return (
     <View style={styles.container}>
       <ImageBackground
         source={require('../assets/wall.jpg')}
@@ -334,6 +235,20 @@ const PatientDetailsScreen = ({ route }) => {
                   {selectedVisit === index && renderVisitItems(visitData)}
                 </TouchableOpacity>
               ))}
+              
+        {/* <Image
+        source={{ uri: 'data:image/jpeg;base64,' + imageData }}
+        style={{ width: 200, height: 200 }}
+      /> */}
+        <View style={styles.fetchedImagesContainer}>
+  <Text style={styles.headerText}>Fetched Patient Images</Text>
+  {fetchedImages.map((image, index) => (
+    <Image key={index} source={{ uri: 'data:image/jpeg;base64,' + image.images }} style={styles.fetchedImage} />
+  ))}
+</View>
+
+        
+             
             </View>
           </View>
           <View style={styles.bottomContainer}>
@@ -358,7 +273,7 @@ const styles = StyleSheet.create({
   },
   layer: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(26, 95, 116, 0.13)',
   },
   upperContainer: {
     flex: 1,
@@ -521,6 +436,15 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     resizeMode: 'contain',
+  },
+  fetchedImagesContainer: {
+    marginTop: 20,
+  },
+  fetchedImage: {
+    width: 200, // Adjust the width as needed
+    height: 200, // Adjust the height as needed
+    marginBottom: 10,
+    borderRadius: 10, // Optional: Add border radius for rounded corners
   },
 });
 

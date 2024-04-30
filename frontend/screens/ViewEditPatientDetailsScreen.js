@@ -17,7 +17,22 @@ const ViewEditPatientDetailsScreen = ({ route }) => {
   const [editedCity, setEditedCity] = useState('');
   const [editedState, setEditedState] = useState('');
   const [editedConsent, setEditedConsent] = useState(true);
-
+  // useEffect(() => {
+  //   // Assuming some asynchronous operation sets editedConsent
+  //   const fetchEditedConsent = async () => {
+  //     try {
+  //       const consent = await fetchConsent(); // Fetch editedConsent from an API
+  //       setEditedConsent(consent);
+  //     } catch (error) {
+  //       console.error('Error fetching editedConsent:', error);
+  //     }
+  //   };
+  
+  //   fetchEditedConsent(); // Call the function to fetch editedConsent
+  // }, []); 
+  useEffect(() => {
+    console.log('consent updated:', editedConsent);
+  }, [editedConsent]); 
   useEffect(() => {
     // Fetch patient details using API
     const fetchPatientDetails = async () => {
@@ -61,13 +76,50 @@ const ViewEditPatientDetailsScreen = ({ route }) => {
   };
 
   const handleNoClick = () => {
-    setEditedConsent(false);
+    console.log("Before setting editedConsent:", editedConsent);
+setEditedConsent(false);
+console.log("After setting editedConsent:", editedConsent);
+
   };
 
   const handleSaveChanges = async () => {
     try {
       //setIsSaving(true);
       setIsSaving(true);
+      let requestBody = {}; // Initialize requestBody outside of the if-else block
+      console.log(editedConsent);
+    
+    
+      // if (editedConsent) {
+      //   // If editedConsent is true, include all fields in the requestBody
+      //   requestBody = {
+      //     fname: patientDetails.fname,
+      //     lname: patientDetails.lname,
+      //     phone_number: editedPhoneNumber,
+      //     email_id: editedEmail,
+      //     address_line: editedAddress,
+      //     city: editedCity,
+      //     state: editedState,
+      //     consent: editedConsent,
+      //   };
+      // }
+      // else{
+      //   console.log(editedConsent);
+      //   requestBody = {
+      //     consent: editedConsent,
+      //     // Set other fields to null
+      //     fname: null,
+      //     lname: null,
+      //     phone_number: null,
+      //     email_id: null,
+      //     address_line: null,
+      //     city: null,
+      //     state: null,
+      //   };
+      // }
+      console.log("editedConsent:", editedConsent);
+
+      if (editedConsent=='Yes'){
       const response = await fetch(`http://localhost:9090/api/v1/patients/${patientId}`, {
         method: 'PUT',
         headers: {
@@ -84,8 +136,8 @@ const ViewEditPatientDetailsScreen = ({ route }) => {
           state: editedState,
           consent: editedConsent,
         }),
+        //body: JSON.stringify(requestBody),
       });
-
       if (response.ok) {
         console.log('Changes saved successfully');
         //setChangesSaved(true); 
@@ -96,6 +148,32 @@ const ViewEditPatientDetailsScreen = ({ route }) => {
       } else {
         console.error('Failed to save changes');
       }
+    }
+    else{
+      console.log("h");
+      const response = await fetch(`http://localhost:9090/api/v1/patients/${patientId}`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          consent: editedConsent,
+        }),
+        //body: JSON.stringify(requestBody),
+      });
+      if (response.ok) {
+        console.log('Changes saved successfully');
+        //setChangesSaved(true); 
+        // Optionally, update the local state or any UI feedback here
+        setTimeout(() => {
+          setIsSaving(false);
+        }, 2000);
+      } else {
+        console.error('Failed to save changes');
+      }
+    }
+      
     } catch (error) {
       console.error('Error saving changes:', error);
     }
@@ -163,6 +241,15 @@ const ViewEditPatientDetailsScreen = ({ route }) => {
               <Text style={styles.formLabel}>Gender:</Text>
               <Text style={styles.formValue}>{patientDetails.gender}</Text>
             </View>
+            <View style={styles.formRow}>
+              <Text style={styles.formLabel}>Assigned Doctor ID:</Text>
+              <Text style={styles.formValue}>{patientDetails.docId}</Text>
+            </View>
+            <View style={styles.formRow}>
+              <Text style={styles.formLabel}>Allocated Bed ID, if admitted:</Text>
+              <Text style={styles.formValue}>{patientDetails.bedId}</Text>
+            </View>
+
 
             <View style={styles.formRow}>
               <Text style={styles.formLabel}>Phone Number:</Text>
@@ -214,11 +301,17 @@ const ViewEditPatientDetailsScreen = ({ route }) => {
               <Picker
                 selectedValue={editedConsent}
                 style={{ height: 50, width: 150,fontSize:22 }}
-                onValueChange={(itemValue) => setEditedConsent(itemValue)}
+                onValueChange={(itemValue) => {
+                  setEditedConsent(itemValue);
+                  if (!itemValue) { // If consent is false
+                    handleNoClick(); // Call handleNoClick function
+                  }
+                }}
               >
                 <Picker.Item label="Yes" value={true} />
                 <Picker.Item label="No" value={false} />
               </Picker>
+              {console.log("Current value of editedConsent:", editedConsent)}
             </View>
 
             <TouchableOpacity

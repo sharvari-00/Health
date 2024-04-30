@@ -19,13 +19,15 @@ public class Reports {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private Integer patient_id;
+    @Column(name = "patient_id") // Ensure the column name matches the database column name
+    private Integer patientId;
+    //private Integer patient_id;
     @Lob
     @Column(length = 2000)
     private byte[] images;
 
     public Integer getPatient_id() {
-        return patient_id;
+        return patientId;
     }
 
     public byte[] getImages() {
@@ -41,7 +43,7 @@ public class Reports {
     }
 
     public void setPatient_id(Integer patient_id) {
-        this.patient_id = patient_id;
+        this.patientId = patient_id;
     }
 
     public void setImages(byte[] images) {
