@@ -126,7 +126,7 @@ const PatientDetailsScreen = ({ route }) => {
   const handleToggleVisit = (visitIndex) => {
     setSelectedVisit(selectedVisit === visitIndex ? null : visitIndex);
   };
-  const handleEmergency = () => {
+  const handleEmergency = (bedId) => {
     // Include patient ID, bed ID, and message in the emergency notification
     const emergencyMessage = `Hurry! Need your assistance. Patient ID: ${patientId}, Bed ID: ${bedId};`;
     // Trigger emergency with patientId, bedId, and message
@@ -268,14 +268,15 @@ const PatientDetailsScreen = ({ route }) => {
     <Image style={styles.logo} source={require('../assets/logo2.png')} />
   </View>
   <View style={styles.emergencyContainer}>
-    <TouchableOpacity
-      style={[styles.emergencyButton, { backgroundColor: emergency ? 'yellow' : 'red' }]}
-      onPress={emergency ? handleDoctorAcknowledge : handleEmergency}
-    >
-      <Text style={styles.emergencyButtonText}>
-        {emergency ? 'Informing Doctor' : 'Emergency'}
-      </Text>
-    </TouchableOpacity>
+  <TouchableOpacity
+  style={[styles.emergencyButton, { backgroundColor: emergency ? 'yellow' : 'red' }]}
+  onPress={() => emergency ? handleDoctorAcknowledge() : handleEmergency(bedId)}
+>
+  <Text style={styles.emergencyButtonText}>
+    {emergency ? 'Informing Doctor' : 'Emergency'}
+  </Text>
+</TouchableOpacity>
+
     {/* Render emergency details if emergency is active */}
     {emergency && (
       <View style={styles.emergencyDetails}>
@@ -330,7 +331,9 @@ const styles = StyleSheet.create({
   bottomContainer: {
     flex: 1,
     justifyContent: 'flex-end',
-    alignItems: 'flex-start',
+    alignItems: 'flex-end',
+    paddingRight:20,
+    flexDirection:'row',
   },
   headerText: {
     fontSize: 40,
@@ -489,7 +492,7 @@ const styles = StyleSheet.create({
     
   },
   emergencyButtonText: {
-    color: '#FFFFFF',
+    color: '#000000',
     fontWeight: 'bold',
   },
   emergencyDetails: {

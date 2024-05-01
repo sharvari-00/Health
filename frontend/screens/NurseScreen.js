@@ -104,7 +104,7 @@ const NurseScreen = () => {
                 renderItem={({ item }) => (
                   <TouchableOpacity
                     style={styles.patientItem}
-                    onPress={() => handleViewDetails(item.id,item.bedID)}
+                    onPress={() => handleViewDetails(item.id,item.bedId)}
                   >
                     <Text style={styles.patientText}>Patient ID: {item.id}</Text>
                     <Text style={styles.patientText}>Bed No: {item.bedId}</Text>
