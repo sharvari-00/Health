@@ -4,6 +4,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 import { useNavigation } from '@react-navigation/native';
 import { useEmergencyContext } from './EmergencyContext';
+import Slider from '@react-native-community/slider'; // Import Slider from react-native-community
+
+
 
 const PatientDetailsScreen = ({ route }) => {
   const { patientId,bedId } = route.params;
@@ -14,6 +17,9 @@ const PatientDetailsScreen = ({ route }) => {
   const [fetchedImages, setFetchedImages] = useState([]);
   const { emergency, triggerEmergency, resolveEmergency } = useEmergencyContext(); // Access the emergency context
   const [image, setImage] = useState(null);
+  const [temperature, setTemperature] = useState(98.6); // State for temperature
+  const [bloodPressure, setBloodPressure] = useState({ systolic: 120, diastolic: 80 }); // State for blood pressure
+ 
   useEffect(() => {
     console.log('image state updated:', image);
   }, [image]); 
@@ -169,7 +175,7 @@ const PatientDetailsScreen = ({ route }) => {
       </View>
     );
   };
-
+  
   const fetchPatientImages = async (patientId) => {
     try {
       const apiUrl = `http://localhost:9090/api/v1/nurse/patientImages/${patientId}`;
@@ -215,12 +221,48 @@ const PatientDetailsScreen = ({ route }) => {
           <View style={styles.middleContainer}>
             {/* Right Middle Container */}
             <View style={styles.rightMiddleContainer}>
-              <Text style={[styles.patientDetailText, { fontSize: 24, textAlign: 'center' }]}>Patient History</Text>
+              <Text style={[styles.consultationFormHeading, ]}>Patient Details</Text>
               <Text style={styles.patientDetailText}>Patient Id: {patientDetails.id}</Text>
               <Text style={styles.patientDetailText}>First Name: {patientDetails.fname}</Text>
               <Text style={styles.patientDetailText}>Last Name: {patientDetails.lname}</Text>
               <Text style={styles.patientDetailText}>Age: {patientDetails.age}</Text>
               <Text style={styles.patientDetailText}>Gender: {patientDetails.gender}</Text>
+              <Text style={styles.consultationFormHeading}>Patient Vitals</Text>
+              <View style={styles.toolContainer}>
+                <Text style={styles.sliderLabel}>Temperature: {temperature.toFixed(1)} °F</Text>
+                <Slider
+                  style={styles.slider}
+                  minimumValue={95}
+                  maximumValue={105}
+                  step={0.1}
+                  value={temperature}
+                  onValueChange={(temp) => setTemperature(temp)}
+                />
+                
+                <View style={styles.bloodPressureSliderContainer}>
+                  <Text style={styles.sliderLabel}>Systolic:</Text>
+                  <Slider
+                    style={styles.slider}
+                    minimumValue={90}
+                    maximumValue={180}
+                    step={1}
+                    value={bloodPressure.systolic}
+                    onValueChange={(systolic) => setBloodPressure({ ...bloodPressure, systolic })}
+                  />
+                  <Text style={styles.sliderLabel}>Diastolic:</Text>
+                  <Slider
+                    style={styles.slider}
+                    minimumValue={60}
+                    maximumValue={120}
+                    step={1}
+                    value={bloodPressure.diastolic}
+                    onValueChange={(diastolic) => setBloodPressure({ ...bloodPressure, diastolic })}
+                  />
+                </View>
+                <Text style={styles.sliderLabel}>Blood Pressure: {bloodPressure.systolic}/{bloodPressure.diastolic} mmHg</Text>
+              </View>
+              
+
  
 <TouchableOpacity style={styles.uploadButton} onPress={pickImage}>
       <Text style={styles.buttonText}>{image ? 'Change Image' : 'Upload Image'}</Text>
@@ -240,8 +282,14 @@ const PatientDetailsScreen = ({ route }) => {
             </View>
             {/* Left Middle Container */}
             <View style={styles.leftMiddleContainer}>
+            <Text style={styles.consultationFormHeading}>Patient History</Text>
               {visits.map((visitData, index) => (
-                <TouchableOpacity key={index} onPress={() => handleToggleVisit(index)}>
+                <TouchableOpacity key={index} onPress={() => handleToggleVisit(index)}style={{
+                  backgroundColor: 'rgba(255, 255, 242, 0.45)',
+                  borderRadius: 10,
+                  padding: 10,
+                  marginBottom: 10,
+                }}>
                   <Text style={styles.visitDate}>Visit {index + 1}</Text>
                   {/* <Text style={styles.visitDate}>Date: {visitData[0].data.diagnosisDate}</Text> */}
                   {selectedVisit === index && renderVisitItems(visitData)}
@@ -252,8 +300,8 @@ const PatientDetailsScreen = ({ route }) => {
         source={{ uri: 'data:image/jpeg;base64,' + imageData }}
         style={{ width: 200, height: 200 }}
       /> */}
+
         <View style={styles.fetchedImagesContainer}>
-  <Text style={styles.headerText}>Fetched Patient Images</Text>
   {fetchedImages.map((image, index) => (
     <Image key={index} source={{ uri: 'data:image/jpeg;base64,' + image.images }} style={styles.fetchedImage} />
   ))}
@@ -319,11 +367,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   leftMiddleContainer: {
-    flex: 8,
+    flex: 2,
     padding: 20,
   },
   rightMiddleContainer: {
-    flex: 2,
+    flex: 1,
     justifyContent: 'center',
     backgroundColor: 'rgba(223, 233, 235, 0.2)',
     alignItems: 'center',
@@ -338,8 +386,38 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 40,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color:  '#004849',
     marginBottom: 20,
+  },
+  consultationFormHeading: {
+    marginTop: 30,
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: '#004849',
+    marginBottom: 10,
+  },
+  visitContainer: {
+    backgroundColor: 'rgba(255, 255, 242, 0.45)',
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 10,
+  },
+  visitItemContainer: {
+    flexDirection: 'row',
+    marginBottom: 5,
+    fontSize: 25,
+    color: '000000',
+  },
+  visitItemType: {
+    fontWeight: 'bold',
+    marginRight: 5,
+    fontSize: 25,
+    color: '000000',
+  },
+  visitItemText: {
+    flex: 1,
+    fontSize: 25,
+    color: '000000',
   },
   divider: {
     width: '80%',
@@ -359,14 +437,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   buttonText: {
-    fontSize: 18,
+    fontSize: 29,
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
   patientDetailText: {
-    fontSize: 20,
+    fontSize: 25,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#000000',
     marginBottom: 10,
   },
   imageUploadText: {
@@ -376,7 +454,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   uploadButton: {
-    backgroundColor: '#61828a',
+    backgroundColor: '#326974',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
@@ -394,6 +472,23 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
+  toolContainer: {
+    marginTop:15,
+    marginBottom:15,
+    backgroundColor: '#f0f0f0', // Background color of the tool container
+    borderRadius: 10, // Curved corners
+    padding: 10, // Padding around the content
+  },
+  sliderLabel: {
+    fontSize: 20, // Adjust font size as needed
+    marginBottom: 5, // Spacing between labels
+  },
+  slider: {
+    marginBottom: 15, // Spacing between sliders
+  },
+  bloodPressureSliderContainer: {
+    marginBottom: 15, // Spacing between blood pressure sliders and text
+  },
   cameraButton: {
     backgroundColor: '#61828a',
     paddingVertical: 10,
@@ -408,7 +503,7 @@ const styles = StyleSheet.create({
     width: 170,
   },
   saveButton: {
-    backgroundColor: '#61828a',
+    backgroundColor: '#326974',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
@@ -434,22 +529,17 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 20,
   },
-  visitContainer: {
-    backgroundColor: '#2E5B8B',
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 10,
+  
+  visitItem: {
+    fontSize: 23,
+    color: '#000000',
+    marginBottom: 5,
   },
   visitDate: {
-    fontSize: 18,
+    fontSize: 23,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: '#FFFFFF',
-  },
-  visitItem: {
-    fontSize: 16,
-    color: '#FFFFFF',
-    marginBottom: 5,
+    color: '#000000',
   },
   modalContainer: {
     flex: 1,

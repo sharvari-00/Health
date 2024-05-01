@@ -227,7 +227,12 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
               <Text style={styles.patientDetail}>Bed No.: {patientDetails?.bedId}</Text>
               <Text style={styles.sectionHeading}>Previous Visits History </Text>
               {visits.map((visitData, index) => (
-                <TouchableOpacity key={index} onPress={() => handleToggleVisit(index)}>
+                <TouchableOpacity key={index} onPress={() => handleToggleVisit(index)}style={{
+                  backgroundColor: 'rgba(255, 255, 242, 0.45)',
+                  borderRadius: 10,
+                  padding: 10,
+                  marginBottom: 10,
+                }}>
                   <Text style={styles.visitDate}>Visit {index + 1}</Text>
                   {/* <Text style={styles.visitDate}>Date: {visitData[0].data.diagnosisDate}</Text> */}
                   {selectedVisit === index && renderVisitItems(visitData)}
@@ -274,7 +279,7 @@ const styles = StyleSheet.create({
     fontSize: 50,
     fontWeight: 'bold',
     color: '#004849',
-
+    fontFamily: 'Cursive',
     marginBottom: 10,
   },
   divider: {

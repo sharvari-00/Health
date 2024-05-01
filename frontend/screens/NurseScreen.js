@@ -91,8 +91,8 @@ const NurseScreen = () => {
           <View style={styles.middleContainer}>
             <View style={styles.leftMiddleContainer}>
               <Text style={styles.dateText}>{currentDate}</Text>
-              <Text style={styles.greetingText}>Hello, {userName}</Text>
-              <Text style={styles.departmentText}>Nurse</Text>
+              <Text style={styles.greetingText}>Hello Nurse</Text>
+              
               <Text style={styles.infoText}>Hope you have a great day today!</Text>
               {/* Additional nurse details can be added here */}
             </View>
@@ -124,6 +124,7 @@ const NurseScreen = () => {
   );
 };
 
+
 const lightBorderColor = '#326974'; // Light brown color for borders
 
 const styles = StyleSheet.create({
@@ -139,12 +140,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(26, 95, 116, 0.13)', // Semi-transparent layer
   },
   upperContainer: {
-    flex: 3, // 2 parts out of 10
+    flex: 2, // 2 parts out of 10
     justifyContent: 'center',
     alignItems: 'center',
   },
   middleContainer: {
-    flex: 4, // 6 parts out of 10
+    flex: 5, // 6 parts out of 10
     flexDirection: 'row',
   },
   leftMiddleContainer: {
@@ -167,13 +168,13 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 40,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#004849',
     marginBottom: 20,
   },
   listHeaderText: {
-    fontSize: 24,
+    fontSize: 29,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#004849',
     marginBottom: 10,
   },
   divider: {
@@ -194,7 +195,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   buttonText: {
-    fontSize: 18,
+    fontSize: 29,
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
@@ -206,8 +207,8 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   patientText: {
-    fontSize: 16,
-    color: '#FFFFFF',
+    fontSize: 25,
+    color: '#000000',
   },
   logoContainer: {
     position: 'absolute',
@@ -222,14 +223,16 @@ const styles = StyleSheet.create({
   dateText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#004849',
     alignSelf: 'flex-start',
-    marginBottom: 100,
+    marginBottom: 10,
+    marginLeft: 20,
   },
   greetingText: {
-    fontSize: 24,
+    paddingTop: 80, 
+    fontSize: 29,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#004849',
     marginBottom: 10,
   },
   departmentText: {
@@ -239,9 +242,10 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   infoText: {
-    fontSize: 20,
+    paddingTop: 40,
+    fontSize: 22,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#004849',
     marginBottom: 10,
   },
 });
