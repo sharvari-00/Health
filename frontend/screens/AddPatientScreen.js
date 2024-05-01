@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image, Picker } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { Button, Dialog, Portal, Provider } from 'react-native-paper';
 
 const AddPatientScreen = ({ navigation }) => {
   const [firstName, setFirstName] = useState('');
@@ -17,9 +17,19 @@ const AddPatientScreen = ({ navigation }) => {
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
 
-  const [consent, setConsent] = useState(true); // Default value for consent
+  const [consent, setConsent] = useState(false); // Default value for consent
   const [accessToken, setAccessToken] = useState('');
-
+  const [isVisible, setIsVisible] = useState(false); // State to manage visibility of dialog box
+  const [isAdultDialogVisible, setIsAdultDialogVisible] = useState(false); // State to manage visibility of adult dialog
+  useEffect(() => {
+    // Show dialog when consent changes from "No" to "Yes"
+    if (consent&& age < 18) {
+      setIsVisible(true);
+    }
+    if (consent && age >= 18) {
+      setIsAdultDialogVisible(true);
+    }
+  }, [consent, age]);
   useEffect(() => {
     // Fetch the accessToken from AsyncStorage
     const fetchAccessToken = async () => {
@@ -37,7 +47,7 @@ const AddPatientScreen = ({ navigation }) => {
     fetchAccessToken();
   }, []); // Empty dependency array ensures this runs only once
 
-
+  
   const handleSave = () => {
     // Pass the patient data to the BookAppointmentScreen
     navigation.navigate('BookAppointmentScreen', {
@@ -57,8 +67,12 @@ const AddPatientScreen = ({ navigation }) => {
 
     });
   };
-
+  const showDialog = () => setIsVisible(true);
+  const hideDialog = () => setIsVisible(false);
+  const showAdultDialog = () => setIsAdultDialogVisible(true);
+  const hideAdultDialog = () => setIsAdultDialogVisible(false);
   return (
+    <Provider>
     <ImageBackground source={require('../assets/wall.jpg')} style={styles.backgroundImage}>
       <View style={styles.overlay}>
         {/* Upper Container */}
@@ -201,7 +215,31 @@ const AddPatientScreen = ({ navigation }) => {
                 </Picker>
               </View>
             </View>
-
+{/* More input fields here */}
+                          {/* Consent dialog */}
+                          <Portal>
+                <Dialog visible={isVisible} onDismiss={hideDialog}>
+                  <Dialog.Title>Consent Confirmation</Dialog.Title>
+                  <Dialog.Content>
+                    <Text>Ensure that the guardian of the minor patient provides consent. By sharing consent, you allow access to private details.</Text>
+                  </Dialog.Content>
+                  <Dialog.Actions>
+                    <Button onPress={hideDialog}>OK</Button>
+                  </Dialog.Actions>
+                </Dialog>
+              </Portal>
+              {/* Adult dialog */}
+              <Portal>
+                <Dialog visible={isAdultDialogVisible} onDismiss={hideAdultDialog}>
+                  <Dialog.Title>Adult Confirmation</Dialog.Title>
+                  <Dialog.Content>
+                    <Text>By sharing consent, you allow access to private details.</Text>
+                  </Dialog.Content>
+                  <Dialog.Actions>
+                    <Button onPress={hideAdultDialog}>OK</Button>
+                  </Dialog.Actions>
+                </Dialog>
+              </Portal>
             {/* More input fields here */}
             <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
               <Text style={styles.buttonText}>Next</Text>
@@ -215,6 +253,7 @@ const AddPatientScreen = ({ navigation }) => {
         </View>
       </View>
     </ImageBackground>
+    </Provider>
   );
 };
 

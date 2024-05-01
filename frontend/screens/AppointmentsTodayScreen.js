@@ -12,6 +12,8 @@ const AppointmentsTodayScreen = ({ route }) => {
 
   const [appointmentsData, setAppointmentsData] = useState([]);
   const [accessToken, setAccessToken] = useState('');
+  const [disabledItems, setDisabledItems] = useState([]);
+  
   
 
   useEffect(() => {
@@ -50,8 +52,9 @@ const AppointmentsTodayScreen = ({ route }) => {
     }
   }, [doctorId, accessToken]);
 
-  const handlePatientClick = (patientId, name, age, gender) => {
+  const handlePatientClick = (patientId, name, age, gender,index) => {
     navigation.navigate('PatientFormScreen', { patientId,name,age,gender});
+    setDisabledItems(prevDisabledItems => [...prevDisabledItems, index]);
   }
 
   return (
@@ -84,8 +87,15 @@ const AppointmentsTodayScreen = ({ route }) => {
                 keyExtractor={(item) => item.id}
                 renderItem={({ item, index }) => (
                   <TouchableOpacity
-                    style={[styles.patientItem, { backgroundColor: 'rgba(255, 255, 242, 0.45)' }]}
-                    onPress={() => handlePatientClick(item.id, `${item.fname} ${item.lname}`, item.age, item.gender)}
+                  style={[
+                    styles.patientItem,
+                    { 
+                      backgroundColor: disabledItems.includes(index) ? 'rgba(255, 255, 242, 0.45)' : 'transparent',
+                      opacity: disabledItems.includes(index) ? 0.5 : 1
+                    }
+                  ]}
+                  onPress={() => handlePatientClick(item.id, `${item.fname} ${item.lname}`, item.age, item.gender, index)}
+                  disabled={disabledItems.includes(index)}
                   >
                     <Text style={styles.serialNumber}>{index + 1}</Text>
                     <View style={styles.patientDetails}>

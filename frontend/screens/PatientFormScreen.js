@@ -20,6 +20,7 @@ const PatientFormScreen = ({ route }) => {
   const [customSymptom, setCustomSymptom] = useState('');
 
   const [diagnosis, setDiagnosis] = useState('');
+  const [allergy, setAllergy]=useState('');
   const [prescription, setPrescription] = useState('');
   const [admitPatient, setAdmitPatient] = useState('No');
   const [formSaved, setFormSaved] = useState(false);
@@ -62,6 +63,7 @@ const PatientFormScreen = ({ route }) => {
     try {
       await Promise.all([
         addSymptoms(),
+        addAllergy(),
         addDiagnosis(),
         addPrescription(),
         updateAdmission()
@@ -124,6 +126,22 @@ const PatientFormScreen = ({ route }) => {
       throw new Error('Failed to add prescription');
     }
   };
+  const addAllergy = async () => {
+    const response = await fetch(`http://localhost:9090/api/v1/doctor/allergy/${patientId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`
+      },
+      body: JSON.stringify({
+        patient_id: patientId,
+        allergen: allergy,
+      })
+    });
+    if (!response.ok) {
+      throw new Error('Failed to add prescription');
+    }
+  };
 
   const updateAdmission = async () => {
     const response = await fetch(`http://localhost:9090/api/v1/admission/admit/${patientId}`, {
@@ -144,7 +162,7 @@ const PatientFormScreen = ({ route }) => {
   };
 
   const handleConfirmConsultation = () => {
-    navigation.navigate('AppointmentsTodayScreen');
+    navigation.navigate('AppointmentsTodayScreen', { doctorId });
   };
 
   return (
@@ -162,7 +180,7 @@ const PatientFormScreen = ({ route }) => {
                 onPress={handleConfirmConsultation}
                 style={styles.confirmButton}
               >
-                <Text style={styles.buttonText}>Back to Appointments</Text>
+                {/* <Text style={styles.buttonText}>Back to Appointments</Text> */}
               </TouchableOpacity>
             </View>
           </View>
@@ -278,13 +296,19 @@ const PatientFormScreen = ({ route }) => {
                   </TouchableOpacity>
                 </View>
               )}
-  
+              <TextInput
+                style={styles.input}
+                placeholder="Any allergies or existing medications"
+                value={allergy}
+                onChangeText={(text) => setAllergy(text)}
+              />
               <TextInput
                 style={styles.input}
                 placeholder="Treatment Plan"
                 value={diagnosis}
                 onChangeText={(text) => setDiagnosis(text)}
               />
+
               <TextInput
                 style={styles.input}
                 placeholder="Prescription"

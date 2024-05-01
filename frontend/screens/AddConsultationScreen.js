@@ -18,7 +18,7 @@ const PatientFormScreen = ({ route }) => {
     bed_id: ''
   });
   const [symptoms, setSymptoms] = useState([]);
-
+  const [allergen, setAllergen]=useState([]);
   const [customSymptom, setCustomSymptom] = useState('');
 
   const [diagnosis, setDiagnosis] = useState('');
@@ -48,25 +48,24 @@ const PatientFormScreen = ({ route }) => {
     fetchAccessToken();
   }, []);
 
+ 
   useEffect(() => {
-    const fetchPatientDetails = async () => {
+    const fetchPatientAllergens = async () => {
       try {
-        const response = await fetch(`YOUR_BACKEND_API_ENDPOINT/patient/${patientId}`, {
+        const response = await fetch(`http://localhost:9090/api/v1/doctor/allergies_patient/${patientId}`, {
+          method: 'GET',
           headers: {
             Authorization: `Bearer ${accessToken}`
           }
         });
         const data = await response.json();
-        setPatientDetails(data);
+        setAllergen(data);
       } catch (error) {
         console.error('Error fetching patient details:', error);
       }
     };
-
-    if (accessToken) {
-      fetchPatientDetails();
-    }
-  }, [accessToken, patientId]);
+      fetchPatientAllergens();
+  },  [accessToken, patientId]);
   
   const handleAddCustomSymptom = () => {
     if (customSymptom.trim() !== '') {
@@ -175,6 +174,16 @@ const PatientFormScreen = ({ route }) => {
               <Text style={styles.patientDetail}>Gender: {gender}</Text>
               <Text style={styles.patientDetail}>Age: {age}</Text>
               <Text style={styles.patientDetail}>Bed No.: {bedNo}</Text>
+              <Text style={styles.consultationFormHeading}>Allergies/Ongoing Medications</Text>
+<View style={styles.tagsContainer}>
+  {allergen.map((allergenItem, index) => (
+    <TouchableOpacity key={index} style={styles.tag}>
+      <Text style={{ fontSize: 18 }}>{allergenItem.allergen}</Text>
+    </TouchableOpacity>
+  ))}
+</View>
+
+
               <Text style={styles.consultationFormHeading}> Patient Vitals</Text>
               <View style={styles.toolContainer}>
                 <Text style={styles.sliderLabel}>Temperature: {temperature.toFixed(1)} °F</Text>

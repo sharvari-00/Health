@@ -1,5 +1,7 @@
 package com.example.healthcare.service;
 
+import com.example.healthcare.allergy.Allergy;
+import com.example.healthcare.allergy.AllergyRepository;
 import com.example.healthcare.diagnosis.Diagnosis;
 import com.example.healthcare.diagnosis.DiagnosisRepository;
 import com.example.healthcare.doctor_details.Doctor_details;
@@ -32,6 +34,12 @@ public class Doctor_service<TreatmentDto> {
     SymptomsRepository symptomsRepository;
     @Autowired
     DiagnosisRepository diagnosisRepository;
+    @Autowired
+    AllergyRepository allergyRepository;
+
+    public Doctor_service(AllergyRepository allergyRepository) {
+        this.allergyRepository = allergyRepository;
+    }
     //Doctor details Update
     public Doctor_details updateDoctorDetailsByAdmin(String doctorEmail, Doctor_details updatedDoctorDetails) {
         // Find the doctor details by email
@@ -138,4 +146,11 @@ public class Doctor_service<TreatmentDto> {
         return (List<Diagnosis>) diagnosisRepository.findByPatientId(patientId);
     }
 
+    public Allergy createAllergy(int patientId, Allergy allergy) {
+        allergy.setPatientId(patientId);
+        return allergyRepository.save(allergy);
+    }
+    public List<Allergy> findByPatientId(Integer patientId) {
+        return allergyRepository.findAllByPatientId(patientId);
+    }
 }

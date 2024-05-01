@@ -1,6 +1,7 @@
 package com.example.healthcare.controller;
 
 import com.example.healthcare.DTO.patientInfoDTO;
+import com.example.healthcare.allergy.Allergy;
 import com.example.healthcare.diagnosis.Diagnosis;
 import com.example.healthcare.doctor_details.Doctor_details;
 import com.example.healthcare.login.Login;
@@ -130,6 +131,37 @@ public class Doctor_Controller {
                 return ResponseEntity.ok(updatedDiagnosis);
             }else {
 
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    @PostMapping("allergy/{patient_id}")
+    public ResponseEntity<Allergy> createAllergy(@PathVariable int patient_id, @RequestBody Allergy allergy) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            if (authentication != null && authentication.getAuthorities().stream()
+                    .anyMatch(r -> r.getAuthority().equals("DOCTOR"))) {
+                Allergy createdAllergy = doctor_service.createAllergy(patient_id, allergy);
+                return ResponseEntity.ok(createdAllergy);
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    @GetMapping("/allergies_patient/{patientId}")
+    public ResponseEntity<List<Allergy>> getAllergiesByPatientId(@PathVariable Integer patientId) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.getAuthorities().stream()
+                    .anyMatch(r -> r.getAuthority().equals("DOCTOR"))) {
+                List<Allergy> allergies = doctor_service.findByPatientId(patientId); // Use findByPatientId
+                return ResponseEntity.ok().body(allergies);
+            } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
         } catch (Exception e) {
