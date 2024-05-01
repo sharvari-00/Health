@@ -26,7 +26,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
-
+import java.time.LocalTime;
 import java.io.IOException;
 
 @Service
@@ -86,18 +86,51 @@ public class AuthenticationService {
                         request.getPassword()
                 )
         );
+
+        // Retrieve the user from the repository
         var user = repository.findByEmail(request.getEmail())
                 .orElseThrow();
+
+        Role userRole = user.getRole();
+        Role requestedRole = Role.valueOf(request.getRole()); // Convert string to Role enum
+
+        // Check if the user's role matches the requested role
+        if (!userRole.equals(requestedRole)) {
+            throw new UnauthorizedException("You're not qualified to perform this task.");
+        }
+        if (user.getRole() == Role.NURSE) {
+            var nurse = nurse_details_repo.findByEmail(request.getEmail())
+                    .orElseThrow(); // Assuming nurse is registered before authentication
+
+            // Get current time
+            LocalTime currentTime = LocalTime.now();
+
+            // Convert shift start and end times to LocalTime
+            LocalTime shiftStarts = nurse.getShift_starts().toLocalTime();
+            LocalTime shiftEnds = nurse.getShift_ends().toLocalTime();
+
+            // Check if current time is within nurse's shift duration
+            if (currentTime.isBefore(shiftStarts) || currentTime.isAfter(shiftEnds)) {
+                // Nurse is trying to login outside of shift duration
+                throw new RuntimeException("Nurse cannot login outside of shift hours");
+            }
+        }
+        // Generate JWT token and refresh token
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
+
+        // Revoke all existing user tokens
         revokeAllUserTokens(user);
+
+        // Save the user token
         saveUserToken(user, jwtToken);
+
+        // Return the authentication response
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
                 .build();
     }
-
     private void saveUserToken(Login user, String jwtToken) {
         var token = Token.builder()
                 .user(user)

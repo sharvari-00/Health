@@ -53,8 +53,19 @@ public class Nurse_Controller {
     }
     @PutMapping("/{nurseEmail}")
     public ResponseEntity<Nurse_details> updateNurseDetailsByAdmin(@PathVariable String nurseEmail, @RequestBody Nurse_details updatedNurseDetails) {
-       Nurse_details updatedNurseDetailsByAdmin = nurse_service.updateNurseDetailsByAdmin(nurseEmail,updatedNurseDetails);
-        return ResponseEntity.ok(updatedNurseDetailsByAdmin);
+        // Get the authentication object from the security context
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        // Check if the authentication object contains the admin role
+        if (authentication != null && authentication.getAuthorities().stream()
+                .anyMatch(r -> r.getAuthority().equals("ADMIN"))) {
+            // If the user is authenticated as an admin, proceed to update nurse details
+            Nurse_details updatedNurseDetailsByAdmin = nurse_service.updateNurseDetailsByAdmin(nurseEmail, updatedNurseDetails);
+            return ResponseEntity.ok(updatedNurseDetailsByAdmin);
+        } else {
+            // If the user is not authenticated as an admin, return unauthorized status
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
     @GetMapping("/onRoundPatients")
     public List<patientInfoDTO> getPatientsWithBedId() {

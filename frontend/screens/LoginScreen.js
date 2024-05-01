@@ -181,119 +181,70 @@ import { TextInput as PaperTextInput } from 'react-native-paper'; // Import Pape
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
-// const LoginScreen = ({ route, navigation }) => {
-//   const { role } = route.params;
-//   const [email, setEmail] = useState('');
-//   const [password, setPassword] = useState('');
-//   const [showPassword, setShowPassword] = useState(false);
-
-//   const handleLogin = async () => {
-//     try {
-//       const response = await fetch('http://localhost:9090/api/v1/auth/authenticate', {
-//         method: 'POST',
-//         headers: {
-//           'Content-Type': 'application/json',
-//         },
-//         body: JSON.stringify({ "email": email, "password": password }),
-//       });
-
-//       if (!response.ok) {
-//         throw new Error('Authentication failed');
-//       }
-
-//       const { access_token, refresh_token } = await response.json();
-
-//       // Store the access token securely (e.g., using AsyncStorage)
-//       await AsyncStorage.setItem('accessToken', access_token);
-//       await AsyncStorage.setItem('refreshToken', refresh_token);
-
-//       // Navigate to the appropriate screen based on user's role
-//       switch (role) {
-//         case 'pharmacist':
-//           navigation.navigate('PatientIdScreen', { accessToken: access_token, refreshToken: refresh_token });
-//           break;
-//         case 'nurse':
-//           navigation.navigate('NurseScreen', { accessToken: access_token, refreshToken: refresh_token });
-//           break;
-//         case 'doctor':
-//           navigation.navigate('DoctorScreen', {
-//             accessToken: access_token,
-//             refreshToken: refresh_token,
-//             email: email // Pass email as a parameter
-//           });
-//           break;
-
-//         case 'frontdesk':
-//           navigation.navigate('FrontDeskScreen', {});
-//           break;
-//         default:
-//           // Handle unrecognized roles
-//           break;
-//       }
-//     } catch (error) {
-//       console.error('Login error:', error.message);
-//       // Handle login error
-//     }
-//   };
 const LoginScreen = ({ route, navigation }) => {
   const { role } = route.params;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-
   const handleLogin = async () => {
     try {
+      const normalizedRole = role.toUpperCase() === 'FRONTDESK' ? 'ADMIN' : role.toUpperCase();
       const response = await fetch('http://localhost:9090/api/v1/auth/authenticate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ "email": email, "password": password }),
+        body: JSON.stringify({ "email": email, "password": password ,"role":normalizedRole}),
       });
 
       if (!response.ok) {
-        if (response.status === 403) {
-          setErrorMessage('Invalid credentials');
-        } else {
-          throw new Error('Authentication failed');
-        }
+      const errorResponse = await response.json();
+      if (response.status === 400) {
+        throw new Error("Nurse cannot login outside shift hours");
       } else {
-        const { access_token, refresh_token } = await response.json();
+        throw new Error("Invalid Credentials");
+      }
+    }
 
-        // Store the access token securely (e.g., using AsyncStorage)
-        await AsyncStorage.setItem('accessToken', access_token);
-        await AsyncStorage.setItem('refreshToken', refresh_token);
+      const { access_token, refresh_token } = await response.json();
 
-        // Navigate to the appropriate screen based on user's role
-        switch (role) {
-          case 'pharmacist':
-            navigation.navigate('PatientIdScreen', { accessToken: access_token, refreshToken: refresh_token });
-            break;
-          case 'nurse':
-            navigation.navigate('NurseScreen', { accessToken: access_token, refreshToken: refresh_token });
-            break;
+      // Store the access token securely (e.g., using AsyncStorage)
+       await AsyncStorage.setItem('accessToken', access_token);
+       await AsyncStorage.setItem('refreshToken', refresh_token);
+
+
+      // Navigate to the appropriate screen based on user's role
+      switch (role) {
+        case 'pharmacist':
+          navigation.navigate('PatientIdScreen', { accessToken: access_token, refreshToken: refresh_token });
+          break;
+        case 'nurse':
+          navigation.navigate('NurseScreen', { accessToken: access_token, refreshToken: refresh_token });
+          break;
           case 'doctor':
-            navigation.navigate('DoctorScreen', {
-              accessToken: access_token,
-              refreshToken: refresh_token,
+            navigation.navigate('DoctorScreen', { 
+              accessToken: access_token, 
+              refreshToken: refresh_token, 
               email: email // Pass email as a parameter
             });
             break;
 
-          case 'frontdesk':
-            navigation.navigate('FrontDeskScreen', {});
-            break;
-            default:
-            // Handle unrecognized roles
-            break;
-        }
+        case 'frontdesk':
+          navigation.navigate('FrontDeskScreen', { });
+          break;
+        default:
+          // Handle unrecognized roles
+          break;
       }
     } catch (error) {
-      console.error('Login error:', error.message);
-      // Handle login error
+      console.error('Error:', error);
+      const errorMessage = error.message === "Nurse cannot login outside shift hours" ? error.message : "Invalid Credentials";
+      console.error('Error Message:', errorMessage);
+      setErrorMessage("Please check your credentials or login in your shift timings"); // Set the error message state
     }
   };
+
   return (
     <View style={styles.container}>
       <View style={styles.background}>
@@ -340,7 +291,8 @@ const LoginScreen = ({ route, navigation }) => {
                 <TouchableOpacity style={styles.button} onPress={handleLogin}>
                   <Text style={styles.buttonText}>Login</Text>
                 </TouchableOpacity>
-                {errorMessage ? <Text>{errorMessage}</Text> : null}
+                {errorMessage ? <Text style={{ fontSize: 25, color: 'red' }}>{errorMessage}</Text> : null}
+
               </View>
             </View>
           </View>
