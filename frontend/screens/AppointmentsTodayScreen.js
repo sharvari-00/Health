@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, FlatList, StyleSheet, ImageBackground, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { useEmergencyContext } from './EmergencyContext';
+import { Alert } from 'react-native';
 
 // Existing imports
 
@@ -13,7 +14,7 @@ const AppointmentsTodayScreen = ({ route }) => {
   const [appointmentsData, setAppointmentsData] = useState([]);
   const [accessToken, setAccessToken] = useState('');
   const [disabledItems, setDisabledItems] = useState([]);
-  
+  const { emergency, resolveEmergency } = useEmergencyContext();
   
 
   useEffect(() => {
@@ -56,7 +57,12 @@ const AppointmentsTodayScreen = ({ route }) => {
     navigation.navigate('PatientFormScreen', { patientId,name,age,gender});
     setDisabledItems(prevDisabledItems => [...prevDisabledItems, index]);
   }
-
+  const handleEmergencyConfirmation = () => {
+    // Resolve the emergency when the doctor confirms
+    resolveEmergency();
+    // Additional logic if needed...
+    Alert.alert('Emergency Resolved', 'Thank you for your assistance!');
+  };
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -120,8 +126,22 @@ const AppointmentsTodayScreen = ({ route }) => {
             </ScrollView>
           </View>
           <View style={styles.lowerContainer}>
-            <Image style={styles.logo} source={require('../assets/logo2.png')} />
-          </View>
+  {/* Left container for logo */}
+  <View style={styles.logoContainer}>
+    <Image style={styles.logo} source={require('../assets/logo2.png')} />
+  </View>
+  {/* Right container for emergency notification */}
+  <View style={styles.emergencyNotificationContainer}>
+    {emergency && (
+      <View style={styles.emergencyNotification}>
+        <Text style={styles.emergencyNotificationText}>{emergency.message}</Text>
+        <TouchableOpacity style={styles.confirmButton} onPress={handleEmergencyConfirmation}>
+          <Text style={styles.confirmButtonText}>OK</Text>
+        </TouchableOpacity>
+      </View>
+    )}
+  </View>
+</View>
         </View>
       </ImageBackground>
     </View>
@@ -153,9 +173,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   lowerContainer: {
-    flex: 2,
-    justifyContent: 'flex-end',
-    alignItems: 'flex-start',
+    flex: 1,
+    flexDirection: 'row',
   },
   headerText: {
     fontSize: 50,
@@ -243,6 +262,38 @@ const styles = StyleSheet.create({
     height: 200,
     resizeMode: 'contain',
     //marginBottom: 20,
+  },
+  logoContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    paddingHorizontal: 20,
+  },
+  emergencyNotificationContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+    paddingHorizontal: 20,
+  },
+  emergencyNotification: {
+    backgroundColor: '#FF0000',
+    padding: 10,
+    borderRadius: 5,
+  },
+  emergencyNotificationText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    marginBottom: 5,
+  },
+  confirmButton: {
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 5,
+  },
+  confirmButtonText: {
+    color: '#FF0000',
+    fontSize: 16,
   },
 });
 

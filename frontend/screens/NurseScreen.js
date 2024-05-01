@@ -62,8 +62,8 @@ const NurseScreen = () => {
     }
   }, [accessToken]);
 
-  const handleViewDetails = (patientId) => {
-    navigation.navigate('PatientDetailsScreen', { patientId });
+  const handleViewDetails = (patientId, bedId) => {
+    navigation.navigate('PatientDetailsScreen', { patientId, bedId});
   };
 
   const currentDate = new Date().toDateString();
@@ -104,7 +104,7 @@ const NurseScreen = () => {
                 renderItem={({ item }) => (
                   <TouchableOpacity
                     style={styles.patientItem}
-                    onPress={() => handleViewDetails(item.id)}
+                    onPress={() => handleViewDetails(item.id,item.bedID)}
                   >
                     <Text style={styles.patientText}>Patient ID: {item.id}</Text>
                     <Text style={styles.patientText}>Bed No: {item.bedId}</Text>
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
   },
   layer: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent layer
+    backgroundColor: 'rgba(26, 95, 116, 0.13)', // Semi-transparent layer
   },
   upperContainer: {
     flex: 3, // 2 parts out of 10

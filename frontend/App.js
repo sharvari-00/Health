@@ -20,11 +20,14 @@ import PrescriptionScreen from './screens/PrescriptionScreen';
 import AddConsultationScreen from './screens/AddConsultationScreen';
 import ViewImageScreen from './screens/ViewImageScreen';
 import { PaperProvider } from 'react-native-paper';
+import { EmergencyProvider } from './screens/EmergencyContext';
 const Stack = createStackNavigator();
 
 const App = () => {
   return (
+    <EmergencyProvider>
     <PaperProvider>
+
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen name="Home" component={HomeScreen} />
@@ -48,6 +51,7 @@ const App = () => {
       </Stack.Navigator>
     </NavigationContainer>
     </PaperProvider>
+    </EmergencyProvider>
   );
 };
 

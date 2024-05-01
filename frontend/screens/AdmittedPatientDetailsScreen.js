@@ -25,7 +25,6 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
   const [visits, setVisits] = useState([]);
   const [selectedVisit, setSelectedVisit] = useState(null);
 
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -40,31 +39,6 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
             'Content-Type': 'application/json',
           },
         });
-// <<<<<<< HEAD
-//         if (patientResponse.ok) {
-//           const patientData = await patientResponse.json();
-//           setPatientDetails(patientData);
-//         } else {
-//           console.error('Failed to fetch patient details');
-//         }
-
-//         // Fetch symptoms
-//         const symptomsResponse = await fetch(`http://localhost:9090/api/v1/doctor/symptoms_patient/${patientId}`, {
-//           method: 'GET',
-//           headers: {
-//             Authorization: `Bearer ${token}`,
-//             'Content-Type': 'application/json',
-//           },
-//         });
-//         if (symptomsResponse.ok) {
-//           const symptomsData = await symptomsResponse.json();
-//           setSymptoms(symptomsData);
-//         } else {
-//           console.error('Failed to fetch symptoms');
-//         }
-
-//         // Fetch diagnosis
-//         const diagnosisResponse = await fetch(`http://localhost:9090/api/v1/doctor/diagnosis_patient/${patientId}`, {
 
         const patientData = await patientResponse.json();
         setPatientDetails(patientData);
@@ -78,36 +52,6 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
             'Content-Type': 'application/json',
           },
         });
-// <<<<<<< HEAD
-//         if (diagnosisResponse.ok) {
-//           const diagnosisData = await diagnosisResponse.json();
-//           setDiagnosis(diagnosisData);
-//         } else {
-//           console.error('Failed to fetch diagnosis');
-//         }
-
-//         // Fetch prescription
-//         const prescriptionResponse = await fetch(`http://localhost:9090/api/v1/doctor/prescriptions_patient/${patientId}`, {
-//           method: 'GET',
-//           headers: {
-//             Authorization: `Bearer ${token}`,
-//             'Content-Type': 'application/json',
-//           },
-//         });
-//         if (prescriptionResponse.ok) {
-//           const prescriptionData = await prescriptionResponse.json();
-//           setPrescription(prescriptionData);
-//         } else {
-//           console.error('Failed to fetch prescription');
-//         }
-//       } catch (error) {
-//         console.error('Error fetching data:', error);
-//       }
-//     };
-
-//     fetchData();
-//   }, []);
-
         const visitsData = await visitsResponse.json();
         setVisits(visitsData);
       } catch (error) {

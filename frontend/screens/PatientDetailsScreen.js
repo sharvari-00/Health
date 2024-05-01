@@ -3,22 +3,22 @@ import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Image, Modal
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 import { useNavigation } from '@react-navigation/native';
-
+import { useEmergencyContext } from './EmergencyContext';
 
 const PatientDetailsScreen = ({ route }) => {
-  const [patientId, setPatientId] = useState(1);
-
+  const { patientId,bedId } = route.params;
   const navigation = useNavigation();
   const [visits, setVisits] = useState([]);
   const [selectedVisit, setSelectedVisit] = useState(null);
   const [patientDetails, setPatientDetails] = useState({});
   const [fetchedImages, setFetchedImages] = useState([]);
+  const { emergency, triggerEmergency, resolveEmergency } = useEmergencyContext(); // Access the emergency context
   const [image, setImage] = useState(null);
   useEffect(() => {
     console.log('image state updated:', image);
   }, [image]); 
 
-
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -125,6 +125,18 @@ const PatientDetailsScreen = ({ route }) => {
   
   const handleToggleVisit = (visitIndex) => {
     setSelectedVisit(selectedVisit === visitIndex ? null : visitIndex);
+  };
+  const handleEmergency = () => {
+    // Include patient ID, bed ID, and message in the emergency notification
+    const emergencyMessage = `Hurry! Need your assistance. Patient ID: ${patientId}, Bed ID: ${bedId};`;
+    // Trigger emergency with patientId, bedId, and message
+    triggerEmergency(patientId, bedId, emergencyMessage);
+    // Additional logic if needed...
+  };
+  const handleDoctorAcknowledge = () => {
+    // Resolve the emergency
+    resolveEmergency();
+    // Additional logic if needed...
   };
 
   const renderVisitItems = (visitData) => {
@@ -252,10 +264,31 @@ const PatientDetailsScreen = ({ route }) => {
             </View>
           </View>
           <View style={styles.bottomContainer}>
-            <View style={styles.logoContainer}>
-              <Image style={styles.logo} source={require('../assets/logo2.png')} />
-            </View>
-          </View>
+  <View style={styles.logoContainer}>
+    <Image style={styles.logo} source={require('../assets/logo2.png')} />
+  </View>
+  <View style={styles.emergencyContainer}>
+    <TouchableOpacity
+      style={[styles.emergencyButton, { backgroundColor: emergency ? 'yellow' : 'red' }]}
+      onPress={emergency ? handleDoctorAcknowledge : handleEmergency}
+    >
+      <Text style={styles.emergencyButtonText}>
+        {emergency ? 'Informing Doctor' : 'Emergency'}
+      </Text>
+    </TouchableOpacity>
+    {/* Render emergency details if emergency is active */}
+    {emergency && (
+      <View style={styles.emergencyDetails}>
+        <Text style={styles.emergencyDetailsText}>
+          Patient ID: {emergency.patientId}
+        </Text>
+        <Text style={styles.emergencyDetailsText}>
+          Bed ID: {emergency.bedId}
+        </Text>
+      </View>
+    )}
+  </View>
+</View>
       
         </View>
       </ImageBackground>
@@ -445,6 +478,34 @@ const styles = StyleSheet.create({
     height: 200, // Adjust the height as needed
     marginBottom: 10,
     borderRadius: 10, // Optional: Add border radius for rounded corners
+  },
+  emergencyButton: {
+    alignSelf: 'flex-end',
+  marginBottom: 20,
+  marginRight: 20,
+    backgroundColor: 'red',
+    padding: 10,
+    borderRadius: 5,
+    
+  },
+  emergencyButtonText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+  },
+  emergencyDetails: {
+    position: 'absolute',
+    bottom: 80,
+    right: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    padding: 10,
+    borderRadius: 5,
+  },
+  emergencyDetailsText: {
+    color: '#000000',
+  },
+  emergencyContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
   },
 });
 
