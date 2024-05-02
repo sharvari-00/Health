@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ImageBackground, Image, TextInput } from 'react-native';
 import { Calendar } from 'react-native-calendars';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import { useNavigation } from '@react-navigation/native';
 
 const FrontDeskScreen = ({ navigation }) => {
   const [showInput, setShowInput] = useState(false); // State to control the visibility of input and buttons
   const [patientId, setPatientId] = useState(''); // State to store the entered patient ID
   const [errorMessage, setErrorMessage] = useState(''); // State to store error message
-
+  const [accessToken, setAccessToken] = useState('');
+  
 
   const handleAddPatient = () => {
     // Implement logic for adding a patient
@@ -34,19 +37,23 @@ const FrontDeskScreen = ({ navigation }) => {
     }
   };
   
-  const checkIfPatientExists = async (patientId) => {
+  const checkIfPatientExists = async () => {
     try {
-      const response = await fetch(`your_backend_api_url/exists/${patientId}`);
+      const token = await AsyncStorage.getItem('accessToken');
+      const response = await fetch(`http://localhost:9090/api/v1/patients/exists/${patientId}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      
       if (response.ok) {
-        const patientData = await response.json();
-        // Check if patientData is null
-        return patientData !== null;
-      } else if (response.status === 403) {
-        // Patient does not exist, forbidden
-        return false;
+        const exists = await response.json();
+        return exists;
       } else {
-        // Handle other error cases
         console.error('Error:', response.status);
+        // You might handle different error cases here
         return false;
       }
     } catch (error) {
