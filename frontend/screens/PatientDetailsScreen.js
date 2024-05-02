@@ -19,7 +19,8 @@ const PatientDetailsScreen = ({ route }) => {
   const [image, setImage] = useState(null);
   const [temperature, setTemperature] = useState(98.6); // State for temperature
   const [bloodPressure, setBloodPressure] = useState({ systolic: 120, diastolic: 80 }); // State for blood pressure
- 
+  const [saveButtonClicked, setSaveButtonClicked] = useState(false);
+
   useEffect(() => {
     console.log('image state updated:', image);
   }, [image]); 
@@ -83,6 +84,7 @@ const PatientDetailsScreen = ({ route }) => {
         setImage(selectedAsset.uri);
         console.log('Selected image URI:', selectedAsset.uri);
         console.log('select',image);
+        setSaveButtonClicked(false);
       }
     } catch (error) {
       console.error('Error picking image:', error);
@@ -123,10 +125,12 @@ const PatientDetailsScreen = ({ route }) => {
   const handleSaveImage = async () => {
     if (image) {
       await saveImage(image, patientId);
+      setSaveButtonClicked(true); // Button clicked, set saveButtonClicked to true
     } else {
       alert('Please select an image first.');
     }
   };
+  
   
   
   const handleToggleVisit = (visitIndex) => {
@@ -265,7 +269,7 @@ const PatientDetailsScreen = ({ route }) => {
 
  
 <TouchableOpacity style={styles.uploadButton} onPress={pickImage}>
-      <Text style={styles.buttonText}>{image ? 'Change Image' : 'Upload Image'}</Text>
+      <Text style={styles.buttonText}>{image ? 'Upload more' : 'Upload Image'}</Text>
     </TouchableOpacity>
     {image && (
       <View style={{ alignItems: 'center' }}>
@@ -274,9 +278,14 @@ const PatientDetailsScreen = ({ route }) => {
     )}
     {image && (
   <View style={{ alignItems: 'center' }}>
-    <TouchableOpacity style={styles.saveButton} onPress={handleSaveImage}>
-      <Text style={styles.buttonText}>Save Image</Text>
-    </TouchableOpacity>
+    <TouchableOpacity 
+  style={[styles.saveButton, { opacity: saveButtonClicked ? 0.5 : 1 }]} 
+  onPress={handleSaveImage} 
+  disabled={saveButtonClicked} // Disable the button if saveButtonClicked is true
+>
+  <Text style={styles.buttonText}>Save Image</Text>
+</TouchableOpacity>
+
   </View>
 )}
             </View>

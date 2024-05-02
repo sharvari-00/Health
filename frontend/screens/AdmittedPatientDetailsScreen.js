@@ -20,7 +20,6 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
   const [dischargeProcessing, setDischargeProcessing] = useState(false);
   const [temperature, setTemperature] = useState(98.6); // State for temperature
   const [bloodPressure, setBloodPressure] = useState({ systolic: 120, diastolic: 80 }); // State for blood pressure
- 
 
   const [visits, setVisits] = useState([]);
   const [selectedVisit, setSelectedVisit] = useState(null);
@@ -124,15 +123,14 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
         },
       });
   
-      if (response.ok) {
-        setDischargeProcessing(false);
-      } else {
+      if (!response.ok) {
         console.error('Failed to discharge patient:', response.status);
       }
     } catch (error) {
       console.error('Error discharging patient:', error);
     }
   };
+  
 
   return (
     <View style={styles.container}>
@@ -200,14 +198,15 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
                 <Text style={styles.buttonText}>Add Consultation</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.button, styles.dischargeButton]}
-                onPress={handleDischarge}
-                disabled={dischargeProcessing}
-              >
-                <Text style={styles.buttonText}>
-                  {dischargeProcessing ? 'Discharge in Processing' : 'Discharge'}
-                </Text>
-              </TouchableOpacity>
+  style={[styles.button, styles.dischargeButton]}
+  onPress={handleDischarge}
+  disabled={dischargeProcessing}
+>
+  <Text style={styles.buttonText}>
+    {dischargeProcessing ? 'Discharge in Processing' : 'Discharge'}
+  </Text>
+</TouchableOpacity>
+
               <TouchableOpacity
           style={[styles.button, styles.viewReportButton]}
           onPress={handleViewTestReport}

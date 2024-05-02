@@ -221,7 +221,8 @@ const AddPatientScreen = ({ navigation }) => {
                 <Dialog visible={isVisible} onDismiss={hideDialog}>
                   <Dialog.Title>Consent Confirmation</Dialog.Title>
                   <Dialog.Content>
-                    <Text>Ensure that the guardian of the minor patient provides consent. By sharing consent, you allow access to private details.</Text>
+                    <Text style={{color: 'red', fontSize:18}}>The patient is a minor, consent must be obtained from their guardian.</Text>
+                    <Text style={{fontSize:18}}>By providing consent, you authorize the sharing of patient details and further consultation information with third-party entities and government agencies. If you wish to withdraw your consent at a later time, you have the option to do so. Additionally, should you desire to remove your personal information, you may request its deletion. However, it's important to note that your health information will still be retained. If you prefer not to have any of your details shared, you can opt for a manual process instead.</Text>
                   </Dialog.Content>
                   <Dialog.Actions>
                     <Button onPress={hideDialog}>OK</Button>
@@ -231,9 +232,10 @@ const AddPatientScreen = ({ navigation }) => {
               {/* Adult dialog */}
               <Portal>
                 <Dialog visible={isAdultDialogVisible} onDismiss={hideAdultDialog}>
-                  <Dialog.Title>Adult Confirmation</Dialog.Title>
+                  <Dialog.Title>Consent Confirmation</Dialog.Title>
                   <Dialog.Content>
-                    <Text>By sharing consent, you allow access to private details.</Text>
+                  <Text style={{fontSize:18}}>By providing consent, you authorize the sharing of patient details and further consultation information with third-party entities and government agencies. If you wish to withdraw your consent at a later time, you have the option to do so. Additionally, should you desire to remove your personal information, you may request its deletion. However, it's important to note that your health information will still be retained. If you prefer not to have any of your details shared, you can opt for a manual process instead.</Text>
+                 
                   </Dialog.Content>
                   <Dialog.Actions>
                     <Button onPress={hideAdultDialog}>OK</Button>

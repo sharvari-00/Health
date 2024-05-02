@@ -6,7 +6,8 @@ import { useNavigation } from '@react-navigation/native';
 const FrontDeskScreen = ({ navigation }) => {
   const [showInput, setShowInput] = useState(false); // State to control the visibility of input and buttons
   const [patientId, setPatientId] = useState(''); // State to store the entered patient ID
-  
+  const [errorMessage, setErrorMessage] = useState(''); // State to store error message
+
 
   const handleAddPatient = () => {
     // Implement logic for adding a patient
@@ -18,19 +19,50 @@ const FrontDeskScreen = ({ navigation }) => {
     setShowInput(true);
   };
 
-  const handleNext = () => {
-    // Navigate to ViewEditPatientDetailsScreen with patientId
-    navigation.navigate('ViewEditPatientDetailsScreen', { patientId });
-    // Reset input field and hide input and buttons
-    setPatientId('');
-    setShowInput(false);
+  const handleNext = async () => {
+    // Check if patient ID exists, if not, display error message
+    const patientExists = await checkIfPatientExists(patientId);
+    if (patientExists) {
+      // Navigate to ViewEditPatientDetailsScreen with patientId
+      navigation.navigate('ViewEditPatientDetailsScreen', { patientId });
+      // Reset input field and hide input and buttons
+      setPatientId('');
+      setShowInput(false);
+      setErrorMessage('');
+    } else {
+      setErrorMessage('Patient not found');
+    }
   };
-
+  
+  const checkIfPatientExists = async (patientId) => {
+    try {
+      const response = await fetch(`your_backend_api_url/exists/${patientId}`);
+      if (response.ok) {
+        const patientData = await response.json();
+        // Check if patientData is null
+        return patientData !== null;
+      } else if (response.status === 403) {
+        // Patient does not exist, forbidden
+        return false;
+      } else {
+        // Handle other error cases
+        console.error('Error:', response.status);
+        return false;
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      return false;
+    }
+  };
+  
   const handleCancel = () => {
     // Reset input field and hide input and buttons
     setPatientId('');
     setShowInput(false);
   };
+
+  
+  
 
   return (
     <View style={styles.container}>
@@ -87,13 +119,15 @@ const FrontDeskScreen = ({ navigation }) => {
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
                       <Text style={styles.buttonText}>Cancel</Text>
-                    </TouchableOpacity>
+                      </TouchableOpacity>
                   </View>
+                  {errorMessage ? <Text style={styles.errorMessage}>{errorMessage}</Text> : null}
                 </View>
               ) : (
                 <TouchableOpacity style={styles.button} onPress={handleViewEditPatients}>
                   <Text style={styles.buttonText}>View/Edit Patients</Text>
                 </TouchableOpacity>
+                
               )}
             </View>
           </View>
@@ -163,6 +197,11 @@ const styles = StyleSheet.create({
     height: 2,
     backgroundColor: '#FFFFFF',
     marginVertical: 20,
+  },
+  errorMessage: {
+    fontSize: 20,
+    color: 'red',
+    marginTop: 10,
   },
   buttonContainer: {
     flexDirection: 'row',
