@@ -146,7 +146,7 @@ const AdmittedPatientDetailsScreen = ({ route }) => {
             <View style={styles.divider} />
             <View style={styles.buttonContainer}>
               <TouchableOpacity style={styles.backButton}>
-                <Text style={styles.buttonText}>Back</Text>
+                
               </TouchableOpacity>
               <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Home')}>
                 <Text style={styles.buttonText}>Logout</Text>

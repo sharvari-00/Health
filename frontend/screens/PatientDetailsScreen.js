@@ -214,7 +214,7 @@ const PatientDetailsScreen = ({ route }) => {
                 <Text style={styles.buttonText}>Back</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.logoutButton}>
-                <Text style={styles.buttonText}>Logout</Text>
+               
               </TouchableOpacity>
             </View>
           </View>
@@ -321,7 +321,7 @@ const PatientDetailsScreen = ({ route }) => {
   onPress={() => emergency ? handleDoctorAcknowledge() : handleEmergency(bedId)}
 >
   <Text style={styles.emergencyButtonText}>
-    {emergency ? 'Informing Doctor' : 'Emergency'}
+    {emergency ? 'Informing Doctor' : 'Click in case of Emergency'}
   </Text>
 </TouchableOpacity>
 
@@ -584,6 +584,7 @@ const styles = StyleSheet.create({
   emergencyButtonText: {
     color: '#000000',
     fontWeight: 'bold',
+    fontSize:22,
   },
   emergencyDetails: {
     position: 'absolute',

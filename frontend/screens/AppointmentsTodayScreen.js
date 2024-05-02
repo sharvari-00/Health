@@ -76,7 +76,7 @@ const AppointmentsTodayScreen = ({ route }) => {
             <View style={styles.divider} />
             <View style={styles.buttonContainer}>
               <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('DoctorScreen')}>
-                <Text style={styles.buttonText}>Back</Text>
+                
               </TouchableOpacity>
               <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Home')}>
                 <Text style={styles.buttonText}>Logout</Text>
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
   },
   emergencyNotificationText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 20,
     marginBottom: 5,
   },
   confirmButton: {

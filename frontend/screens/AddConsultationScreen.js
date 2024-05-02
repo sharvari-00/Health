@@ -338,6 +338,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  addButton: {
+    backgroundColor: '#326974',
+    padding: 10,
+    marginVertical: 10,
+    alignItems: 'center',
+    borderRadius: 5,
+    width: '20%',
+  },
   heading: {
     fontSize: 50,
     fontWeight: 'bold',
